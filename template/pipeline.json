@@ -1,0 +1,47 @@
+{
+  "project": {
+    "name": "{{PROJECT_NAME}}",
+    "description": "{{PROJECT_DESCRIPTION}}"
+  },
+  "stack": {
+    "frontend": "{{STACK_FRONTEND}}",
+    "database": "{{STACK_DATABASE}}",
+    "auth": "{{STACK_AUTH}}",
+    "ai": "{{STACK_AI}}",
+    "deploy": "{{STACK_DEPLOY}}",
+    "storage": "{{STACK_STORAGE}}",
+    "e2e": "{{STACK_E2E}}",
+    "analytics": "{{STACK_ANALYTICS}}"
+  },
+  "ci": {
+    "nodeVersion": "{{NODE_VERSION}}",
+    "buildCommand": "{{BUILD_COMMAND}}",
+    "testCommand": "{{TEST_COMMAND}}",
+    "lintCommand": "{{LINT_COMMAND}}",
+    "typecheckCommand": "{{TYPECHECK_COMMAND}}",
+    "packageManager": "{{PACKAGE_MANAGER}}"
+  },
+  "database": {
+    "type": "{{DATABASE_TYPE}}",
+    "projectId": "{{DATABASE_PROJECT_ID}}",
+    "region": "{{DATABASE_REGION}}",
+    "tables": [],
+    "userRoles": [],
+    "rlsEnabled": {{RLS_ENABLED}}
+  },
+  "github": {
+    "owner": "{{GITHUB_OWNER}}",
+    "repo": "{{GITHUB_REPO}}"
+  },
+  "deploy": {
+    "platform": "{{DEPLOY_PLATFORM}}",
+    "projectId": "{{DEPLOY_PROJECT_ID}}",
+    "previewUrls": {{PREVIEW_URLS_ENABLED}}
+  },
+  "monitoring": {
+    "platform": "{{MONITORING_PLATFORM}}",
+    "org": "{{MONITORING_ORG}}",
+    "project": "{{MONITORING_PROJECT}}"
+  },
+  "version": "1.0.0"
+}

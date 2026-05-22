@@ -1,0 +1,115 @@
+# CI Pipeline — Industry-standard checks for every PR
+# Runs: lint → type-check → test → build
+# Gates: ALL must pass before merge
+# Concurrency: auto-cancel previous runs on same branch (saves CI minutes)
+
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
+
+# Cancel in-progress runs for the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "{{NODE_VERSION}}"
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "{{PACKAGE_MANAGER}}"
+
+      - name: Install dependencies
+        run: {{PACKAGE_MANAGER}} ci
+
+      - name: Lint
+        run: {{LINT_COMMAND}}
+
+  typecheck:
+    name: TypeScript Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "{{PACKAGE_MANAGER}}"
+
+      - name: Install dependencies
+        run: {{PACKAGE_MANAGER}} ci
+
+      - name: TypeScript type check
+        run: {{TYPECHECK_COMMAND}}
+
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "{{PACKAGE_MANAGER}}"
+
+      - name: Install dependencies
+        run: {{PACKAGE_MANAGER}} ci
+
+      - name: Run tests
+        run: {{TEST_COMMAND}}
+
+      {% if COVERAGE_ENABLED %}
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 7
+      {% endif %}
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [lint, typecheck, test]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "{{PACKAGE_MANAGER}}"
+
+      - name: Install dependencies
+        run: {{PACKAGE_MANAGER}} ci
+
+      # NOTE: Add any required env vars as GitHub repository secrets:
+      # Settings → Secrets and variables → Actions → Repository secrets
+      - name: Build
+        run: {{BUILD_COMMAND}}
+        env:
+          {% for env_var in BUILD_ENV_VARS %}
+          {{env_var.name}}: ${{ secrets.{{env_var.secret}} }}
+          {% endfor %}

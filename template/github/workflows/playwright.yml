@@ -1,0 +1,70 @@
+# Playwright E2E — Runs against preview deployment on every PR
+# Tests against the real preview deployment, not a local server
+# This catches platform-specific issues (edge functions, serverless, caching)
+
+name: Playwright E2E
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "{{NODE_VERSION}}"
+
+jobs:
+  wait-for-preview:
+    name: Wait for Preview Deploy
+    if: github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      preview_url: ${{ steps.wait.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Wait for preview deployment
+        id: wait
+        uses: jakub-g/await-vercel-preview@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          vercel_project_id: ${{ secrets.VERCEL_PROJECT_ID }}
+          max_timeout_seconds: 300
+
+  e2e:
+    name: Playwright E2E Tests
+    if: github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [wait-for-preview]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "{{PACKAGE_MANAGER}}"
+
+      - name: Install dependencies
+        run: {{PACKAGE_MANAGER}} ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright tests
+        run: npx playwright test --reporter=html
+        env:
+          PLAYWRIGHT_TEST_BASE_URL: ${{ needs.wait-for-preview.outputs.preview_url }}
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

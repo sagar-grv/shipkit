@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Pre-commit hook — catches issues before they reach CI
+# Runs: lint-staged (ESLint fix + Prettier format on staged files)
+
+npx lint-staged

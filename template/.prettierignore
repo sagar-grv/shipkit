@@ -1,0 +1,2 @@
+# Template files have {{PLACEHOLDER}} syntax — not valid JSON/TS
+pipeline/template/
