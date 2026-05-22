@@ -7,7 +7,7 @@
     - GitHub Actions CI/CD (lint, typecheck, test, build)
     - CodeQL security scanning
     - Playwright E2E tests on preview deployments
-    - OpenCode AI agents (planner, security reviewer, monitor)
+    - AI agent prompts (planner, security reviewer, monitor, builder)
     - Pre-commit hooks (Husky + lint-staged)
     - Project docs (AGENTS.md, ROADMAP.md, BUGS.md, LAST_SESSION.md)
     - pipeline.json (source of truth for agents and tooling)
@@ -180,7 +180,7 @@ ${C.Bold}${C.Cyan}
     - GitHub Actions CI/CD (lint, typecheck, test, build)
     - CodeQL security scanning
     - Playwright E2E tests
-    - OpenCode AI agents (planner, security, monitor)
+    - AI agent prompts (planner, security, monitor, builder)
     - Husky pre-commit hooks
     - Project management docs
 ${C.Reset}
@@ -457,10 +457,10 @@ $Files = @(
   @{ src = "github/workflows/ci.yml";          dst = ".github/workflows/ci.yml" }
   @{ src = "github/workflows/codeql.yml";      dst = ".github/workflows/codeql.yml" }
   @{ src = "github/workflows/playwright.yml";  dst = ".github/workflows/playwright.yml" }
-  @{ src = "agents/co-developer.md";           dst = ".opencode/agents/co-developer.md" }
-  @{ src = "agents/planner.md";                dst = ".opencode/agents/planner.md" }
-  @{ src = "agents/security-reviewer.md";      dst = ".opencode/agents/security-reviewer.md" }
-  @{ src = "agents/monitor.md";                dst = ".opencode/agents/monitor.md" }
+  @{ src = "agents/co-developer.md";           dst = "agents/co-developer.md" }
+  @{ src = "agents/planner.md";                dst = "agents/planner.md" }
+  @{ src = "agents/security-reviewer.md";      dst = "agents/security-reviewer.md" }
+  @{ src = "agents/monitor.md";                dst = "agents/monitor.md" }
   @{ src = "husky/pre-commit";                 dst = ".husky/pre-commit" }
   @{ src = "docs/AGENTS.md";                   dst = "AGENTS.md" }
   @{ src = "docs/ROADMAP.md";                  dst = "ROADMAP.md" }
@@ -612,7 +612,7 @@ ${C.Cyan}Project Structure:${C.Reset}
   |       |-- ci.yml           lint, typecheck, test, build
   |       |-- codeql.yml       Security scanning
   |       |-- playwright.yml   E2E on preview
-  |-- .opencode/agents/
+  |-- agents/
   |   |-- planner.md           PM + Eng Lead
   |   |-- security-reviewer.md Security Engineer
   |   |-- monitor.md           SRE + Incident Commander

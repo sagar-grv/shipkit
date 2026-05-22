@@ -4,8 +4,6 @@
 
 ### 🚀 Initial Release
 
-ShipKit is born from real-world usage building [HealthVault](https://github.com/sagar-grv/healthvault) — a production medical report platform built by a solo developer.
-
 **What's included:**
 
 #### AI Agent Team

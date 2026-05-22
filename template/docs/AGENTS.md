@@ -38,10 +38,10 @@ Never apply band-aid fixes. If you don't understand the cause, say so.
 ```
 User Instruction → Planner Agent → Builder Agent → Security Agent → CI/CD → Deploy → Monitor
      ↑                 ↑                ↑               ↑            ↑         ↑        ↑
-  You say          .opencode/    .opencode/         .opencode/    GitHub     Deploy   Monitor
-  "plan: <x>"     agents/       agents/co-          agents/       Actions    platform Agent
-                  planner.md    developer.md        security-      (auto)    (auto)   (every
-                                                    reviewer.md                      session)
+  You say          agents/        agents/co-         agents/       GitHub     Deploy   Monitor
+  "plan: <x>"     planner.md     developer.md       security-     Actions    platform Agent
+                                                    reviewer.md   (auto)    (auto)   (every
+                                                                                      session)
 ```
 
 ### Stage 1 — Planning
@@ -87,12 +87,12 @@ Trigger: Every session start + on-demand (`check errors`)
 
 | Real Team Role | AI Agent | File | Responsibility |
 |---|---|---|---|
-| Product Manager + Eng Lead | Planner | `.opencode/agents/planner.md` | Requirements → plan, architecture, scope |
-| Developer | Builder | `.opencode/agents/co-developer.md` | Write code, local testing |
+| Product Manager + Eng Lead | Planner | `agents/planner.md` | Requirements → plan, architecture, scope |
+| Developer | Builder | `agents/co-developer.md` | Write code, local testing |
 | QA Engineer | Tester | Part of co-developer.md | Write tests, verify coverage |
-| Security Engineer | Security Reviewer | `.opencode/agents/security-reviewer.md` | Pre-PR security review |
+| Security Engineer | Security Reviewer | `agents/security-reviewer.md` | Pre-PR security review |
 | DevOps Engineer | CI/CD (Auto) | `.github/workflows/*.yml` | Build, test, deploy automation |
-| SRE + Incident Commander | Monitor | `.opencode/agents/monitor.md` | Error tracking, RCA, fix proposals |
+| SRE + Incident Commander | Monitor | `agents/monitor.md` | Error tracking, RCA, fix proposals |
 
 ## 6. Session Continuity
 
