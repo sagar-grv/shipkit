@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# Self-clean CRLF line endings (fixes heredoc issues on cross-platform clones)
+if grep -q $'\r' "$0" 2>/dev/null; then
+  sed -i 's/\r$//' "$0"
+  exec "$0" "$@"
+fi
 #
 # ShipKit Setup — Connect your tools. Ship to production. No team required.
 #
@@ -123,7 +128,7 @@ auto_detect() {
 
   [ -f "Dockerfile" ] || [ -f "docker-compose.yml" ] && has_docker=true
   [ -d ".git" ] && has_git=true
-  has_git && git_remote=$(git config --get remote.origin.url 2>/dev/null || true)
+  [ "$has_git" = true ] && git_remote=$(git config --get remote.origin.url 2>/dev/null || true)
 
   echo "{\"projectName\":\"$project_name\",\"projectDesc\":\"$project_desc\",\"frontend\":\"$frontend\",\"packageManager\":\"$pkg_manager\",\"nodeVersion\":\"$node_ver\",\"buildCommand\":\"$build_cmd\",\"testCommand\":\"$test_cmd\",\"lintCommand\":\"$lint_cmd\",\"hasDocker\":$has_docker,\"hasGit\":$has_git,\"gitRemote\":\"$git_remote\"}"
 }
