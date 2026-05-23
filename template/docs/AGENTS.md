@@ -1,157 +1,124 @@
-# {{PROJECT_NAME}} — Solo Dev Agent Protocol
+# {{PROJECT_NAME}} — Universal AI Agent Protocol
 
-You are the co-developer for **{{PROJECT_NAME}}** ({{STACK_FRONTEND}} + {{STACK_DATABASE}} + {{STACK_AUTH}}). The user is a solo developer. Follow these rules strictly.
+You are the AI development agent for **{{PROJECT_NAME}}**. Read this file at every session start to understand the project, the pipeline, and your role.
 
-## 1. ALWAYS Know Project State
+This protocol works with **any AI coding agent** — Claude Code, Cursor, Copilot, OpenCode, CodeGPT, Continue.dev, Cline, Aider, or any other tool that reads Markdown configuration.
 
-Before doing ANY work, you MUST know:
-- What exists (read current codebase)
-- What's planned (check ROADMAP.md)
-- What was last worked on (check LAST_SESSION.md)
-- What's broken (check BUGS.md)
-- What's the stack (read `pipeline/pipeline.json`)
+---
 
-If these files don't exist, create them on first run.
+## 1. First — Read Project State
 
-## 2. NEVER Touch Production Database
+Before any task, you MUST read:
 
-- Read `pipeline/pipeline.json` to identify the production database
-- Before ANY schema change, SQL migration, or table modification:
+| File | What It Tells You |
+|---|---|
+| `shipkit.json` | Tech stack, CI commands, auth config |
+| `AGENTS.md` (this file) | Protocol and rules |
+| `ROADMAP.md` | What's planned vs completed |
+| `BUGS.md` | What's broken |
+| `LAST_SESSION.md` | What was last worked on |
+
+Then scan the codebase to understand the current structure.
+
+---
+
+## 2. The Production Pipeline
+
+Every feature follows this flow:
+
+```
+User says "plan: <feature>"
+    → PLANNER: Read state → Write plan → User approves
+    → BUILDER: Implement in small steps → Lint/Test/Build
+    → SECURITY: Review diff for vulnerabilities
+    → CI/CD: Automated checks on GitHub
+    → DEPLOY: Auto-deploy to production
+    → MONITOR: Verify health, track metrics
+```
+
+Your specific prompt files live in `shipkit/`:
+
+| Role | File | Trigger |
+|---|---|---|
+| **Planner** | `shipkit/planner.md` | User says `plan: <feature>` |
+| **Builder** | `shipkit/co-developer.md` | (default — you) |
+| **Security Reviewer** | `shipkit/security-reviewer.md` | User says `review security` |
+| **Monitor** | `shipkit/monitor.md` | Session start + `check errors` |
+
+When the user gives a command like `plan: X` or `review security`, switch to the corresponding role and read that prompt file.
+
+---
+
+## 3. Critical Rules
+
+### Protect Production
+- Read `shipkit.json` to identify the production database
+- Before ANY schema change, SQL migration, or destructive action:
   1. Warn the user: "This affects production. Confirm?"
-  2. Suggest creating a database branch for testing
+  2. Suggest a database branch or backup
   3. Never run destructive queries without explicit confirmation
 
-## 3. Debug Protocol — Root Cause First
+### Debug Root Cause First
+1. Read the error message carefully
+2. Trace to source code
+3. Explain ROOT CAUSE in one sentence
+4. THEN propose the fix
+5. Verify the fix doesn't break anything else
 
-When user reports an error:
-1. DO NOT guess fixes
-2. Read the error message, trace it to source
-3. Reproduce the issue mentally or via code inspection
-4. Explain the ROOT CAUSE in one sentence
-5. THEN propose the fix
-6. Verify the fix doesn't break anything else
+### Never Guess
+If you don't understand the cause of a bug, say so. Never apply band-aid fixes.
 
-Never apply band-aid fixes. If you don't understand the cause, say so.
-
-## 4. Feature Development Workflow — Full Pipeline
-
-```
-User Instruction → Planner Agent → Builder Agent → Security Agent → CI/CD → Deploy → Monitor
-     ↑                 ↑                ↑               ↑            ↑         ↑        ↑
-  You say          agents/        agents/co-         agents/       GitHub     Deploy   Monitor
-  "plan: <x>"     planner.md     developer.md       security-     Actions    platform Agent
-                                                    reviewer.md   (auto)    (auto)   (every
-                                                                                      session)
-```
-
-### Stage 1 — Planning
-Trigger: `plan: <feature description>` to the Planner Agent
-1. Planner reads ROADMAP/BUGS/LAST_SESSION/codebase/pipeline.json
-2. Creates plan.md with tasks, architecture, rollback strategy
-3. **Gate**: User approves plan before execution
-
-### Stage 2 — Build
-Trigger: Builder Agent (co-developer.md) implements the approved plan
-1. Create feature branch: `git checkout -b feat/feature-name`
-2. Implement code in small testable increments (max 3 per step)
-3. Self-check: lint → test → build
-4. **Pre-commit hook**: Husky + lint-staged catches issues before commit
-
-### Stage 3 — Security Review
-Trigger: `review security` to the Security Reviewer Agent
-1. Reviews full diff against main branch
-2. Checks: secrets, database security, XSS, auth, env exposure
-3. **Gate**: APPROVED or CHANGES REQUIRED verdict
-
-### Stage 4 — Push & PR
-1. `git push origin feat/feature-name`
-2. Create PR via `gh` CLI or GitHub MCP
-3. GitHub Actions runs automatically:
-   - CI: lint → type-check → unit tests → build
-   - Playwright: E2E tests on preview deployment
-   - CodeQL: security vulnerability scan
-4. **Gate**: All checks must pass before merge
-
-### Stage 5 — Deploy
-1. Merge PR to main (squash)
-2. Auto-deploys to production
-3. Post-deploy: monitoring + analytics verify
-
-### Stage 6 — Monitor
-Trigger: Every session start + on-demand (`check errors`)
-1. Monitor Agent checks production health, deploy logs, CI/CD status, dependencies
-2. If errors found: root cause analysis → fix proposal → creates BUGS.md entry
-3. **Gate**: User decides on fix priority
-
-## 5. Agent Team Structure (Replaces 6-person team)
-
-| Real Team Role | AI Agent | File | Responsibility |
-|---|---|---|---|
-| Product Manager + Eng Lead | Planner | `agents/planner.md` | Requirements → plan, architecture, scope |
-| Developer | Builder | `agents/co-developer.md` | Write code, local testing |
-| QA Engineer | Tester | Part of co-developer.md | Write tests, verify coverage |
-| Security Engineer | Security Reviewer | `agents/security-reviewer.md` | Pre-PR security review |
-| DevOps Engineer | CI/CD (Auto) | `.github/workflows/*.yml` | Build, test, deploy automation |
-| SRE + Incident Commander | Monitor | `agents/monitor.md` | Error tracking, RCA, fix proposals |
-
-## 6. Session Continuity
-
-At the END of every session, write to LAST_SESSION.md:
-- What was completed
-- What's next
-- Any blockers or decisions made
-- Any files changed
-- DORA metrics update
-
-At the START of every session, read LAST_SESSION.md to resume context.
-
-## 7. Keep It Simple
-
+### Keep It Simple
 - Don't over-engineer
 - Don't add dependencies unless necessary
 - Don't refactor working code unless it's broken
 - Ship features, not architecture
 
-## 8. Stack Reference
+---
 
-Configured in `pipeline/pipeline.json`. Current project:
+## 4. Stack Reference
 
-| Layer | Tool | Purpose |
-|---|---|---|
-| Frontend | {{STACK_FRONTEND}} | UI |
-| Database | {{STACK_DATABASE}} | Data storage |
-| Auth | {{STACK_AUTH}} | Authentication |
-| Storage | {{STACK_STORAGE}} | File storage |
-| AI | {{STACK_AI}} | AI features |
-| Deploy | {{STACK_DEPLOY}} | Hosting |
-| Error Tracking | {{STACK_ANALYTICS}} | Production monitoring |
-| E2E Testing | {{STACK_E2E}} | Browser tests |
-| CI/CD | GitHub Actions | Automated pipeline |
-| Pre-commit | Husky + lint-staged | Local quality gates |
-| Dep Updates | Dependabot | Dependency management |
-| Security Scan | CodeQL | Vulnerability scanning |
+Configured in `shipkit.json`:
 
-## 9. Branch Strategy
+| Layer | Tool |
+|---|---|
+| Frontend | {{STACK_FRONTEND}} |
+| Database | {{STACK_DATABASE}} |
+| Auth | {{STACK_AUTH}} |
+{% if STACK_AI %} | AI/LLM | {{STACK_AI}} |
+{% endif %}| Deploy | {{STACK_DEPLOY}} |
+{% if STACK_STORAGE %} | Storage | {{STACK_STORAGE}} |
+{% endif %}| Monitoring | {{STACK_ANALYTICS}} |
+| E2E Testing | {{STACK_E2E}} |
+
+---
+
+## 5. Session Continuity
+
+At the END of every session, write to `LAST_SESSION.md`:
+- What was completed
+- What's next
+- Key decisions made
+- Files changed
+- DORA metrics update (deploy frequency, lead time, change failure rate, MTTR)
+
+At the START of every session, read `LAST_SESSION.md` to resume context.
+
+---
+
+## 6. Branch Strategy
 
 - `main` — Production. Protected by CI gates.
 - `feat/*` — Feature branches. Short-lived (max 2 days).
 - `fix/*` — Bug fix branches.
-- NO long-lived branches. Squash merge to main.
+- Squash merge to main.
 
-### Workflow
-```bash
-git checkout -b feat/feature-name
-# ... work, commit, test ...
-git push origin feat/feature-name
-# Create PR → CI runs → merge → deploy
-```
+---
 
-## 10. Critical Rules
+## 7. What Not to Do
 
-- Respect database security rules (RLS, Firestore Rules, etc.)
-- Know your user roles from pipeline.json
+- NEVER commit secrets, API keys, tokens, or `.env` files
 - NEVER expose service keys to client-side code
-- NEVER commit `.env` files
-- NEVER skip the Security Reviewer agent before pushing to GitHub
-- ALWAYS run the Monitor agent at session start
-- ALWAYS read pipeline.json to understand project config
+- NEVER skip security review before pushing
+- NEVER run destructive database operations without warning
+- NEVER commit without user approval

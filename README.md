@@ -1,458 +1,356 @@
+# ShipKit — MVP to Production Pipeline
 
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/badge/shipkit-%E2%9C%A6-violet?style=for-the-badge&logo=github&logoColor=white&labelColor=%23111111">
-    <img alt="shipkit" src="https://img.shields.io/badge/shipkit-%E2%9C%A6-violet?style=for-the-badge&logo=github&logoColor=white&labelColor=%23ffffff">
-  </picture>
-</p>
+> **Connect your tools. Ship to production. No team required.**
 
-<p align="center">
-  <b>Replace a 6-person engineering team with AI agents + industry-standard CI/CD.</b><br>
-  <i>Drop into any project. Works with any AI agent. Any IDE. Any stack. 10 minutes.</i>
-</p>
+[![License](https://img.shields.io/badge/License-Apache%202.0%20%2B%20Ethical-blue.svg)](LICENSE)
 
-<p align="center">
-  <a href="#-quick-start"><img src="https://img.shields.io/badge/Quick_Start-%E2%86%92-blue?style=flat-square" alt="Quick Start"></a>
-  <a href="#-the-ai-agent-team"><img src="https://img.shields.io/badge/AI_Agents-%E2%86%92-purple?style=flat-square" alt="AI Agents"></a>
-  <a href="#%EF%B8%8F-approaches--methods"><img src="https://img.shields.io/badge/Approaches-%E2%86%92-green?style=flat-square" alt="Approaches"></a>
-  <a href="#%EF%B8%8F-license"><img src="https://img.shields.io/badge/License-%E2%86%92-orange?style=flat-square" alt="License"></a>
-  <br>
-  <img src="https://img.shields.io/github/stars/sagar-grv/shipkit?style=flat-square&color=yellow" alt="Stars">
-  <img src="https://img.shields.io/github/license/sagar-grv/shipkit?style=flat-square" alt="License">
-  <a href="https://github.com/sagar-grv/shipkit/graphs/contributors"><img src="https://img.shields.io/github/contributors/sagar-grv/shipkit?style=flat-square" alt="Contributors"></a>
-</p>
+ShipKit is an open-source orchestration layer that takes any MVP and turns it into a production-grade application — automatically.
+
+**You bring your code and your tools. ShipKit connects everything together.**
+
+Your AI agent learns the stack. CI/CD runs on every push. Security scans every PR. Pre-commit hooks catch issues locally. Session continuity keeps your AI agent context-aware. All from a single command.
 
 ---
 
-## 🚢 What Is ShipKit?
+## ✨ What Makes ShipKit Different
 
-ShipKit is a **production pipeline template** for solo developers and small teams. Drop it into any project and instantly get:
-
-| What you get | Instead of |
+| Without ShipKit | With ShipKit |
 |---|---|
-| 4 AI agents = your product team | Hiring a PM, Security Engineer, SRE, and QA |
-| Industry-standard CI/CD | Writing YAML from scratch |
-| Pre-commit quality gates | Fixing bugs after they reach production |
-| Automated dependency updates | Weekly manual security audits |
-| Security scanning on every PR | Discovering vulnerabilities after deploy |
-| Session continuity for AI agents | Starting from scratch every conversation |
-
-**It works with any tech stack** — Next.js, React, Vue, Svelte, Astro, Remix. Any database. Any cloud. Any AI agent (Claude, ChatGPT, Copilot, Cursor, OpenCode, Cline). Any IDE.
-
-### The Problem It Solves
-
-As a solo developer or small team, you're competing against companies with 6+ engineers who have:
-
-- A **PM** who tracks requirements and prevents scope creep
-- An **Engineering Lead** who designs architecture and plans sprints
-- A **Security Engineer** who reviews every PR for vulnerabilities
-- An **SRE** who monitors production and responds to incidents
-- A **DevOps Engineer** who maintains CI/CD pipelines
-- A **QA Engineer** who catches regressions before they ship
-
-ShipKit gives you **all of them** as AI agents + automation. Not a SaaS subscription. Not another tool to learn. Just files you add to your project.
+| Manually configure CI/CD for every project | One command generates CI/CD, security, hooks |
+| Write separate prompts for your AI agent | AI agent auto-reads `shipkit.json` — knows your stack |
+| No session memory — AI forgets context every time | AGENTS.md + LAST_SESSION.md = persistent context |
+| Set up security scanning manually | CodeQL + Security Reviewer prompt built-in |
+| No production monitoring | Monitor Agent checks health every session |
+| Solo dev acts as PM + Engineer + QA + Security + DevOps + SRE | 6 AI agent roles replace the team |
 
 ---
 
-## 🔥 Quick Start
-
-### 1. Install in any project
+## 🚀 Quick Start
 
 ```bash
-# Download ShipKit into your project
-curl -fsSL https://github.com/sagar-grv/shipkit/archive/main.tar.gz | tar -xz --strip=1 shipkit-main
-# Or: git submodule add https://github.com/sagar-grv/shipkit.git
+# In your project directory:
+npx shipkit setup
+# or: curl -fsSL https://shipkit.dev/setup.sh | bash
+# or: irm https://shipkit.dev/setup.ps1 | powershell
 
-# Run interactive setup
-./setup.ps1        # Windows
-# or
-./setup.sh         # Linux / macOS
+# Answer 5 quick questions about your tools:
+# → What AI agent do you use? (Claude Code / Cursor / Copilot / OpenCode / Custom)
+# → Authenticate to GitHub
+# → Deploy platform? (Vercel / Netlify / Fly.io / Railway / Docker / Custom)
+# → Database? (Supabase / Firebase / MongoDB / PostgreSQL / SQLite)
+# → Optional: Sentry for error tracking?
+
+# That's it. Your production pipeline is ready.
 ```
 
-### 2. Install dependencies
+**What happens under the hood:**
 
-```bash
-npm install --save-dev husky lint-staged prettier
-npx husky init
-```
-
-### 3. Push to GitHub
-
-```bash
-git add .
-git commit -m "chore: add ShipKit production pipeline"
-git push origin main
-```
-
-**That's it.** Your project now has:
-- AI agents that act as your team
-- CI/CD that runs on every PR
-- Security scanning on every commit
-- A system that remembers context between sessions
-
-### How It Works With Your AI Agent
-
-ShipKit's agent prompts are **plain markdown files**. Load them into any AI tool:
-
-| AI Tool | How to Use ShipKit Agents |
+| File | Purpose |
 |---|---|
-| **Claude** (you're here) | Reference `agents/*.md` in your CLAUDE.md or project instructions |
-| **ChatGPT / Gemini** | Paste the relevant agent prompt before starting a task |
-| **GitHub Copilot** | Add to `.github/copilot-instructions.md` |
-| **Cursor** | Add to `.cursorrules` or `.cursor/rules/` |
-| **Cline** | Add to `.clinerules` |
-| **OpenCode** | Place in `.opencode/agents/` (setup does this automatically) |
-| **Windsurf** | Add to `.windsurfrules` |
-| **Any AI CLI** | Pass the file: `cat agents/planner.md | ...` |
-
-The setup script generates everything. You just run it and tell your AI assistant about the files.
+| `shipkit.json` | Config — your stack, tools, auth. AI agent reads this at startup |
+| `AGENTS.md` | Universal AI agent protocol — works with any AI tool |
+| `.github/workflows/ci.yml` | Lint → typecheck → test → build on every PR |
+| `.github/workflows/codeql.yml` | Security vulnerability scan |
+| `.github/dependabot.yml` | Weekly dependency updates |
+| `.husky/pre-commit` | Catch secrets, lint errors before they reach Git |
+| `ROADMAP.md` | Feature tracker — AI agent stays aligned |
+| `BUGS.md` | Bug tracker — root cause documented |
+| `LAST_SESSION.md` | Session continuity — AI never forgets context |
 
 ---
 
-## 🧠 The AI Agent Team
+## 🔄 How It Works
 
-ShipKit replaces 6 engineering roles with **AI agent prompts** — plain markdown files you load into your AI coding assistant. Each has a specific role, specific triggers, and specific gates.
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    YOUR PROJECT                              │
+│  (any stack — Next.js, React, Vue, Python, Go, anything)    │
+└───────────────────┬─────────────────────────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────────────────────────┐
+│                     SHIPKIT LAYER                            │
+│                                                              │
+│  shipkit.json ──► AI agent learns your stack + tools         │
+│  AGENTS.md    ──► Universal behavior protocol                │
+│  .github/     ──► CI/CD + Security + Dependencies            │
+│  .husky/      ──► Pre-commit quality gates                   │
+│  ROADMAP.md   ──► Feature planning                           │
+│  BUGS.md      ──► Bug tracking                              │
+│  LAST_SESSION.md ──► Session memory                          │
+└───────────────────┬─────────────────────────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────────────────────────┐
+│                   YOUR TOOLS (anything)                      │
+│                                                              │
+│  AI Agent: Claude Code / Cursor / Copilot / OpenCode / ...  │
+│  Deploy:   Vercel / Netlify / Fly.io / Railway / Docker     │
+│  Database: Supabase / Firebase / MongoDB / PostgreSQL        │
+│  IDE:      VS Code / JetBrains / Cursor / Vim / ...          │
+│  Monitor:  Sentry / Datadog / PostHog / LogRocket            │
+└─────────────────────────────────────────────────────────────┘
+```
 
-### Team Roster
-
-| Role | Agent | How to Invoke | What It Does |
-|---|---|---|---|
-| **Product Manager + Engineering Lead** | Planner | `plan: <feature>` | Reads project state, writes detailed plans with architecture and rollback strategy |
-| **Developer + QA** | Builder | *(default agent)* | Writes code in small increments, runs tests, commits |
-| **Security Engineer** | Security Reviewer | `review security` | 10-category security audit of every diff before it ships |
-| **SRE + Incident Commander** | Monitor | Session start + `check errors` | Checks production health, tracks DORA metrics, initiates incident response |
-| **DevOps Engineer** | GitHub Actions | *(auto on PR)* | CI pipeline, CodeQL security scan, Playwright E2E |
-| **Dependency Manager** | Dependabot | *(weekly auto)* | Keeps npm + Actions dependencies updated |
-
-### How They Work Together
+### The Development Pipeline
 
 ```
 You say "plan: <feature>"
     │
     ▼
-┌──────────────────────────────────────────────────────────────────────────┐
-│ ① PLANNER AGENT (agents/planner.md)                                     │
-│   Reads roadmap → checks for bugs → reviews last session                │
-│   → writes plan with tasks, architecture, rollback strategy             │
-│   GATE: User approves plan before execution                              │
-└──────────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────┐
+│ ① PLANNER (AI Agent)                │
+│   Reads state → writes plan         │
+│   Gate: You approve                  │
+└─────────────────────────────────────┘
     │
     ▼
-┌──────────────────────────────────────────────────────────────────────────┐
-│ ② BUILDER AGENT (agents/co-developer.md)                                │
-│   Creates feature branch → implements in small steps (max 3)            │
-│   → runs lint → tests → build on each step                              │
-│   Pre-commit: Husky catches issues before commit                         │
-└──────────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────┐
+│ ② BUILDER (AI Agent)                │
+│   Implements in small steps         │
+│   Self-checks: lint → test → build  │
+│   Pre-commit: catches issues        │
+└─────────────────────────────────────┘
     │
     ▼
-┌──────────────────────────────────────────────────────────────────────────┐
-│ ③ SECURITY REVIEWER (agents/security-reviewer.md)                       │
-│   Reviews full diff against main branch                                 │
-│   Checks: secrets, DB security, XSS, auth, env exposure, upload safety  │
-│   GATE: APPROVED or CHANGES REQUIRED verdict                             │
-└──────────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────┐
+│ ③ SECURITY REVIEW (AI Agent)        │
+│   Checks: secrets, XSS, auth, DB    │
+│   Gate: APPROVED / CHANGES REQUIRED │
+└─────────────────────────────────────┘
     │
     ▼
-┌──────────────────────────────────────────────────────────────────────────┐
-│ ④ GITHUB ACTIONS (CI/CD — fully automated)                              │
-│   ┌──────────┐ ┌───────────┐ ┌───────┐ ┌────────┐ ┌──────────┐         │
-│   │  Lint    │ │ TypeCheck │ │ Tests │ │ CodeQL │ │Playwright│         │
-│   │          │ │           │ │       │ │Security│ │   E2E    │         │
-│   └──────────┘ └───────────┘ └───────┘ └────────┘ └──────────┘         │
-│   ALL must pass before merge                                             │
-└──────────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────┐
+│ ④ CI/CD (GitHub Actions)            │
+│   Lint → Typecheck → Test → Build   │
+│   CodeQL security scan              │
+│   E2E tests on preview              │
+└─────────────────────────────────────┘
     │
     ▼
-┌──────────────────────────────────────────────────────────────────────────┐
-│ ⑤ AUTO-DEPLOY                                                            │
-│   Merge PR → main → deploys → monitoring verifies                        │
-└──────────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────┐
+│ ⑤ DEPLOY (auto)                     │
+│   Merge → Deploy → Live             │
+└─────────────────────────────────────┘
     │
     ▼
-┌──────────────────────────────────────────────────────────────────────────┐
-│ ⑥ MONITOR AGENT (agents/monitor.md)                                     │
-│   Every session: checks health, CI status, dependencies, bugs           │
-│   If errors: root cause analysis → fix proposal → BUGS.md entry         │
-│   Tracks: DORA metrics, deploy frequency, MTTR                           │
-└──────────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────┐
+│ ⑥ MONITOR (AI Agent)                │
+│   Checks health every session       │
+│   RCA on errors → BUGS.md → fix PR  │
+└─────────────────────────────────────┘
 ```
-
-### 6 Gates That Protect Your Production
-
-| # | Gate | Catches | When | Who |
-|---|---|---|---|---|
-| 1 | **Husky pre-commit** | Secrets in staged files, lint errors, type errors | `git commit` | 💻 Local |
-| 2 | **Security Reviewer** | SQL injection, XSS, auth bypass, secret leaks | `review security` | 🤖 AI |
-| 3 | **CI (lint → typecheck → test → build)** | Code quality, broken tests, build failures | PR created | ⚙️ Auto |
-| 4 | **CodeQL** | 100+ vulnerability classes | PR + main | ⚙️ Auto |
-| 5 | **Dependabot** | Vulnerable dependencies | Weekly | ⚙️ Auto |
-| 6 | **Monitor Agent** | Error trends, performance regression, bug debt | Every session | 🤖 AI |
 
 ---
 
-## 🛠️ Approaches & Methods
+## 🧠 AI Agent Team
 
-### Method 1: Interactive Setup (Recommended)
+ShipKit gives your AI agent 6 distinct **roles** — each with a dedicated prompt file. Your AI agent reads the right prompt for each stage of development.
 
-The guided setup asks about your project and generates everything:
+| Role | Prompt File | What It Does |
+|---|---|---|
+| **Planner** (PM + Eng Lead) | `shipkit/planner.md` | Reads state → writes plan with tasks, architecture, rollback |
+| **Builder** (Developer) | `shipkit/co-developer.md` | Writes code in small steps, runs tests, commits |
+| **QA** (Tester) | (built into Builder) | Ensures test coverage, runs test suite |
+| **Security Reviewer** | `shipkit/security-reviewer.md` | 10-category audit → APPROVED or CHANGES REQUIRED |
+| **DevOps** | GitHub Actions (auto) | CI pipeline + CodeQL + E2E |
+| **Monitor** (SRE) | `shipkit/monitor.md` | Health checks, root cause analysis, DORA metrics |
+
+### Works With Any AI Agent
+
+ShipKit's prompt files are **plain Markdown** — compatible with every AI coding tool:
+
+| AI Tool | How It Reads ShipKit |
+|---|---|
+| **Claude Code** | Reads `AGENTS.md` + `CLAUDE.md` at session start |
+| **Cursor** | Reads `.cursorrules` + `AGENTS.md` |
+| **GitHub Copilot** | Reads `.github/copilot-instructions.md` |
+| **OpenCode** | Reads `.opencode/agents/*.md` |
+| **CodeGPT** | Reads `AGENTS.md` on project open |
+| **Continue.dev** | Reads `AGENTS.md` from config |
+| **Any AI agent** | Reads `AGENTS.md` + `shipkit.json` — adapts automatically |
+
+> **No lock-in.** Switch AI tools anytime. ShipKit's protocol works with all of them.
+
+---
+
+## 🔧 Setup
+
+ShipKit offers 3 ways to get started:
+
+### 1. Interactive (Recommended)
 
 ```bash
-./setup.ps1        # Windows
-./setup.sh         # Linux / macOS
+npx shipkit setup
 ```
 
-**What it asks:**
-- Project name and description
-- Frontend framework (Next.js, Vite, Nuxt, SvelteKit, Remix, Other)
-- Database (Supabase, Firebase, MongoDB, PostgreSQL, SQLite, None)
-- Auth (Supabase Auth, Firebase Auth, Clerk, Auth0, NextAuth, Custom)
-- AI provider (Gemini, OpenAI, Claude, Hugging Face, or none)
-- Deploy platform (Vercel, Netlify, Fly.io, Railway, Cloudflare, Self-hosted)
-- E2E framework (Playwright, Cypress, or none)
-- Error tracking (Sentry, LogRocket, Datadog, PostHog, or none)
-- Node version, package manager, build/test commands
-- GitHub username and repo name
+A guided interview that asks about your tools and generates everything. Takes ~2 minutes.
 
-**Best for**: First-time setup, new projects, tailored configuration.
-
-### Method 2: Headless / CI Setup
-
-Use a config file for automated setup:
+### 2. One-Line Script
 
 ```bash
-./setup.ps1 -ConfigFile my-project.json -Force
-./setup.sh -c my-project.json
+# Linux / macOS:
+curl -fsSL https://shipkit.dev/setup.sh | bash
+
+# Windows PowerShell:
+irm https://shipkit.dev/setup.ps1 | powershell
 ```
 
-**Config file example:**
+### 3. Headless / CI Mode
+
+Create a `shipkit.config.json` file, then:
+
+```bash
+npx shipkit setup --config shipkit.config.json
+```
+
+---
+
+## 🔐 How the AI Agent Adapts
+
+ShipKit generates a `shipkit.json` file that your AI agent reads at every session start:
+
 ```json
 {
   "project": {
-    "name": "MySaaS",
-    "description": "A SaaS analytics platform"
+    "name": "MyApp",
+    "description": "A web application"
   },
   "stack": {
     "frontend": "Next.js 15+",
     "database": "Supabase Postgres",
-    "auth": "Clerk",
-    "ai": "OpenAI API",
+    "auth": "Supabase Auth",
+    "ai": "Gemini API",
     "deploy": "Vercel",
-    "e2e": "Playwright",
-    "analytics": "Sentry"
+    "monitoring": "Sentry"
   },
   "ci": {
     "nodeVersion": "20",
-    "packageManager": "npm",
     "buildCommand": "npm run build",
     "testCommand": "npm test"
   },
-  "github": {
-    "owner": "my-org",
-    "repo": "my-saas"
+  "auth": {
+    "githubToken": "ghp_***",
+    "vercelToken": "***",
+    "supabaseKey": "***"
   }
 }
 ```
 
-**Best for**: CI pipelines, reproducible builds, team onboarding.
-
-### Method 3: Manual / Selective Integration
-
-Don't want the full pipeline? Pick what you need:
-
-| Component | Files | What You Get |
-|---|---|---|
-| **AI Agents only** | `agents/*`, `AGENTS.md` | Your AI product team without CI/CD |
-| **CI/CD only** | `.github/workflows/*`, `.github/dependabot.yml` | GitHub Actions without agents |
-| **Pre-commit only** | `.husky/pre-commit` | Local quality gates only |
-| **Session tracking** | `ROADMAP.md`, `BUGS.md`, `LAST_SESSION.md` | Project management docs |
-| **Everything** | Run `setup.ps1` / `setup.sh` | Complete production pipeline |
-
-**Best for**: Existing projects with partial tooling, gradual adoption.
-
-### Method 4: Solo Dev Workflow
-
-The daily workflow ShipKit is built for:
-
-```bash
-# Morning — start session
-# 1. Tell your AI agent: "run monitor check"
-# 2. Review BUGS.md for any open issues
-# 3. Check ROADMAP.md for today's priorities
-
-# Feature development
-# 1. Say "plan: <feature>" → Planner creates a plan
-# 2. Approve → Builder implements it
-# 3. Say "review security" → Security Reviewer checks
-# 4. Push → PR → CI runs → Merge → Deploy
-
-# Evening — end session
-# 1. Update LAST_SESSION.md
-# 2. Update ROADMAP.md with progress
-```
-
-### Method 5: Small Team Workflow
-
-- All PRs require Security Reviewer approval
-- All PRs require CI to pass
-- Use Planner for sprint planning sessions
-- Monitor Agent runs at daily standup
-
-### Method 6: Any AI Agent / Any IDE
-
-ShipKit agents are **plain markdown** — they work everywhere:
-
-```
-# Claude Desktop / Web
-→ Upload or reference agents/planner.md in your project instructions
-
-# ChatGPT
-→ Paste the agent prompt before starting a task
-
-# VS Code + Copilot
-→ Include in .github/copilot-instructions.md
-
-# Cursor
-→ Add to .cursorrules or reference via @Agent
-
-# OpenCode
-→ Setup outputs to .opencode/agents/ automatically
-
-# Cline
-→ Add to .clinerules
-
-# JetBrains AI
-→ Reference in project settings
-
-# Terminal / Any CLI
-→ cat agents/planner.md | your-ai-command
-```
+Your AI agent automatically:
+- Uses the right build/test/lint commands
+- Checks the correct deploy platform for logs
+- Adapts security review to your database type
+- Warns before production database changes
+- Tracks DORA metrics relevant to your stack
 
 ---
 
-## 📂 What You Get
+## 🛡️ Security Gates (Staged)
+
+| Gate | What It Catches | When | Who |
+|---|---|---|---|
+| Husky pre-commit | Secrets in staged files, lint errors, type errors | `git commit` | Local |
+| Security Reviewer | SQL injection, XSS, RLS bypass, env exposure, auth bugs | Before push | AI Agent |
+| CI (lint → typecheck → test → build) | Code quality, broken tests, build failures | PR created | Auto |
+| CodeQL | 100+ vulnerability classes | PR + main | Auto |
+| Dependabot | Vulnerable npm/GitHub Actions deps | Weekly | Auto |
+| Monitor Agent | Error trends, performance regression, bug debt | Every session | AI Agent |
+
+---
+
+## 📊 DORA Metrics
+
+ShipKit tracks the 4 key DevOps metrics that separate high-performing teams from everyone else:
+
+| Metric | How to Track | What Good Looks Like |
+|---|---|---|
+| **Deploy Frequency** | Deploy platform logs | Multiple / week |
+| **Lead Time** | Plan → merged PR time | < 1 day |
+| **Change Failure Rate** | Errors / deploys (monitoring) | < 15% |
+| **MTTR** | Error → fix deployed | < 1 hour |
+
+The Monitor Agent tracks these at every session start and updates LAST_SESSION.md with trends.
+
+---
+
+## 📁 Project Structure
+
+After running ShipKit setup, your project looks like this:
 
 ```
 your-project/
-├── pipeline.json                ← Config — all agents read this
-├── AGENTS.md                   ← Agent protocol and rules
-├── ROADMAP.md                  ← Feature tracker with sprint planning
-├── BUGS.md                     ← Bug tracker with severity levels
-├── LAST_SESSION.md             ← Session continuity & DORA metrics
-│
+├── shipkit.json               ← Config (source of truth)
+├── AGENTS.md                  ← Universal AI agent protocol
+├── ROADMAP.md                 ← Feature tracker
+├── BUGS.md                    ← Bug tracker
+├── LAST_SESSION.md            ← Session continuity
+├── shipkit/                   ← AI agent prompts
+│   ├── planner.md
+│   ├── co-developer.md
+│   ├── security-reviewer.md
+│   └── monitor.md
 ├── .github/
-│   ├── dependabot.yml          ← Weekly dependency updates (grouped)
+│   ├── dependabot.yml
 │   └── workflows/
-│       ├── ci.yml              ← Lint → TypeCheck → Test → Build
-│       ├── codeql.yml          ← GitHub's security vulnerability scanner
-│       └── playwright.yml      ← E2E tests on preview deployments
-│
-├── agents/                     ← Your AI team (works with any AI agent)
-│   ├── planner.md              ← PM + Engineering Lead
-│   ├── security-reviewer.md    ← Security Engineer
-│   ├── monitor.md              ← SRE + Incident Commander
-│   └── co-developer.md         ← Developer + QA
-│
-└── .husky/pre-commit           ← Lint-staged pre-commit quality gate
+│       ├── ci.yml
+│       ├── codeql.yml
+│       └── playwright.yml
+├── .husky/pre-commit
+└── .github/copilot-instructions.md   (if Copilot)
+    .cursorrules                       (if Cursor)
+    CLAUDE.md                          (if Claude Code)
+    .opencode/agents/                  (if OpenCode)
 ```
 
 ---
 
-## 🔐 Security (6 Layers)
+## 🤝 Supported Platforms
 
-| Layer | What It Prevents | How |
-|---|---|---|
-| **Pre-commit** | Secrets committed to Git | `husky` + `lint-staged` scan staged files |
-| **AI Security Review** | SQL injection, XSS, auth bypass, secret leaks | 10-category checklist, stack-adaptive |
-| **CI Pipeline** | Broken builds reach production | `lint → typecheck → test → build` |
-| **CodeQL** | 100+ vulnerability classes | GitHub's CodeQL analysis engine |
-| **Dependabot** | Vulnerable dependencies | Weekly automated PRs with grouped updates |
-| **Monitor Agent** | Unknown errors in production | Session-start health checks + incident response |
+ShipKit works with any combination of tools. Here are the most common:
 
----
-
-## 📊 DORA Metrics (Tracked Automatically)
-
-| Metric | How to Track | Solo Dev Target |
-|---|---|---|
-| **Deploy Frequency** | Deploy platform logs | Multiple times per week |
-| **Lead Time** | Plan → merged PR time | < 1 day |
-| **Change Failure Rate** | Errors / deploys | < 15% |
-| **MTTR** | Error → fix deployed | < 1 hour |
-
-Tracked by the Monitor Agent at every session start, updated in LAST_SESSION.md.
-
----
-
-## ⚙️ Required GitHub Secrets
-
-After pushing to GitHub, add these in **Settings → Secrets and variables → Actions**:
-
-| Secret | Value |
+| Category | Supported |
 |---|---|
-| Your public URL (e.g. `NEXT_PUBLIC_SUPABASE_URL`) | From your project dashboard |
-| Your public key (e.g. `NEXT_PUBLIC_SUPABASE_ANON_KEY`) | From your project dashboard |
-| Any custom env vars you specified during setup | As configured |
+| **AI Agents** | Claude Code, Cursor, GitHub Copilot, OpenCode, CodeGPT, Continue.dev, Cline, Aider |
+| **IDEs** | VS Code, JetBrains, Cursor, Windsurf, Vim/Neovim, Emacs |
+| **Frontend** | Next.js, React, Vue, Svelte, Angular, Solid, Qwik, Remix, Nuxt, Astro, plain HTML/CSS/JS |
+| **Backend** | Node.js, Python, Go, Rust, Ruby, PHP, Java, .NET, Deno, Bun |
+| **Database** | Supabase, Firebase, MongoDB, PostgreSQL, MySQL, SQLite, Prisma, Drizzle |
+| **Auth** | Supabase Auth, Firebase Auth, Clerk, Auth0, NextAuth, Lucia |
+| **Deploy** | Vercel, Netlify, Fly.io, Railway, Render, Cloudflare, Docker, AWS, GCP |
+| **Monitoring** | Sentry, Datadog, LogRocket, PostHog, Grafana, OpenTelemetry |
+| **Package Managers** | npm, pnpm, yarn, bun, pip, cargo, go mod, gem, composer |
 
 ---
 
 ## 🗺️ Roadmap
 
-- [x] AI Agent team (Planner, Builder, Security Reviewer, Monitor)
-- [x] GitHub Actions CI/CD (lint, typecheck, test, build)
-- [x] CodeQL security scanning
-- [x] Playwright E2E test workflow
-- [x] Dependabot dependency updates
-- [x] Husky pre-commit hooks
-- [x] Interactive setup scripts (PowerShell + Bash)
-- [x] Stack-agnostic template system
-- [x] Session continuity (LAST_SESSION.md)
-- [x] DORA metrics tracking
-- [x] AI-agent-agnostic (works with Claude, ChatGPT, Copilot, Cursor, OpenCode, Cline, etc.)
-- [ ] Docker dev environment template
-- [ ] Community agent library (user-contributed agents)
-- [ ] IDE extension (one-click setup)
-- [ ] Video guide series
+- [ ] **ShipKit CLI** — `npx shipkit` with commands: `setup`, `check`, `update`, `doctor`
+- [ ] **Auto-detect** — ShipKit reads your project and detects framework, database, deploy config automatically
+- [ ] **One-click deploy** — `shipkit deploy` that handles the full deploy flow
+- [ ] **Dashboard** — Web UI to see pipeline status, DORA metrics, security alerts
+- [ ] **Multi-service** — Support for monorepos and microservices
+- [ ] **GitLab / Bitbucket** — Support for alternative Git providers
+- [ ] **VS Code extension** — One-click ShipKit install from VS Code
 
 ---
 
-## 🤝 Contributing
+## 📄 License
 
-ShipKit is open source and community-driven. We welcome:
+Apache 2.0 + Additional Ethical Use Terms — see [LICENSE](LICENSE).
 
-- **New agent templates** — adapt ShipKit to more stacks
-- **Setup script improvements** — more platforms, better DX
-- **Documentation** — translations, guides, tutorials
-- **Bug reports** — found something? Open an issue
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
+Free to use, modify, and share. Built for the solo developer community.
 
 ---
 
-## ⚖️ License
+## 💬 Why ShipKit?
 
-**Apache 2.0 with Ethical Use Clause** — Full license in [LICENSE](./LICENSE).
+> *"I spent more time setting up CI/CD, writing AI prompts, and managing context than actually coding. ShipKit does all of that in one command."*
 
-You are free to:
-- ✅ Use ShipKit in commercial projects
-- ✅ Modify and distribute it
-- ✅ Create proprietary forks (with attribution)
-- ✅ Use it for any legal purpose
+> *"My AI agent used to forget the stack after every session. Now it reads shipkit.json and knows everything."*
 
-You may NOT:
-- ❌ Use it for weapons, surveillance, or human rights violations
-- ❌ Claim it as your own work (attribution required)
-- ❌ Remove the license or attribution from derivative works
+> *"I'm one person competing against teams of six. ShipKit gives me the same pipeline."*
 
 ---
 
-<p align="center">
-  <b>Built by a solo developer, for solo developers.</b><br>
-  <a href="https://github.com/sagar-grv">@sagar-grv</a> ·
-  <a href="https://github.com/sagar-grv/shipkit/issues">Issues</a> ·
-  <a href="https://github.com/sagar-grv/shipkit/discussions">Discussions</a>
-</p>
-
-<p align="center">
-  <a href="#-what-is-shipkit">↑ Back to top</a>
-</p>
+**ShipKit** — Because your MVP deserves a production pipeline.

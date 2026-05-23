@@ -1,270 +1,597 @@
 #!/usr/bin/env bash
 #
-# ShipKit Setup — Linux / macOS
-# Generates all pipeline files for YOUR project.
-# Run from your project root: ./shipkit/setup.sh
+# ShipKit Setup — Connect your tools. Ship to production. No team required.
 #
+# Usage:
+#   curl -fsSL https://shipkit.dev/setup.sh | bash
+#   ./setup.sh                        # Interactive
+#   ./setup.sh --config config.json   # Headless
+#   ./setup.sh --detect-only          # Print detected config
+#
+# Works with ANY stack, ANY AI agent, ANY IDE, ANY deploy platform.
+
 set -euo pipefail
 
-RED='\033[0;31m'
+# Colors
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
+RED='\033[0;31m'
 BOLD='\033[1m'
 NC='\033[0m'
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TEMPLATE_DIR="$SCRIPT_DIR/template"
+# Parse args
+CONFIG_FILE=""
+OUTPUT_DIR="."
+FORCE=false
+DETECT_ONLY=false
 
-echo ""
-echo -e "${BOLD}${CYAN}ShipKit Setup — Production Pipeline Generator${NC}"
-echo ""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --config) CONFIG_FILE="$2"; shift 2 ;;
+    --output) OUTPUT_DIR="$2"; shift 2 ;;
+    --force|-f) FORCE=true; shift ;;
+    --detect-only) DETECT_ONLY=true; shift ;;
+    *) echo "Usage: $0 [--config file] [--output dir] [--force] [--detect-only]"; exit 1 ;;
+  esac
+done
 
-# Helper functions
-prompt() {
-  local prompt="$1"
-  local default="$2"
-  local val
-  if [ -n "$default" ]; then
-    read -p "$(echo -e "${YELLOW}${prompt}${NC} [$default] ")" val
-  else
-    read -p "$(echo -e "${YELLOW}${prompt}${NC} ")" val
-  fi
+# Helpers
+title() { echo -e "\n${BOLD}${CYAN}===== $1 =====${NC}\n"; }
+step() { echo -e "${GREEN}[*]${NC} $1"; }
+info() { echo -e "  ${YELLOW}$1${NC}"; }
+
+read_value() {
+  local prompt="$1" default="$2"
+  local default_str=""
+  [ -n "$default" ] && default_str=" [$default]"
+  read -r -p "$prompt$default_str: " val
   echo "${val:-$default}"
 }
 
-choose() {
-  local prompt="$1"
-  shift
+read_choice() {
+  local prompt="$1"; shift
+  local default="$1"; shift
   local options=("$@")
-  local default=""
   echo -e "${YELLOW}$prompt${NC}"
   for i in "${!options[@]}"; do
-    if [ "$i" -eq 0 ]; then
-      echo "  [$((i+1))] ${options[$i]} ${GREEN}(default)${NC}"
-      default="${options[$i]}"
-    else
-      echo "  [$((i+1))] ${options[$i]}"
-    fi
+    local mark=""
+    [ "${options[$i]}" = "$default" ] && mark=" ${GREEN}(default)${NC}"
+    echo "  $((i+1)). ${options[$i]}$mark"
   done
-  local val
-  read -p "Enter number (1-${#options[@]}): " val
-  if [ -z "$val" ]; then echo "$default"; return; fi
-  if [[ "$val" =~ ^[0-9]+$ ]] && [ "$val" -ge 1 ] && [ "$val" -le "${#options[@]}" ]; then
-    echo "${options[$((val-1))]}"
+  read -r -p "Enter number (1-${#options[@]}): " val
+  [ -z "$val" ] && echo "$default" && return
+  local num
+  num=$(echo "$val" | tr -dc '0-9')
+  if [ "$num" -ge 1 ] && [ "$num" -le "${#options[@]}" ]; then
+    echo "${options[$((num-1))]}"
   else
     echo "$default"
   fi
 }
 
-confirm() {
-  local prompt="$1"
-  local default="${2:-true}"
-  local yn
-  if [ "$default" = true ]; then
-    read -p "$(echo -e "${YELLOW}${prompt}${NC} (Y/n) ")" yn
-  else
-    read -p "$(echo -e "${YELLOW}${prompt}${NC} (y/N) ")" yn
+confirm_yn() {
+  local prompt="$1" default="$2"
+  local default_str="y/N"
+  $default && default_str="Y/n"
+  read -r -p "$prompt ($default_str): " val
+  [ -z "$val" ] && echo "$default" && return
+  [[ "$val" =~ ^[Yy] ]] && echo true || echo false
+}
+
+# Auto-detect project
+auto_detect() {
+  local project_name=""
+  local project_desc=""
+  local frontend=""
+  local pkg_manager="npm"
+  local node_ver="20"
+  local build_cmd=""
+  local test_cmd=""
+  local lint_cmd=""
+  local has_docker=false
+  local has_git=false
+  local git_remote=""
+
+  if [ -f "package.json" ]; then
+    if command -v node &>/dev/null; then
+      project_name=$(node -e "try{console.log(require('./package.json').name||'')}catch(e){}" 2>/dev/null || true)
+      project_desc=$(node -e "try{console.log(require('./package.json').description||'')}catch(e){}" 2>/dev/null || true)
+      build_cmd=$(node -e "try{const s=require('./package.json').scripts||{};console.log(s.build?'npm run build':'')}catch(e){}" 2>/dev/null || true)
+      test_cmd=$(node -e "try{const s=require('./package.json').scripts||{};console.log(s.test?'npm test':'')}catch(e){}" 2>/dev/null || true)
+      lint_cmd=$(node -e "try{const s=require('./package.json').scripts||{};console.log(s.lint?'npm run lint':'')}catch(e){}" 2>/dev/null || true)
+
+      # Detect framework
+      if node -e "try{require('next/package.json')}catch(e){process.exit(1)}" 2>/dev/null; then
+        frontend="Next.js"
+      elif node -e "try{require('react/package.json')}catch(e){process.exit(1)}" 2>/dev/null; then
+        frontend="React + Vite"
+      elif node -e "try{require('vue/package.json')}catch(e){process.exit(1)}" 2>/dev/null; then
+        frontend="Vue"
+      elif node -e "try{require('svelte/package.json')}catch(e){process.exit(1)}" 2>/dev/null; then
+        frontend="Svelte"
+      fi
+
+      # Detect package manager
+      if command -v pnpm &>/dev/null && [ -f "pnpm-lock.yaml" ]; then
+        pkg_manager="pnpm"
+      elif command -v yarn &>/dev/null && [ -f "yarn.lock" ]; then
+        pkg_manager="yarn"
+      fi
+    fi
   fi
-  if [ -z "$yn" ]; then echo "$default"; return; fi
-  case "$yn" in
-    [Yy]*) echo true ;;
-    *) echo false ;;
-  esac
+
+  [ -f "Dockerfile" ] || [ -f "docker-compose.yml" ] && has_docker=true
+  [ -d ".git" ] && has_git=true
+  has_git && git_remote=$(git config --get remote.origin.url 2>/dev/null || true)
+
+  echo "{\"projectName\":\"$project_name\",\"projectDesc\":\"$project_desc\",\"frontend\":\"$frontend\",\"packageManager\":\"$pkg_manager\",\"nodeVersion\":\"$node_ver\",\"buildCommand\":\"$build_cmd\",\"testCommand\":\"$test_cmd\",\"lintCommand\":\"$lint_cmd\",\"hasDocker\":$has_docker,\"hasGit\":$has_git,\"gitRemote\":\"$git_remote\"}"
 }
 
+# Load config
+CONFIG="{}"
+if [ -n "$CONFIG_FILE" ] && [ -f "$CONFIG_FILE" ]; then
+  step "Loading config from $CONFIG_FILE"
+  CONFIG=$(cat "$CONFIG_FILE")
+fi
+
+# Detect
+DETECTED=$(auto_detect)
+
+if $DETECT_ONLY; then
+  echo -e "${CYAN}Detected project config:${NC}"
+  echo "$DETECTED" | python3 -m json.tool 2>/dev/null || echo "$DETECTED"
+  exit 0
+fi
+
+# Extract values from config
+get_config_val() {
+  local key="$1"
+  echo "$CONFIG" | python3 -c "import sys,json; c=json.load(sys.stdin); print(c.get('$key',''))" 2>/dev/null || true
+}
+
+get_proj_val() {
+  echo "$CONFIG" | python3 -c "import sys,json; c=json.load(sys.stdin); p=c.get('project',{}); print(p.get('$1',''))" 2>/dev/null || true
+}
+
+get_detected_val() {
+  echo "$DETECTED" | python3 -c "import sys,json; c=json.load(sys.stdin); print(c.get('$1',''))" 2>/dev/null || true
+}
+
+# Extract nested config values
+# We'll use python3 for JSON parsing throughout
+parse_json() {
+  python3 -c "import sys,json; d=json.loads(sys.stdin.read()); print(d)" 2>/dev/null || echo "{}"
+}
+
+# ============================
+# WELCOME
+# ============================
+echo -e "${BOLD}${CYAN}"
+cat << 'EOF'
+ ⚓ ShipKit — MVP to Production Pipeline
+   Connect your tools. Ship to production. No team required.
+
+   This script will:
+   • Detect your project's tech stack
+   • Configure CI/CD (lint → test → build → deploy)
+   • Set up security scanning (CodeQL + Dependabot)
+   • Generate AI agent prompts (works with Claude Code, Cursor, Copilot, any agent)
+   • Create pre-commit hooks
+   • Set up session continuity for your AI agent
+
+   Takes ~2 minutes. Works with any stack, any AI agent.
+EOF
+echo -e "${NC}"
+
+DETECTED_FRONTEND=$(get_detected_val "frontend")
+DETECTED_PM=$(get_detected_val "packageManager")
+DETECTED_NODE=$(get_detected_val "nodeVersion")
+[ -n "$DETECTED_FRONTEND" ] && info "Detected: $DETECTED_FRONTEND | $DETECTED_PM | Node $DETECTED_NODE"
+
+# ============================
+# 1. PROJECT INFO
+# ============================
+title "PROJECT"
+
+DEFAULT_NAME=$(get_detected_val "projectName")
+DEFAULT_DESC=$(get_detected_val "projectDesc")
+PROJ_NAME=$(read_value "Project name" "${DEFAULT_NAME:-MyApp}")
+PROJ_DESC=$(read_value "Project description" "${DEFAULT_DESC:-A web application}")
+
+# ============================
+# 2. AI AGENT
+# ============================
+title "AI AGENT"
+
+read -r -d '' AGENT_CHOICES << 'AGENTS' || true
+Claude Code (Anthropic)
+Cursor
+GitHub Copilot
+OpenCode
+CodeGPT
+Continue.dev
+Cline
+Aider
+Other / Custom
+AGENTS
+
+SELECTED_AGENT=$(read_choice "Which AI agent do you use?" "Claude Code (Anthropic)" $AGENT_CHOICES)
+
+# Map agent to config file
+case "$SELECTED_AGENT" in
+  "Claude Code"*) AGENT_CONFIG_FILES="CLAUDE.md" ;;
+  "Cursor"*) AGENT_CONFIG_FILES=".cursorrules" ;;
+  "GitHub Copilot"*) AGENT_CONFIG_FILES=".github/copilot-instructions.md" ;;
+  "OpenCode"*) AGENT_CONFIG_FILES=".opencode/agents/co-developer.md" ;;
+  *) AGENT_CONFIG_FILES="AGENTS.md" ;;
+esac
+
+# ============================
+# 3. GITHUB
+# ============================
+title "GITHUB"
+
+GH_OWNER=""
+GH_REPO=""
+
+if command -v gh &>/dev/null; then
+  if [ "$(confirm_yn "GitHub CLI detected. Auto-configure from current repo?" true)" = true ]; then
+    GH_OWNER=$(gh repo view --json owner --jq .owner.login 2>/dev/null || true)
+    GH_REPO=$(gh repo view --json name --jq .name 2>/dev/null || true)
+    [ -n "$GH_OWNER" ] && step "Detected: $GH_OWNER / $GH_REPO"
+  fi
+fi
+
+if [ -z "$GH_OWNER" ]; then
+  GIT_REMOTE=$(get_detected_val "gitRemote")
+  GH_OWNER=$(read_value "GitHub username/organization" "$(echo "$GIT_REMOTE" | sed -E 's/.*[:/]([^/]+)\/.*/\1/')")
+  GH_REPO=$(read_value "GitHub repository name" "$(echo "$PROJ_NAME" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9-')")
+fi
+
+if command -v gh &>/dev/null; then
+  if [ "$(confirm_yn "Authenticate ShipKit with GitHub?" true)" = true ]; then
+    GH_TOKEN=$(gh auth token 2>/dev/null || true)
+    [ -n "$GH_TOKEN" ] && step "GitHub authenticated."
+  fi
+fi
+
+# ============================
+# 4. DEPLOY PLATFORM
+# ============================
+title "DEPLOY PLATFORM"
+
+read -r -d '' DEPLOY_CHOICES << 'DEPLOYS' || true
+Vercel
+Netlify
+Fly.io
+Railway
+Render
+Cloudflare Pages
+Docker / Self-hosted
+AWS
+GCP
+None yet
+DEPLOYS
+
+DEPLOY_PLATFORM="Vercel"
+[ -f "vercel.json" ] || [ -d ".vercel" ] && DEPLOY_PLATFORM="Vercel"
+[ -f "netlify.toml" ] && DEPLOY_PLATFORM="Netlify"
+[ -z "$DEPLOY_PLATFORM" ] && DEPLOY_PLATFORM=$(read_choice "Where do you deploy?" "Vercel" $DEPLOY_CHOICES)
+
+DEPLOY_TOKEN=""
+DEPLOY_PROJECT_ID=""
+if [ "$DEPLOY_PLATFORM" != "None yet" ]; then
+  if [ "$DEPLOY_PLATFORM" = "Vercel" ] && command -v vercel &>/dev/null; then
+    if [ "$(confirm_yn "Authenticate with Vercel?" true)" = true ]; then
+      DEPLOY_TOKEN=$(vercel token 2>/dev/null || true)
+      DEPLOY_PROJECT_ID=$(vercel project --json 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('id',''))" 2>/dev/null || true)
+      [ -n "$DEPLOY_PROJECT_ID" ] && step "Vercel project detected."
+    fi
+  fi
+fi
+
+# ============================
+# 5. DATABASE
+# ============================
+title "DATABASE"
+
+read -r -d '' DB_CHOICES << 'DBS' || true
+Supabase Postgres
+Firebase Firestore
+MongoDB
+PostgreSQL (direct)
+MySQL
+SQLite
+None yet
+DBS
+
+DB_CHOICE="Supabase Postgres"
+[ -d "supabase" ] || [ -f "supabase.json" ] && DB_CHOICE="Supabase Postgres"
+[ -f "firebase.json" ] && DB_CHOICE="Firebase Firestore"
+[ -z "$DB_CHOICE" ] && DB_CHOICE=$(read_choice "Which database do you use?" "Supabase Postgres" $DB_CHOICES)
+
+if [[ "$DB_CHOICE" == "Supabase"* ]] && command -v supabase &>/dev/null; then
+  if [ "$(confirm_yn "Authenticate with Supabase?" true)" = true ]; then
+    DB_TOKEN=$(supabase auth token 2>/dev/null || true)
+    [ -n "$DB_TOKEN" ] && step "Supabase authenticated."
+  fi
+fi
+
+# ============================
+# 6. MONITORING
+# ============================
+title "MONITORING"
+
+MONITORING_CHOICE=$(read_choice "Error tracking / monitoring?" "None" "Sentry" "Datadog" "LogRocket" "PostHog" "None")
+
+# ============================
+# GENERATE FILES
+# ============================
+title "GENERATING PIPELINE FILES"
+
+TEMPLATE_DIR="$(dirname "$0")/template"
+SCRIPT_DIR="$(dirname "$0")"
+
+# If running from curl pipe, template won't exist locally
+# In that case, we need to download the template
+if [ ! -d "$TEMPLATE_DIR" ] && [ -n "${BASH_SOURCE[0]}" ]; then
+  # Try relative to script
+  SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  TEMPLATE_DIR="$SCRIPT_PATH/template"
+fi
+
+# If template still doesn't exist, the user needs to clone the repo
+if [ ! -d "$TEMPLATE_DIR" ]; then
+  echo -e "${RED}Template directory not found.${NC}"
+  echo -e "Please clone the ShipKit repo and run setup from there:"
+  echo -e "  ${CYAN}git clone https://github.com/sagar-grv/shipkit.git${NC}"
+  echo -e "  ${CYAN}cd shipkit && ./setup.sh${NC}"
+  exit 1
+fi
+
+PROJECT_ROOT="$(cd "$OUTPUT_DIR" && pwd)"
+
+# Render template function (uses Python for template engine)
 render_template() {
-  local content="$1"
-  shift
-  local result="$content"
-  
-  # Replace {{VAR}} placeholders
-  while [ $# -gt 0 ]; do
-    local key="${1#--}"
-    local val="$2"
-    result="${result//\{\{$key\}\}/$val}"
-    shift 2
-  done
-  
-  echo "$result"
-}
-
-# ====== COLLECT CONFIG ======
-echo -e "${BOLD}PROJECT INFORMATION${NC}"
-PROJ_NAME=$(prompt "Project name" "MyApp")
-PROJ_DESC=$(prompt "Project description" "A web application")
-
-echo -e "${BOLD}TECH STACK${NC}"
-STACK_FRONTEND=$(choose "Frontend framework" "Next.js 15+" "React + Vite" "Nuxt.js" "SvelteKit" "Remix" "Other")
-STACK_DATABASE=$(choose "Database" "Supabase Postgres" "Firebase Firestore" "MongoDB" "PostgreSQL (direct)" "None / SQLite" "Other")
-STACK_AUTH=$(choose "Authentication" "Supabase Auth" "Firebase Auth" "Clerk" "Auth0" "NextAuth.js" "Custom / None")
-
-HAS_AI=$(confirm "Does your app use AI/LLM features?" false)
-STACK_AI="None"
-if [ "$HAS_AI" = true ]; then
-  STACK_AI=$(choose "AI provider" "Gemini API" "OpenAI API" "Anthropic Claude" "Hugging Face" "Custom / Local")
-fi
-
-STACK_DEPLOY=$(choose "Deploy platform" "Vercel" "Netlify" "Fly.io" "Railway" "Cloudflare Pages" "Self-hosted")
-STACK_E2E=$(choose "E2E test framework" "Playwright" "Cypress" "None")
-
-HAS_ANALYTICS=$(confirm "Set up error tracking / analytics?" true)
-STACK_ANALYTICS="None"
-if [ "$HAS_ANALYTICS" = true ]; then
-  STACK_ANALYTICS=$(choose "Error tracking" "Sentry" "LogRocket" "Datadog" "PostHog" "Custom")
-fi
-
-# Map database to storage
-if [[ "$STACK_DATABASE" == Supabase* ]]; then
-  STACK_STORAGE="Supabase Storage"
-elif [[ "$STACK_DATABASE" == Firebase* ]]; then
-  STACK_STORAGE="Firebase Storage"
-else
-  STACK_STORAGE="Cloud storage (S3, etc.)"
-fi
-
-echo -e "${BOLD}CI/CD CONFIGURATION${NC}"
-NODE_VERSION=$(prompt "Node.js version" "20")
-PKG_MANAGER=$(choose "Package manager" "npm" "pnpm" "yarn")
-BUILD_CMD=$(prompt "Build command" "$PKG_MANAGER run build")
-TEST_CMD=$(prompt "Test command" "$PKG_MANAGER test")
-
-echo -e "${BOLD}GITHUB CONFIGURATION${NC}"
-GH_OWNER=$(prompt "GitHub username/organization" "your-username")
-GH_REPO=$(prompt "GitHub repository name" "$(echo "$PROJ_NAME" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9-')")
-
-# ====== GENERATE FILES ======
-echo ""
-echo -e "${BOLD}Generating pipeline files...${NC}"
-
-declare -A VARS
-VARS[PROJECT_NAME]="$PROJ_NAME"
-VARS[PROJECT_DESCRIPTION]="$PROJ_DESC"
-VARS[DATE]="$(date +%Y-%m-%d)"
-VARS[STACK_FRONTEND]="$STACK_FRONTEND"
-VARS[STACK_DATABASE]="$STACK_DATABASE"
-VARS[STACK_AUTH]="$STACK_AUTH"
-VARS[STACK_AI]="$STACK_AI"
-VARS[STACK_DEPLOY]="$STACK_DEPLOY"
-VARS[STACK_STORAGE]="$STACK_STORAGE"
-VARS[STACK_E2E]="$STACK_E2E"
-VARS[STACK_ANALYTICS]="$STACK_ANALYTICS"
-VARS[NODE_VERSION]="$NODE_VERSION"
-VARS[BUILD_COMMAND]="$BUILD_CMD"
-VARS[TEST_COMMAND]="$TEST_CMD"
-VARS[LINT_COMMAND]="$PKG_MANAGER run lint"
-VARS[TYPECHECK_COMMAND]="npx tsc --noEmit"
-VARS[PACKAGE_MANAGER]="$PKG_MANAGER"
-VARS[GITHUB_OWNER]="$GH_OWNER"
-VARS[GITHUB_REPO]="$GH_REPO"
-
-GENERATED=0
-SKIPPED=0
-
-copy_and_render() {
   local src="$1"
   local dst="$2"
-  
-  if [ -f "$dst" ]; then
-    echo -e "  ${YELLOW}SKIP${NC}: $dst (exists)"
-    SKIPPED=$((SKIPPED+1))
-    return
-  fi
-  
-  mkdir -p "$(dirname "$dst")"
-  
   local content
-  content=$(<"$src")
-  
-  # Replace all {{VAR}} placeholders
-  for key in "${!VARS[@]}"; do
-    content="${content//\{\{$key\}\}/${VARS[$key]}}"
-  done
-  
+  content=$(cat "$src")
+
+  # Replace {{VAR}} placeholders using Python
+  content=$(python3 -c "
+import sys, re
+content = '''$content'''
+vars = {
+    'PROJECT_NAME': '$PROJ_NAME',
+    'PROJECT_DESCRIPTION': '$PROJ_DESC',
+    'DATE': '$(date +%Y-%m-%d)',
+    'STACK_FRONTEND': '$DETECTED_FRONTEND',
+    'STACK_DATABASE': '$DB_CHOICE',
+    'STACK_AUTH': '$DB_CHOICE',
+    'STACK_AI': 'AI-powered features',
+    'STACK_DEPLOY': '$DEPLOY_PLATFORM',
+    'STACK_STORAGE': '${DB_CHOICE/Supabase*/Supabase Storage}',
+    'STACK_E2E': 'Playwright',
+    'STACK_ANALYTICS': '$MONITORING_CHOICE',
+    'NODE_VERSION': '$DETECTED_NODE',
+    'BUILD_COMMAND': '${DEFAULT_BUILD:-npm run build}',
+    'TEST_COMMAND': '${DEFAULT_TEST:-npm test}',
+    'LINT_COMMAND': '${DEFAULT_LINT:-npm run lint}',
+    'TYPECHECK_COMMAND': 'npx tsc --noEmit',
+    'PACKAGE_MANAGER': '$DETECTED_PM',
+    'COVERAGE_ENABLED': 'true',
+    'DATABASE_TYPE': '$DB_CHOICE',
+    'DATABASE_PROJECT_ID': '',
+    'DATABASE_REGION': '',
+    'RLS_ENABLED': 'true',
+    'GITHUB_OWNER': '$GH_OWNER',
+    'GITHUB_REPO': '$GH_REPO',
+    'DEPLOY_PLATFORM': '$DEPLOY_PLATFORM',
+    'DEPLOY_PROJECT_ID': '$DEPLOY_PROJECT_ID',
+    'PREVIEW_URLS_ENABLED': 'true',
+    'MONITORING_PLATFORM': '$MONITORING_CHOICE',
+    'MONITORING_ORG': '',
+    'MONITORING_PROJECT': '',
+    'AI_AGENT': '$SELECTED_AGENT',
+    'AGENT_CONFIG_FILES': '$AGENT_CONFIG_FILES',
+}
+for key, val in vars.items():
+    content = content.replace('{{' + key + '}}', val)
+# Handle {% if VAR %}...{% endif %}
+def replace_if(match):
+    var_name = match.group(1)
+    inner = match.group(2)
+    val = vars.get(var_name, '')
+    is_truthy = bool(val) and val.lower() not in ('false', '0', '')
+    return inner if is_truthy else ''
+content = re.sub(r'\{\%\s*if\s+(\w+)\s*\%\}(.*?)\{\%\s*endif\s*\%\}', replace_if, content, flags=re.DOTALL)
+print(content, end='')
+" 2>&1) || {
+    info "ERROR: Failed to render $src"
+    return 1
+  }
+
+  mkdir -p "$(dirname "$dst")"
   echo "$content" > "$dst"
-  echo -e "  ${GREEN}CREATE${NC}: $dst"
-  GENERATED=$((GENERATED+1))
+  step "Created ${dst#$PROJECT_ROOT/}"
+  echo "$dst"
 }
 
-copy_and_render "$TEMPLATE_DIR/docs/AGENTS.md" "AGENTS.md"
-copy_and_render "$TEMPLATE_DIR/docs/ROADMAP.md" "ROADMAP.md"
-copy_and_render "$TEMPLATE_DIR/docs/BUGS.md" "BUGS.md"
-copy_and_render "$TEMPLATE_DIR/docs/LAST_SESSION.md" "LAST_SESSION.md"
-copy_and_render "$TEMPLATE_DIR/agents/co-developer.md" "agents/co-developer.md"
-copy_and_render "$TEMPLATE_DIR/agents/planner.md" "agents/planner.md"
-copy_and_render "$TEMPLATE_DIR/agents/security-reviewer.md" "agents/security-reviewer.md"
-copy_and_render "$TEMPLATE_DIR/agents/monitor.md" "agents/monitor.md"
-copy_and_render "$TEMPLATE_DIR/github/dependabot.yml" ".github/dependabot.yml"
-copy_and_render "$TEMPLATE_DIR/github/workflows/ci.yml" ".github/workflows/ci.yml"
-copy_and_render "$TEMPLATE_DIR/github/workflows/codeql.yml" ".github/workflows/codeql.yml"
-copy_and_render "$TEMPLATE_DIR/github/workflows/playwright.yml" ".github/workflows/playwright.yml"
-copy_and_render "$TEMPLATE_DIR/husky/pre-commit" ".husky/pre-commit"
+FILES_GENERATED=0
+FILES_SKIPPED=0
 
-# Generate pipeline.json
-cat > "pipeline.json" << EOF
+write_file() {
+  local src="$1" dst="$2"
+  local full_dst="$PROJECT_ROOT/$dst"
+
+  if [ -f "$full_dst" ] && ! $FORCE; then
+    info "SKIP: $dst (already exists, use --force to overwrite)"
+    FILES_SKIPPED=$((FILES_SKIPPED + 1))
+    return
+  fi
+
+  local full_src="$TEMPLATE_DIR/$src"
+  if [ ! -f "$full_src" ]; then
+    info "WARN: Template not found: $src"
+    return
+  fi
+
+  render_template "$full_src" "$full_dst" && FILES_GENERATED=$((FILES_GENERATED + 1))
+}
+
+write_file "github/dependabot.yml"          ".github/dependabot.yml"
+write_file "github/workflows/ci.yml"        ".github/workflows/ci.yml"
+write_file "github/workflows/codeql.yml"    ".github/workflows/codeql.yml"
+write_file "github/workflows/playwright.yml" ".github/workflows/playwright.yml"
+write_file "agents/co-developer.md"         "shipkit/co-developer.md"
+write_file "agents/planner.md"              "shipkit/planner.md"
+write_file "agents/security-reviewer.md"    "shipkit/security-reviewer.md"
+write_file "agents/monitor.md"              "shipkit/monitor.md"
+write_file "husky/pre-commit"               ".husky/pre-commit"
+write_file "docs/AGENTS.md"                 "AGENTS.md"
+write_file "docs/ROADMAP.md"                "ROADMAP.md"
+write_file "docs/BUGS.md"                   "BUGS.md"
+write_file "docs/LAST_SESSION.md"           "LAST_SESSION.md"
+
+# Generate AI-agent-specific config
+case "$SELECTED_AGENT" in
+  "Claude Code"*)   AGENT_DST="CLAUDE.md" ;;
+  "Cursor"*)        AGENT_DST=".cursorrules" ;;
+  "GitHub Copilot"*) AGENT_DST=".github/copilot-instructions.md" ;;
+  "OpenCode"*)      AGENT_DST=".opencode/agents/co-developer.md" ;;
+  *)                AGENT_DST="" ;;
+esac
+
+if [ -n "$AGENT_DST" ]; then
+  AGENT_FULL="$PROJECT_ROOT/$AGENT_DST"
+  if [ ! -f "$AGENT_FULL" ] || $FORCE; then
+    mkdir -p "$(dirname "$AGENT_FULL")"
+    cat > "$AGENT_FULL" << AGENTEOF
+# $PROJ_NAME — AI Agent Configuration
+
+This file configures your AI agent ($SELECTED_AGENT) for **$PROJ_NAME**.
+
+→ Read \`AGENTS.md\` for the full protocol and rules
+→ Read \`shipkit.json\` for project config and tech stack
+→ Read \`ROADMAP.md\` for what's planned
+→ Read \`BUGS.md\` for what's broken
+→ Read \`LAST_SESSION.md\` for session continuity
+
+## Quick Start
+- Say "plan: <feature>" to start the planning process
+- Say "review security" before pushing changes
+- Say "check errors" at session start
+AGENTEOF
+    step "Created $AGENT_DST"
+    FILES_GENERATED=$((FILES_GENERATED + 1))
+  fi
+fi
+
+# Generate shipkit.json
+SHIPKIT_JSON="$PROJECT_ROOT/shipkit.json"
+cat > "$SHIPKIT_JSON" << JSONEOF
 {
   "project": {
     "name": "$PROJ_NAME",
     "description": "$PROJ_DESC"
   },
   "stack": {
-    "frontend": "$STACK_FRONTEND",
-    "database": "$STACK_DATABASE",
-    "auth": "$STACK_AUTH",
-    "ai": "$STACK_AI",
-    "deploy": "$STACK_DEPLOY",
-    "storage": "$STACK_STORAGE",
-    "e2e": "$STACK_E2E",
-    "analytics": "$STACK_ANALYTICS"
+    "frontend": "${DETECTED_FRONTEND:-Web application}",
+    "database": "$DB_CHOICE",
+    "auth": "$DB_CHOICE",
+    "deploy": "$DEPLOY_PLATFORM",
+    "monitoring": "$MONITORING_CHOICE"
   },
   "ci": {
-    "nodeVersion": "$NODE_VERSION",
-    "buildCommand": "$BUILD_CMD",
-    "testCommand": "$TEST_CMD",
-    "lintCommand": "$PKG_MANAGER run lint",
-    "typecheckCommand": "npx tsc --noEmit",
-    "packageManager": "$PKG_MANAGER"
+    "nodeVersion": "${DETECTED_NODE:-20}",
+    "buildCommand": "npm run build",
+    "testCommand": "npm test",
+    "lintCommand": "npm run lint"
+  },
+  "aiAgent": {
+    "tool": "$SELECTED_AGENT",
+    "configFiles": "$AGENT_CONFIG_FILES"
   },
   "github": {
     "owner": "$GH_OWNER",
     "repo": "$GH_REPO"
   },
-  "version": "1.0.0"
+  "deploy": {
+    "platform": "$DEPLOY_PLATFORM",
+    "projectId": "${DEPLOY_PROJECT_ID:-}"
+  },
+  "database": {
+    "type": "$DB_CHOICE"
+  },
+  "version": "2.0.0"
 }
-EOF
-echo -e "  ${GREEN}CREATE${NC}: pipeline.json"
-GENERATED=$((GENERATED+1))
+JSONEOF
+step "Created shipkit.json"
+FILES_GENERATED=$((FILES_GENERATED + 1))
 
-# Set up Husky
-if command -v npx &> /dev/null; then
-  if [ ! -d ".husky" ]; then
-    echo ""
-    echo "Initializing Husky..."
-    npx husky init
+# Husky setup
+title "SETTING UP PRE-COMMIT HOOKS"
+
+if command -v npx &>/dev/null; then
+  HUSKY_DIR="$PROJECT_ROOT/.husky"
+  if [ ! -d "$HUSKY_DIR" ]; then
+    step "Initializing Husky..."
+    (cd "$PROJECT_ROOT" && npx husky init 2>/dev/null) || info "Could not init Husky. Run 'npx husky init' manually."
   fi
-  chmod +x .husky/pre-commit 2>/dev/null || true
-  echo -e "  ${GREEN}OK${NC}: Pre-commit hooks ready"
+  HOOK_PATH="$PROJECT_ROOT/.husky/pre-commit"
+  if [ -f "$HOOK_PATH" ]; then
+    chmod +x "$HOOK_PATH" 2>/dev/null || true
+  fi
+  step "Pre-commit hooks configured."
+else
+  info "Node.js not found. Run 'npx husky init' manually after installing dependencies."
 fi
 
-# ====== SUMMARY ======
-echo ""
-echo -e "${BOLD}${GREEN}SETUP COMPLETE${NC}"
-echo -e "  Generated ${GENERATED} files for ${BOLD}${PROJ_NAME}${NC}"
-if [ $SKIPPED -gt 0 ]; then
-  echo -e "  ${YELLOW}${SKIPPED} files skipped (use -f to overwrite)${NC}"
-fi
-echo ""
-echo -e "${BOLD}Next steps:${NC}"
-echo "  1. Install deps:   npm install --save-dev husky lint-staged prettier"
-echo "  2. Init Husky:     npx husky init"
-echo "  3. Push to GitHub: git push origin main"
-echo "  4. Add GitHub Secrets in Settings > Secrets > Actions"
-echo "  5. Start building: Say 'plan: <feature>' to the Planner Agent"
-echo ""
-echo -e "${BOLD}Remember:${NC}"
-echo "  - Run 'review security' before pushing to catch issues early"
-echo "  - Run 'check errors' at session start for automated health check"
-echo "  - All agent files read pipeline.json to adapt to YOUR stack"
-EOF
+# ============================
+# SUMMARY
+# ============================
+title "SETUP COMPLETE — $PROJ_NAME is ShipKit ready"
 
-echo "Created setup.sh"
+echo -e "${GREEN}[DONE]${NC} Generated $FILES_GENERATED files"
+
+echo -e "
+${CYAN}ShipKit Files:${NC}
+  shipkit.json          ← Config for your AI agent (reads this at startup)
+  AGENTS.md             ← Universal AI agent protocol
+  ROADMAP.md            ← Feature tracker
+  BUGS.md               ← Bug tracker
+  LAST_SESSION.md       ← Session continuity
+  shipkit/              ← AI agent prompts
+  |-- planner.md        PM + Eng Lead
+  |-- co-developer.md   Builder (default agent)
+  |-- security-reviewer.md  Security Engineer
+  |-- monitor.md        SRE + Incident Commander
+  .github/              ← CI/CD + Security + Dependencies
+  .husky/pre-commit     ← Pre-commit hooks"
+
+[ -n "$AGENT_DST" ] && echo "  $AGENT_DST    ← $SELECTED_AGENT config file"
+
+echo -e "
+${YELLOW}Next Steps:${NC}
+  1. Install deps:     ${CYAN}npm install --save-dev husky lint-staged prettier${NC}
+  2. Init Husky:       ${CYAN}npx husky init${NC}
+  3. Push to GitHub:   ${CYAN}git push origin main${NC}
+  4. Open in your AI agent and say \"${CYAN}plan: <feature>${NC}\"
+  5. Before pushing: say \"${CYAN}review security${NC}\"
+  6. At session start: say \"${CYAN}check errors${NC}\"
+
+${CYAN}Your AI Agent will automatically:${NC}
+  • Read shipkit.json to learn your tech stack
+  • Follow AGENTS.md for the development protocol
+  • Plan features with planner.md
+  • Review security before each push
+  • Monitor production health every session
+
+${BOLD}One team. Zero overhead. Production apps.${NC}
+"
+
+if [ $FILES_SKIPPED -gt 0 ]; then
+  echo -e "${YELLOW}[WARN]${NC} $FILES_SKIPPED files were skipped (already exist). Use --force to overwrite."
+fi

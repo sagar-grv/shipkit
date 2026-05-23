@@ -1,22 +1,20 @@
 # Contributing to ShipKit
 
-First off, thanks for taking the time to contribute! ShipKit is built by solo developers, for solo developers — and every contribution makes it better.
+ShipKit is built by solo developers, for solo developers — and every contribution makes it better.
 
 ## How to Contribute
 
 ### 🐛 Bug Reports
 
 Open an [issue](https://github.com/sagar-grv/shipkit/issues) with:
-
 - A clear title and description
 - Steps to reproduce
 - Expected vs actual behavior
-- Your environment (OS, Node version, etc.)
+- Your environment (OS, AI agent, Node version, etc.)
 
 ### 💡 Feature Requests
 
 Open a [discussion](https://github.com/sagar-grv/shipkit/discussions) or issue with:
-
 - What you're trying to achieve
 - Why existing ShipKit doesn't solve it
 - A sketch of how it could work
@@ -34,18 +32,20 @@ Open a [discussion](https://github.com/sagar-grv/shipkit/discussions) or issue w
 
 | Area | Description | Difficulty |
 |---|---|---|
-| **Linux/macOS setup** | Create `setup.sh` equivalent of `setup.ps1` | Beginner |
-| **More stack templates** | Add workflows for Remix, Astro, Django, Rails | Intermediate |
-| **Agent improvements** | Make agents smarter for more tech stacks | Intermediate |
-| **Documentation** | Translations, tutorials, video guides | Beginner |
+| **CLI tool** | Build `npx shipkit` for one-command setup | Advanced |
+| **AI agent adapters** | Add config generators for more AI tools | Intermediate |
+| **More platform support** | GitLab, Bitbucket, Azure DevOps | Intermediate |
 | **Docker templates** | Dev environment with Docker Compose | Intermediate |
+| **Dashboard** | Web UI for pipeline status & metrics | Advanced |
+| **Documentation** | Translations, tutorials, video guides | Beginner |
+| **Testing** | Automated tests for setup scripts | Intermediate |
 
 ## Style Guide
 
 - Keep it simple. ShipKit's philosophy is "Ship features, not architecture."
 - One file, one responsibility.
 - Templates use `{{PLACEHOLDER}}` syntax — keep it consistent.
-- PowerShell scripts use the existing helper functions in `setup.ps1`.
+- AI agent prompts must be plain Markdown (compatible with any AI tool).
 
 ## Code of Conduct
 

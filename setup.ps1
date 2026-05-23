@@ -1,20 +1,18 @@
 <#
 .SYNOPSIS
-  Solo Dev Pipeline Setup - turns this template into YOUR project's CI/CD + AI Agent system
+  ShipKit Setup — connects your tools and generates your production pipeline
 
 .DESCRIPTION
-  Interactive setup script that generates all pipeline files for a solo development project:
-    - GitHub Actions CI/CD (lint, typecheck, test, build)
-    - CodeQL security scanning
-    - Playwright E2E tests on preview deployments
-    - AI agent prompts (planner, security reviewer, monitor, builder)
-    - Pre-commit hooks (Husky + lint-staged)
-    - Project docs (AGENTS.md, ROADMAP.md, BUGS.md, LAST_SESSION.md)
-    - pipeline.json (source of truth for agents and tooling)
+  ShipKit is an open-source orchestration layer that configures your AI agent,
+  CI/CD, security scanning, pre-commit hooks, and session management — all from
+  a single setup command.
+
+  Works with ANY stack, ANY AI agent (Claude Code, Cursor, Copilot, OpenCode, etc.),
+  ANY IDE, and ANY deploy platform.
 
 .PARAMETER ConfigFile
-  Path to a JSON config file to use instead of interactive prompts.
-  Example: .\setup.ps1 -ConfigFile my-project-config.json
+  Path to a JSON config file for headless setup.
+  Example: .\setup.ps1 -ConfigFile project-config.json
 
 .PARAMETER OutputDir
   Directory to output generated files. Defaults to current directory.
@@ -24,17 +22,22 @@
 
 .EXAMPLE
   .\setup.ps1
-  # Interactive mode - answers all questions
+  Interactive mode — answers ~5 questions about your tools
 
 .EXAMPLE
-  .\setup.ps1 -ConfigFile project.json -Force
-  # Headless mode from config file, overwrite existing files
+  .\setup.ps1 -ConfigFile project-config.json -Force
+  Headless mode from config file
+
+.EXAMPLE
+  .\setup.ps1 -DetectOnly
+  Auto-detect project config and print it without writing files
 #>
 
 param(
   [string]$ConfigFile = "",
   [string]$OutputDir = ".",
-  [switch]$Force
+  [switch]$Force,
+  [switch]$DetectOnly
 )
 
 # ---------------------------------------------------------------
@@ -74,7 +77,7 @@ function Read-Choice($Prompt, $Options, $Default) {
   Write-Host "${C.Yellow}$Prompt${C.Reset}"
   for ($i = 0; $i -lt $Options.Count; $i++) {
     $mark = if ($Options[$i] -eq $Default) { " ${C.Green}(default)${C.Reset}" } else { "" }
-    Write-Host "  [$($i+1)] $($Options[$i])$mark"
+    Write-Host "  [$($i+1)] $($Options[i])$mark"
   }
   $val = Read-Host "Enter number (1-$($Options.Count))"
   if ([string]::IsNullOrWhiteSpace($val)) { return $Default }
@@ -121,33 +124,97 @@ function Render-Template {
     if ($isTruthy) { return $innerContent } else { return "" }
   }.GetNewClosure())
 
-  # Handle {% for var in vars %}...{% endfor %} blocks (simple array iteration)
-  $forRegex = [regex]'\{\%\s*for\s+(\w+)\s+in\s+(\w+)\s*\%\}(.*?)\{\%\s*endfor\s*\%\}'
-  $result = $forRegex.Replace($result, {
-    param($match)
-    $itemVar = $match.Groups[1].Value
-    $listVar = $match.Groups[2].Value
-    $template = $match.Groups[3].Value
-    $list = $Vars[$listVar]
-
-    if (-not $list -or $list.Count -eq 0) { return "" }
-
-    $output = ""
-    foreach ($item in $list) {
-      $itemResult = $template
-      if ($item -is [hashtable] -or $item -is [PSCustomObject]) {
-        foreach ($prop in $item.PSObject.Properties) {
-          $itemResult = $itemResult -replace [regex]::Escape("{{${itemVar}.$($prop.Name)}}"), ($prop.Value.ToString())
-        }
-      } else {
-        $itemResult = $itemResult -replace [regex]::Escape("{{${itemVar}}}"), ($item.ToString())
-      }
-      $output += $itemResult
-    }
-    return $output
-  }.GetNewClosure())
-
   return $result
+}
+
+# ---------------------------------------------------------------
+# Auto-Detect Project Info
+# ---------------------------------------------------------------
+
+function Auto-Detect {
+  $detected = @{
+    frontend = ""
+    packageManager = "npm"
+    nodeVersion = "20"
+    buildCommand = ""
+    testCommand = ""
+    lintCommand = ""
+    hasDocker = $false
+    hasGit = $false
+  }
+
+  # Check for package.json
+  $pkgPath = Join-Path $OutputDir "package.json"
+  if (Test-Path $pkgPath) {
+    try {
+      $pkg = Get-Content $pkgPath -Raw | ConvertFrom-Json
+      $detected.projectName = $pkg.name
+      $detected.projectDesc = $pkg.description
+
+      # Detect framework from dependencies
+      $deps = @{}
+      if ($pkg.dependencies) { $pkg.dependencies.PSObject.Properties | ForEach-Object { $deps[$_.Name] = $_.Value } }
+      if ($pkg.devDependencies) { $pkg.devDependencies.PSObject.Properties | ForEach-Object { $deps[$_.Name] = $_.Value } }
+
+      if ($deps.ContainsKey("next")) { $detected.frontend = "Next.js" }
+      elseif ($deps.ContainsKey("react") -or $deps.ContainsKey("react-dom")) { $detected.frontend = "React + Vite" }
+      elseif ($deps.ContainsKey("vue")) { $detected.frontend = "Vue" }
+      elseif ($deps.ContainsKey("svelte")) { $detected.frontend = "Svelte" }
+      elseif ($deps.ContainsKey("@remix-run/react")) { $detected.frontend = "Remix" }
+
+      # Detect tests
+      if ($deps.ContainsKey("playwright")) { $detected.e2e = "Playwright" }
+      elseif ($deps.ContainsKey("cypress")) { $detected.e2e = "Cypress" }
+
+      # Detect lint tools
+      if ($deps.ContainsKey("eslint")) { $detected.lintCommand = "npm run lint" }
+
+      # Detect build/test scripts
+      if ($pkg.scripts) {
+        $scripts = $pkg.scripts
+        if ($scripts.build) { $detected.buildCommand = "npm run build" }
+        else { $detected.buildCommand = "npm run build" }
+        if ($scripts.test) { $detected.testCommand = "npm test" }
+
+        # Detect package manager
+        if (Get-Command pnpm -ErrorAction SilentlyContinue) { $detected.packageManager = "pnpm" }
+        elseif (Get-Command yarn -ErrorAction SilentlyContinue) { $detected.packageManager = "yarn" }
+
+        # Detect node version from engines or .nvmrc
+        if ($pkg.engines -and $pkg.engines.node) {
+          $detected.nodeVersion = ($pkg.engines.node -replace '[^0-9.]', '')
+        }
+      }
+    } catch {
+      Write-Info "Could not read package.json"
+    }
+  }
+
+  # Check for Docker
+  if (Test-Path (Join-Path $OutputDir "Dockerfile") -or (Test-Path (Join-Path $OutputDir "docker-compose.yml"))) {
+    $detected.hasDocker = $true
+  }
+
+  # Check for Git
+  if (Test-Path (Join-Path $OutputDir ".git")) {
+    $detected.hasGit = $true
+    try {
+      $remote = git config --get remote.origin.url 2>$null
+      if ($remote) {
+        $detected.gitRemote = $remote
+      }
+    } catch {}
+  }
+
+  # Check for existing config files
+  $detected.hasSupabase = Test-Path (Join-Path $OutputDir "supabase") -or (Test-Path (Join-Path $OutputDir "supabase.json"))
+  $detected.hasFirebase = Test-Path (Join-Path $OutputDir "firebase.json")
+  $detected.hasVercel = Test-Path (Join-Path $OutputDir "vercel.json") -or (Test-Path (Join-Path $OutputDir ".vercel"))
+  $detected.hasNetlify = Test-Path (Join-Path $OutputDir "netlify.toml")
+  $detected.hasSentry = (Test-Path (Join-Path $OutputDir ".sentryclirc")) -or (Test-Path (Join-Path $OutputDir "sentry.client.config.ts")) -or (Test-Path (Join-Path $OutputDir "sentry.client.config.js"))
+  $detected.hasHusky = Test-Path (Join-Path $OutputDir ".husky")
+
+  return $detected
 }
 
 # ---------------------------------------------------------------
@@ -165,237 +232,201 @@ if ($ConfigFile -and (Test-Path $ConfigFile)) {
   Write-Step "Config loaded."
 }
 
+# Auto-detect project
+$detected = Auto-Detect
+
+if ($DetectOnly) {
+  Write-Host "${C.Cyan}Detected project config:${C.Reset}"
+  $detected | ConvertTo-Json | Write-Host
+  return $detected
+}
+
 # ---------------------------------------------------------------
 # Welcome
 # ---------------------------------------------------------------
 
 Write-Host @"
 ${C.Bold}${C.Cyan}
-╔══════════════════════════════════════════╗
-║          ShipKit Setup - v1.0           ║
-║  Replace a 6-person team with AI agents ║
-╚══════════════════════════════════════════╝
+ ⚓ ShipKit — MVP to Production Pipeline
+   Connect your tools. Ship to production. No team required.
 
-  This script generates a complete production pipeline:
-    - GitHub Actions CI/CD (lint, typecheck, test, build)
-    - CodeQL security scanning
-    - Playwright E2E tests
-    - AI agent prompts (planner, security, monitor, builder)
-    - Husky pre-commit hooks
-    - Project management docs
+   This script will:
+   • Detect your project's tech stack
+   • Configure CI/CD (lint → test → build → deploy)
+   • Set up security scanning (CodeQL + Dependabot)
+   • Generate AI agent prompts (works with Claude Code, Cursor, Copilot, any agent)
+   • Create pre-commit hooks
+   • Set up session continuity for your AI agent
+
+   Takes ~2 minutes. Works with any stack, any AI agent.
 ${C.Reset}
 "@
 
 if (-not $ConfigFile) {
-  Write-Host "${C.Yellow}Press Enter for defaults, type your values to customize.${C.Reset}"
+  Write-Host "${C.Yellow}Press Enter for defaults (auto-detected values shown).${C.Reset}"
+  Write-Info "Detected: $($detected.frontend) | $($detected.packageManager) | Node $($detected.nodeVersion)"
 }
 
 # ---------------------------------------------------------------
 # 1. Project Info
 # ---------------------------------------------------------------
 
-Write-Title "PROJECT INFORMATION"
+Write-Title "PROJECT"
 
 $projName = if ($config.ContainsKey("project") -and $config.project.ContainsKey("name")) {
   $config.project.name
 } else {
-  Read-Value "Project name" "MyApp"
+  Read-Value "Project name" $detected.projectName
 }
 
 $projDesc = if ($config.ContainsKey("project") -and $config.project.ContainsKey("description")) {
   $config.project.description
 } else {
-  Read-Value "Project description" "A web application"
+  Read-Value "Project description" $detected.projectDesc
 }
 
 # ---------------------------------------------------------------
-# 2. Tech Stack
+# 2. AI Agent Selection
 # ---------------------------------------------------------------
 
-Write-Title "TECH STACK"
+Write-Title "AI AGENT"
 
-$stackFrontend = if ($config.ContainsKey("stack") -and $config.stack.ContainsKey("frontend")) {
-  $config.stack.frontend
+$aiAgentOptions = @("Claude Code (Anthropic)", "Cursor", "GitHub Copilot", "OpenCode", "CodeGPT", "Continue.dev", "Cline", "Aider", "Other / Custom")
+$selectedAgent = if ($config.ContainsKey("aiAgent")) {
+  $config.aiAgent
 } else {
-  Read-Choice "Frontend framework" @("Next.js 15+", "React + Vite", "Nuxt.js", "SvelteKit", "Remix", "Other") "Next.js 15+"
+  Read-Choice "Which AI agent do you use?" $aiAgentOptions "Claude Code (Anthropic)"
 }
 
-$stackDatabase = if ($config.ContainsKey("stack") -and $config.stack.ContainsKey("database")) {
-  $config.stack.database
-} else {
-  Read-Choice "Database" @("Supabase Postgres", "Firebase Firestore", "MongoDB", "PostgreSQL (direct)", "None / SQLite", "Other") "Supabase Postgres"
+# Map AI agent to config file paths
+$agentFiles = @{}
+switch -Wildcard ($selectedAgent) {
+  "Claude Code*"   { $agentFiles = @{ agent = "claude-code"; configFiles = @("CLAUDE.md") } }
+  "Cursor*"        { $agentFiles = @{ agent = "cursor"; configFiles = @(".cursorrules") } }
+  "GitHub Copilot*" { $agentFiles = @{ agent = "copilot"; configFiles = @(".github/copilot-instructions.md") } }
+  "OpenCode*"      { $agentFiles = @{ agent = "opencode"; configFiles = @(".opencode/agents/co-developer.md") } }
+  default          { $agentFiles = @{ agent = "custom"; configFiles = @("AGENTS.md") } }
 }
 
-$stackAuth = if ($config.ContainsKey("stack") -and $config.stack.ContainsKey("auth")) {
-  $config.stack.auth
-} else {
-  Read-Choice "Authentication" @("Supabase Auth", "Firebase Auth", "Clerk", "Auth0", "NextAuth.js", "Custom / None") "Supabase Auth"
-}
+# ---------------------------------------------------------------
+# 3. GitHub Auth
+# ---------------------------------------------------------------
 
-$hasAi = Confirm-YN "Does your app use AI/LLM features?" $false
-$stackAi = ""
-if ($hasAi) {
-  $stackAi = if ($config.ContainsKey("stack") -and $config.stack.ContainsKey("ai")) {
-    $config.stack.ai
-  } else {
-    Read-Choice "AI provider" @("Gemini API", "OpenAI API", "Anthropic Claude", "Hugging Face", "Custom / Local") "Gemini API"
+Write-Title "GITHUB"
+
+$ghOwner = ""
+$ghRepo = ""
+$ghToken = ""
+
+if ($config.ContainsKey("github") -and $config.github.ContainsKey("owner")) {
+  $ghOwner = $config.github.owner
+  $ghRepo = $config.github.repo
+} else {
+  # Try gh CLI
+  $ghCli = Get-Command gh -ErrorAction SilentlyContinue
+  if ($ghCli -and (Confirm-YN "GitHub CLI detected. Auto-configure from current repo?" $true)) {
+    try {
+      $ghOwner = gh repo view --json owner --jq .owner.login 2>$null
+      $ghRepo = gh repo view --json name --jq .name 2>$null
+      Write-Step "Detected: $ghOwner / $ghRepo"
+    } catch {
+      Write-Info "Could not auto-detect GitHub repo"
+    }
   }
-}
 
-$stackDeploy = if ($config.ContainsKey("stack") -and $config.stack.ContainsKey("deploy")) {
-  $config.stack.deploy
-} else {
-  Read-Choice "Deploy platform" @("Vercel", "Netlify", "Fly.io", "Railway", "Cloudflare Pages", "Self-hosted") "Vercel"
-}
-
-$stackE2e = if ($config.ContainsKey("stack") -and $config.stack.ContainsKey("e2e")) {
-  $config.stack.e2e
-} else {
-  Read-Choice "E2E test framework" @("Playwright", "Cypress", "None") "Playwright"
-}
-
-$hasAnalytics = Confirm-YN "Set up error tracking / analytics?" $true
-$stackAnalytics = ""
-if ($hasAnalytics) {
-  $stackAnalytics = if ($config.ContainsKey("stack") -and $config.stack.ContainsKey("analytics")) {
-    $config.stack.analytics
-  } else {
-    Read-Choice "Error tracking" @("Sentry", "LogRocket", "Datadog", "PostHog", "Custom") "Sentry"
+  if (-not $ghOwner) {
+    $ghOwner = Read-Value "GitHub username/organization" ($detected.gitRemote -replace '.*[:/]([^/]+)/.*', '$1')
+    $ghRepo = Read-Value "GitHub repository name" ($projName -replace '[^a-zA-Z0-9\-]', '').ToLower()
   }
-}
 
-# Map database to storage
-$stackStorage = if ($config.ContainsKey("stack") -and $config.stack.ContainsKey("storage")) {
-  $config.stack.storage
-} elseif ($stackDatabase -like "Supabase*") {
-  "Supabase Storage"
-} elseif ($stackDatabase -like "Firebase*") {
-  "Firebase Storage"
-} else {
-  "Cloud storage (S3, etc.)"
-}
-
-# ---------------------------------------------------------------
-# 3. CI/CD Config
-# ---------------------------------------------------------------
-
-Write-Title "CI/CD CONFIGURATION"
-
-$nodeVersion = if ($config.ContainsKey("ci") -and $config.ci.ContainsKey("nodeVersion")) {
-  $config.ci.nodeVersion
-} else {
-  Read-Value "Node.js version" "20"
-}
-
-$pkgManager = if ($config.ContainsKey("ci") -and $config.ci.ContainsKey("packageManager")) {
-  $config.ci.packageManager
-} else {
-  Read-Choice "Package manager" @("npm", "pnpm", "yarn") "npm"
-}
-
-$buildCmd = if ($config.ContainsKey("ci") -and $config.ci.ContainsKey("buildCommand")) {
-  $config.ci.buildCommand
-} else {
-  Read-Value "Build command" "$pkgManager run build"
-}
-
-$testCmd = if ($config.ContainsKey("ci") -and $config.ci.ContainsKey("testCommand")) {
-  $config.ci.testCommand
-} else {
-  Read-Value "Test command" "$pkgManager test"
-}
-
-$lintCmd = "$pkgManager run lint"
-$typecheckCmd = "npx tsc --noEmit"
-
-$hasCoverage = Confirm-YN "Upload test coverage reports?" $true
-
-# ---------------------------------------------------------------
-# 4. Database Config
-# ---------------------------------------------------------------
-
-$dbType = ""
-$dbProjectId = ""
-$dbRegion = ""
-$rlsEnabled = $false
-
-if ($stackDatabase -like "Supabase*") {
-  Write-Title "SUPABASE CONFIGURATION"
-  $dbType = "supabase"
-  $dbProjectId = Read-Value "Supabase project ID (from dashboard)" ""
-  $dbRegion = Read-Value "Supabase region" "ap-south-1"
-  $rlsEnabled = Confirm-YN "Enable Row Level Security (RLS)?" $true
-} elseif ($stackDatabase -like "Firebase*") {
-  $dbType = "firebase"
-  $dbProjectId = Read-Value "Firebase project ID" ""
-  $rlsEnabled = $true
-} elseif ($stackDatabase -notlike "None*") {
-  if ($stackDatabase -notlike "SQLite*") {
-    $dbType = "postgresql"
-    Write-Info "PostgreSQL database - remember to set up connection strings in .env"
+  if ($ghCli -and (Confirm-YN "Authenticate ShipKit with GitHub? (enables CI/CD status checks)" $true)) {
+    try {
+      $ghToken = gh auth token 2>$null
+      if ($ghToken) {
+        Write-Step "GitHub authenticated."
+      }
+    } catch {
+      Write-Info "GitHub CLI not authenticated. Run 'gh auth login' later."
+    }
   }
 }
 
 # ---------------------------------------------------------------
-# 5. Deploy Config
+# 4. Deploy Platform
 # ---------------------------------------------------------------
 
+Write-Title "DEPLOY PLATFORM"
+
+$deployOptions = @("Vercel", "Netlify", "Fly.io", "Railway", "Render", "Cloudflare Pages", "Docker / Self-hosted", "AWS", "GCP", "None yet")
+$deployPlatform = if ($config.ContainsKey("deploy") -and $config.deploy.ContainsKey("platform")) {
+  $config.deploy.platform
+} elseif ($detected.hasVercel) {
+  "Vercel"
+} elseif ($detected.hasNetlify) {
+  "Netlify"
+} else {
+  Read-Choice "Where do you deploy?" $deployOptions "Vercel"
+}
+
+$deployToken = ""
 $deployProjectId = ""
-$previewUrlsEnabled = $false
-
-if ($stackDeploy -eq "Vercel") {
-  Write-Title "VERCEL CONFIGURATION"
-  $deployProjectId = Read-Value "Vercel project ID (from Project Settings > General)" ""
-  $previewUrlsEnabled = Confirm-YN "Enable E2E tests on preview deployments?" $true
-}
-
-# ---------------------------------------------------------------
-# 6. Monitoring Config
-# ---------------------------------------------------------------
-
-$monitoringOrg = ""
-$monitoringProject = ""
-
-if ($stackAnalytics) {
-  Write-Title "MONITORING CONFIGURATION"
-  $monitoringOrg = Read-Value "$stackAnalytics organization slug" ""
-  $monitoringProject = Read-Value "$stackAnalytics project slug" ""
-}
-
-# ---------------------------------------------------------------
-# 7. GitHub Config
-# ---------------------------------------------------------------
-
-Write-Title "GITHUB CONFIGURATION"
-
-$ghOwner = if ($config.ContainsKey("github") -and $config.github.ContainsKey("owner")) {
-  $config.github.owner
-} else {
-  Read-Value "GitHub username/organization" "your-username"
-}
-
-$ghRepo = if ($config.ContainsKey("github") -and $config.github.ContainsKey("repo")) {
-  $config.github.repo
-} else {
-  Read-Value "GitHub repository name" ($projName -replace '[^a-zA-Z0-9\-]', '').ToLower()
-}
-
-# ---------------------------------------------------------------
-# 8. Build Env Vars
-# ---------------------------------------------------------------
-
-Write-Title "BUILD ENVIRONMENT VARIABLES"
-
-$buildEnvVars = @()
-$addEnvVars = Confirm-YN "Add build-time environment variables? (e.g., NEXT_PUBLIC_SUPABASE_URL)" $true
-while ($addEnvVars) {
-  $name = Read-Value "  Variable name (e.g., NEXT_PUBLIC_API_URL)" ""
-  $secret = Read-Value "  GitHub secret name (e.g., NEXT_PUBLIC_API_URL)" ""
-  if ($name -and $secret) {
-    $buildEnvVars += @{ name = $name; secret = $secret }
+if ($deployPlatform -ne "None yet") {
+  if ($deployPlatform -eq "Vercel" -and (Get-Command vercel -ErrorAction SilentlyContinue) -and (Confirm-YN "Authenticate with Vercel?" $true)) {
+    try {
+      $deployToken = vercel token 2>$null
+      $deployProjectId = vercel project --json 2>$null | ConvertFrom-Json | Select-Object -ExpandProperty id -ErrorAction SilentlyContinue
+      if ($deployProjectId) { Write-Step "Vercel project detected." }
+    } catch {
+      Write-Info "Could not auto-detect Vercel config"
+    }
   }
-  $addEnvVars = Confirm-YN "  Add another?" $false
 }
+
+# ---------------------------------------------------------------
+# 5. Database
+# ---------------------------------------------------------------
+
+Write-Title "DATABASE"
+
+$dbOptions = @("Supabase Postgres", "Firebase Firestore", "MongoDB", "PostgreSQL (direct)", "MySQL", "SQLite", "None yet")
+$dbChoice = if ($config.ContainsKey("database") -and $config.database.ContainsKey("type")) {
+  $config.database.type
+} elseif ($detected.hasSupabase) {
+  "Supabase Postgres"
+} elseif ($detected.hasFirebase) {
+  "Firebase Firestore"
+} else {
+  Read-Choice "Which database do you use?" $dbOptions "Supabase Postgres"
+}
+
+$dbToken = ""
+if ($dbChoice -like "Supabase*" -and (Get-Command supabase -ErrorAction SilentlyContinue) -and (Confirm-YN "Authenticate with Supabase?" $true)) {
+  try {
+    $dbToken = supabase auth token 2>$null
+    Write-Step "Supabase authenticated."
+  } catch {}
+}
+
+# ---------------------------------------------------------------
+# 6. Error Tracking (Optional)
+# ---------------------------------------------------------------
+
+$monitoringOptions = @("Sentry", "Datadog", "LogRocket", "PostHog", "None")
+$monitoringChoice = if ($config.ContainsKey("monitoring") -and $config.monitoring.ContainsKey("platform")) {
+  $config.monitoring.platform
+} elseif ($detected.hasSentry) {
+  "Sentry"
+} else {
+  Read-Choice "Error tracking / monitoring?" $monitoringOptions "None"
+}
+
+# ---------------------------------------------------------------
+# Map DB to storage
+# ---------------------------------------------------------------
+
+$storageChoice = if ($dbChoice -like "Supabase*") { "Supabase Storage" }
+elseif ($dbChoice -like "Firebase*") { "Firebase Storage" }
+else { "Cloud storage (S3, etc.)" }
 
 # ---------------------------------------------------------------
 # Build Variables
@@ -406,40 +437,43 @@ $Vars = @{
   PROJECT_DESCRIPTION = $projDesc
   DATE = (Get-Date -Format "yyyy-MM-dd")
 
-  STACK_FRONTEND = $stackFrontend
-  STACK_DATABASE = $stackDatabase
-  STACK_AUTH = $stackAuth
-  STACK_AI = if ($stackAi) { $stackAi } else { "None" }
-  STACK_DEPLOY = $stackDeploy
-  STACK_STORAGE = $stackStorage
-  STACK_E2E = $stackE2e
-  STACK_ANALYTICS = if ($stackAnalytics) { $stackAnalytics } else { "None" }
+  STACK_FRONTEND = if ($detected.frontend) { $detected.frontend } else { "Web application" }
+  STACK_DATABASE = $dbChoice
+  STACK_AUTH = $dbChoice  # default: same as DB auth provider
+  STACK_AI = "AI-powered features"
+  STACK_DEPLOY = $deployPlatform
+  STACK_STORAGE = $storageChoice
+  STACK_E2E = if ($detected.e2e) { $detected.e2e } else { "Playwright" }
+  STACK_ANALYTICS = $monitoringChoice
 
-  NODE_VERSION = $nodeVersion
-  BUILD_COMMAND = $buildCmd
-  TEST_COMMAND = $testCmd
-  LINT_COMMAND = $lintCmd
-  TYPECHECK_COMMAND = $typecheckCmd
-  PACKAGE_MANAGER = $pkgManager
-  COVERAGE_ENABLED = if ($hasCoverage) { "true" } else { "false" }
+  NODE_VERSION = $detected.nodeVersion
+  BUILD_COMMAND = $detected.buildCommand
+  TEST_COMMAND = $detected.testCommand
+  LINT_COMMAND = $detected.lintCommand
+  TYPECHECK_COMMAND = "npx tsc --noEmit"
+  PACKAGE_MANAGER = $detected.packageManager
+  COVERAGE_ENABLED = "true"
 
-  DATABASE_TYPE = $dbType
-  DATABASE_PROJECT_ID = $dbProjectId
-  DATABASE_REGION = $dbRegion
-  RLS_ENABLED = if ($rlsEnabled) { "true" } else { "false" }
+  DATABASE_TYPE = $dbChoice
+  DATABASE_PROJECT_ID = ""
+  DATABASE_REGION = ""
+  RLS_ENABLED = if ($dbChoice -like "Supabase*") { "true" } else { "false" }
 
   GITHUB_OWNER = $ghOwner
   GITHUB_REPO = $ghRepo
 
-  DEPLOY_PLATFORM = $stackDeploy
+  DEPLOY_PLATFORM = $deployPlatform
   DEPLOY_PROJECT_ID = $deployProjectId
-  PREVIEW_URLS_ENABLED = if ($previewUrlsEnabled) { "true" } else { "false" }
+  PREVIEW_URLS_ENABLED = if ($deployPlatform -eq "Vercel") { "true" } else { "false" }
 
-  MONITORING_PLATFORM = if ($stackAnalytics) { $stackAnalytics } else { "None" }
-  MONITORING_ORG = $monitoringOrg
-  MONITORING_PROJECT = $monitoringProject
+  MONITORING_PLATFORM = $monitoringChoice
+  MONITORING_ORG = ""
+  MONITORING_PROJECT = ""
 
-  BUILD_ENV_VARS = $buildEnvVars
+  BUILD_ENV_VARS = @()
+
+  AI_AGENT = $selectedAgent
+  AGENT_CONFIG_FILES = $agentFiles.configFiles -join ", "
 }
 
 # ---------------------------------------------------------------
@@ -451,22 +485,30 @@ Write-Title "GENERATING PIPELINE FILES"
 $TemplateDir = Join-Path $PSScriptRoot "template"
 $ProjectRoot = Resolve-Path $OutputDir
 
-# Define all source -> destination mappings
 $Files = @(
   @{ src = "github/dependabot.yml";            dst = ".github/dependabot.yml" }
   @{ src = "github/workflows/ci.yml";          dst = ".github/workflows/ci.yml" }
   @{ src = "github/workflows/codeql.yml";      dst = ".github/workflows/codeql.yml" }
   @{ src = "github/workflows/playwright.yml";  dst = ".github/workflows/playwright.yml" }
-  @{ src = "agents/co-developer.md";           dst = "agents/co-developer.md" }
-  @{ src = "agents/planner.md";                dst = "agents/planner.md" }
-  @{ src = "agents/security-reviewer.md";      dst = "agents/security-reviewer.md" }
-  @{ src = "agents/monitor.md";                dst = "agents/monitor.md" }
+  @{ src = "agents/co-developer.md";           dst = "shipkit/co-developer.md" }
+  @{ src = "agents/planner.md";                dst = "shipkit/planner.md" }
+  @{ src = "agents/security-reviewer.md";      dst = "shipkit/security-reviewer.md" }
+  @{ src = "agents/monitor.md";                dst = "shipkit/monitor.md" }
   @{ src = "husky/pre-commit";                 dst = ".husky/pre-commit" }
   @{ src = "docs/AGENTS.md";                   dst = "AGENTS.md" }
   @{ src = "docs/ROADMAP.md";                  dst = "ROADMAP.md" }
   @{ src = "docs/BUGS.md";                     dst = "BUGS.md" }
   @{ src = "docs/LAST_SESSION.md";             dst = "LAST_SESSION.md" }
 )
+
+# Also generate AI-agent-specific config file
+$agentConfigDst = ""
+switch -Wildcard ($selectedAgent) {
+  "Claude Code*"   { $agentConfigDst = "CLAUDE.md" }
+  "Cursor*"        { $agentConfigDst = ".cursorrules" }
+  "GitHub Copilot*" { $agentConfigDst = ".github/copilot-instructions.md" }
+  "OpenCode*"      { $agentConfigDst = ".opencode/agents/co-developer.md" }
+}
 
 $generatedCount = 0
 $skippedCount = 0
@@ -500,61 +542,96 @@ foreach ($file in $Files) {
   }
 }
 
+# Generate AI-agent-specific config file (copies AGENTS.md or references it)
+if ($agentConfigDst) {
+  $agentDstPath = Join-Path $ProjectRoot $agentConfigDst
+  $agentDir = Split-Path $agentDstPath -Parent
+  if (-not (Test-Path $agentDir)) {
+    New-Item -ItemType Directory -Path $agentDir -Force | Out-Null
+  }
+
+  if (-not (Test-Path $agentDstPath) -or $Force) {
+    # Write a reference file that points to AGENTS.md
+    $agentRef = @"
+# {{PROJECT_NAME}} — AI Agent Configuration
+
+This file configures your AI agent ($selectedAgent) for **{{PROJECT_NAME}}**.
+
+→ Read `AGENTS.md` for the full protocol and rules
+→ Read `shipkit.json` for project config and tech stack
+→ Read `ROADMAP.md` for what's planned
+→ Read `BUGS.md` for what's broken
+→ Read `LAST_SESSION.md` for session continuity
+
+## Quick Start
+- Say "plan: <feature>" to start the planning process
+- Say "review security" before pushing changes
+- Say "check errors" at session start
+"@
+    $renderedAgentRef = Render-Template -Content $agentRef -Vars $Vars
+    $renderedAgentRef | Set-Content $agentDstPath -NoNewline
+    Write-Step "Created $agentConfigDst (AI agent config)"
+    $generatedCount++
+  } else {
+    Write-Info "SKIP: $agentConfigDst (already exists)"
+    $skippedCount++
+  }
+}
+
 # ---------------------------------------------------------------
-# Generate pipeline.json
+# Generate shipkit.json
 # ---------------------------------------------------------------
 
-$pipelineJson = @"
+$shipkitJson = @"
 {
   "project": {
     "name": "$projName",
     "description": "$projDesc"
   },
   "stack": {
-    "frontend": "$stackFrontend",
-    "database": "$stackDatabase",
-    "auth": "$stackAuth",
-    "ai": "$stackAi",
-    "deploy": "$stackDeploy",
-    "storage": "$stackStorage",
-    "e2e": "$stackE2e",
-    "analytics": "$stackAnalytics"
+    "frontend": "$($Vars.STACK_FRONTEND)",
+    "database": "$($Vars.STACK_DATABASE)",
+    "auth": "$($Vars.STACK_AUTH)",
+    "deploy": "$($Vars.STACK_DEPLOY)",
+    "storage": "$($Vars.STACK_STORAGE)",
+    "e2e": "$($Vars.STACK_E2E)",
+    "monitoring": "$($Vars.STACK_ANALYTICS)"
   },
   "ci": {
-    "nodeVersion": "$nodeVersion",
-    "buildCommand": "$buildCmd",
-    "testCommand": "$testCmd",
-    "lintCommand": "$lintCmd",
-    "typecheckCommand": "$typecheckCmd",
-    "packageManager": "$pkgManager"
+    "nodeVersion": "$($Vars.NODE_VERSION)",
+    "buildCommand": "$($Vars.BUILD_COMMAND)",
+    "testCommand": "$($Vars.TEST_COMMAND)",
+    "lintCommand": "$($Vars.LINT_COMMAND)",
+    "typecheckCommand": "$($Vars.TYPECHECK_COMMAND)",
+    "packageManager": "$($Vars.PACKAGE_MANAGER)"
   },
-  "database": {
-    "type": "$dbType",
-    "projectId": "$dbProjectId",
-    "region": "$dbRegion",
-    "rlsEnabled": $($rlsEnabled.ToString().ToLower())
+  "aiAgent": {
+    "tool": "$selectedAgent",
+    "configFiles": "$($Vars.AGENT_CONFIG_FILES)"
   },
   "github": {
-    "owner": "$ghOwner",
-    "repo": "$ghRepo"
+    "owner": "$($Vars.GITHUB_OWNER)",
+    "repo": "$($Vars.GITHUB_REPO)"
   },
   "deploy": {
-    "platform": "$stackDeploy",
-    "projectId": "$deployProjectId",
-    "previewUrls": $($previewUrlsEnabled.ToString().ToLower())
+    "platform": "$($Vars.DEPLOY_PLATFORM)",
+    "projectId": "$($Vars.DEPLOY_PROJECT_ID)",
+    "previewUrls": $($Vars.PREVIEW_URLS_ENABLED.ToString().ToLower())
+  },
+  "database": {
+    "type": "$($Vars.DATABASE_TYPE)",
+    "rlsEnabled": $($Vars.RLS_ENABLED.ToString().ToLower())
   },
   "monitoring": {
-    "platform": "$stackAnalytics",
-    "org": "$monitoringOrg",
-    "project": "$monitoringProject"
+    "platform": "$($Vars.MONITORING_PLATFORM)"
   },
-  "version": "1.0.0"
+  "version": "2.0.0"
 }
 "@
 
-$pipelineJsonPath = Join-Path $ProjectRoot "pipeline.json"
-$pipelineJson | Set-Content $pipelineJsonPath
-Write-Step "Created pipeline.json"
+$shipkitJsonPath = Join-Path $ProjectRoot "shipkit.json"
+$shipkitJson | Set-Content $shipkitJsonPath
+Write-Step "Created shipkit.json"
 $generatedCount++
 
 # ---------------------------------------------------------------
@@ -572,13 +649,11 @@ if (Get-Command npx -ErrorAction SilentlyContinue) {
     Pop-Location
   }
 
-  # Ensure the pre-commit hook is executable on non-Windows
   $hookPath = Join-Path $ProjectRoot ".husky/pre-commit"
   if (Test-Path $hookPath) {
     if ($IsLinux -or $IsMacOS) {
       chmod +x $hookPath 2>$null
     }
-    # Ensure the hook has the lint-staged command
     $hookContent = Get-Content $hookPath -Raw
     if ($hookContent -notmatch "lint-staged") {
       Set-Content $hookPath ". `"`$(dirname -- `"`$0`")/_/husky.sh`n`nnpx lint-staged`n"
@@ -594,43 +669,43 @@ if (Get-Command npx -ErrorAction SilentlyContinue) {
 # Summary
 # ---------------------------------------------------------------
 
-Write-Title "SETUP COMPLETE"
+Write-Title "SETUP COMPLETE — $projName is ShipKit ready"
 
 Write-Host @"
-${C.Green}[DONE]${C.Reset} Generated $generatedCount files for $projName
-${C.Cyan}${C.Reset}
+${C.Green}[DONE]${C.Reset} Generated $generatedCount files
 
-${C.Cyan}Project Structure:${C.Reset}
-  |-- pipeline.json            Config (source of truth for agents)
-  |-- AGENTS.md                ShipKit Agent Protocol
-  |-- ROADMAP.md               Product roadmap
-  |-- BUGS.md                  Bug tracker
-  |-- LAST_SESSION.md          Session continuity
-  |-- .github/
-  |   |-- dependabot.yml       Weekly dependency updates
-  |   |-- workflows/
-  |       |-- ci.yml           lint, typecheck, test, build
-  |       |-- codeql.yml       Security scanning
-  |       |-- playwright.yml   E2E on preview
-  |-- agents/
-  |   |-- planner.md           PM + Eng Lead
-  |   |-- security-reviewer.md Security Engineer
-  |   |-- monitor.md           SRE + Incident Commander
-  |   |-- co-developer.md      Builder
-  |-- .husky/pre-commit        Pre-commit hooks
+${C.Cyan}ShipKit Files:${C.Reset}
+  shipkit.json          ← Config for your AI agent (reads this at startup)
+  AGENTS.md             ← Universal AI agent protocol
+  ROADMAP.md            ← Feature tracker
+  BUGS.md               ← Bug tracker
+  LAST_SESSION.md       ← Session continuity
+  shipkit/              ← AI agent prompts
+  │-- planner.md        PM + Eng Lead
+  │-- co-developer.md   Builder (default agent)
+  │-- security-reviewer.md  Security Engineer
+  |-- monitor.md        SRE + Incident Commander
+  .github/              ← CI/CD + Security + Dependencies
+  .husky/pre-commit     ← Pre-commit hooks
+
+$(if ($agentConfigDst) { "  $agentConfigDst    ← $selectedAgent config file" } else { "" })
 
 ${C.Yellow}Next Steps:${C.Reset}
   1. Install deps:     ${C.Cyan}npm install --save-dev husky lint-staged prettier${C.Reset}
   2. Init Husky:       ${C.Cyan}npx husky init${C.Reset}
   3. Push to GitHub:   ${C.Cyan}git push origin main${C.Reset}
-  4. Add GitHub Secrets: Settings > Secrets > Actions
-  5. Enable branch protection on main branch
-  6. Start building:   ${C.Cyan}Say "plan: <feature>" to the Planner Agent${C.Reset}
+  4. Open in your AI agent and say "${C.Cyan}plan: <feature>${C.Reset}"
+  5. Before pushing: say "${C.Cyan}review security${C.Reset}"
+  6. At session start: say "${C.Cyan}check errors${C.Reset}"
 
-${C.Bold}Remember:${C.Reset}
-  - Run 'review security' before pushing to catch issues early
-  - Run 'check errors' at session start for automated health check
-  - All agent files read pipeline.json to adapt to YOUR stack
+${C.Cyan}Your AI Agent will automatically:${C.Reset}
+  • Read shipkit.json to learn your tech stack
+  • Follow AGENTS.md for the development protocol
+  • Plan features with planner.md
+  • Review security before each push
+  • Monitor production health every session
+
+${C.Bold}One team. Zero overhead. Production apps.${C.Reset}
 "@
 
 if ($skippedCount -gt 0) {
