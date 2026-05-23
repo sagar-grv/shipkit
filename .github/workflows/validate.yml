@@ -1,4 +1,4 @@
-# ShipKit — Validate templates and docs
+﻿# ShipKit — Validate templates and docs
 name: Validate
 
 on:
@@ -19,14 +19,36 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Check template placeholders
+      - name: Check template files
         run: |
-          # Verify all template files have matching {{VAR}} placeholders
-          echo "Checking template syntax..."
-          for f in template/agents/*.md template/docs/*.md; do
-            echo "  ✓ $f"
+          echo "Checking template files exist..."
+          errors=0
+          for f in \
+            template/agents/planner.md \
+            template/agents/co-developer.md \
+            template/agents/security-reviewer.md \
+            template/agents/monitor.md \
+            template/docs/AGENTS.md \
+            template/docs/ROADMAP.md \
+            template/docs/BUGS.md \
+            template/docs/LAST_SESSION.md \
+            template/github/dependabot.yml \
+            template/github/workflows/ci.yml \
+            template/github/workflows/codeql.yml \
+            template/github/workflows/playwright.yml \
+            template/husky/pre-commit; do
+            if [ -f "$f" ]; then
+              echo "  ✓ $f"
+            else
+              echo "  ✗ MISSING: $f"
+              errors=$((errors + 1))
+            fi
           done
-          echo "All templates OK"
+          if [ $errors -gt 0 ]; then
+            echo "ERROR: $errors template files missing!"
+            exit 1
+          fi
+          echo "All template files OK"
 
   check-readme:
     name: Check README

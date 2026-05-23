@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShipKit — MVP to Production Pipeline</title>
+<meta name="description" content="ShipKit: connect your AI agent, CI/CD, security, and deploy in one command. Replace a 6-person team with AI agents + CI/CD.">
+<meta property="og:title" content="ShipKit — MVP to Production Pipeline">
+<meta property="og:description" content="Connect your AI agent, CI/CD, security, and deploy in one command. Any stack, any agent, any deploy.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://sagar-grv.github.io/shipkit/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ShipKit — MVP to Production Pipeline">
+<meta name="twitter:description" content="Connect your AI agent, CI/CD, security, and deploy in one command.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚓</text></svg>">
+<meta property="og:image" content="https://sagar-grv.github.io/shipkit/og-image.svg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://sagar-grv.github.io/shipkit/og-image.svg">
+<style>
+  :root {
+    --bg: #0a0e17;
+    --text: #e2e8f0;
+    --text-dim: #8892b0;
+    --accent: #5eead4;
+    --accent-dim: #2dd4bf;
+    --card: #111827;
+    --card-border: #1e293b;
+    --gradient: linear-gradient(135deg, #5eead4, #3b82f6);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── Nav ─────────────────────────────────────────── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(10, 14, 23, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 0 24px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  nav .logo {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  nav .logo span { font-size: 22px; }
+
+  nav .links { display: flex; gap: 24px; align-items: center; }
+
+  nav a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s;
+  }
+  nav a:hover { color: var(--text); }
+
+  nav .github-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--text);
+    transition: all 0.2s;
+  }
+  nav .github-link:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ─── Hero ─────────────────────────────────────────── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 100px 24px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 50% 50%, rgba(94, 234, 212, 0.03) 0%, transparent 50%);
+    animation: pulse 8s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.2); opacity: 1; }
+  }
+
+  .hero-content { position: relative; max-width: 800px; }
+
+  .hero .badge {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 100px;
+    background: rgba(94, 234, 212, 0.1);
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(94, 234, 212, 0.2);
+  }
+
+  .hero h1 {
+    font-size: clamp(40px, 8vw, 76px);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    letter-spacing: -1.5px;
+  }
+
+  .hero h1 .gradient {
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero p {
+    font-size: clamp(18px, 2.5vw, 22px);
+    color: var(--text-dim);
+    max-width: 640px;
+    margin: 0 auto 36px;
+  }
+
+  .hero .cta-group {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+
+  .btn-primary {
+    background: var(--gradient);
+    color: #0a0e17;
+    border: none;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(94, 234, 212, 0.25);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--card-border);
+  }
+  .btn-secondary:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .hero .code-block {
+    margin-top: 48px;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 16px 24px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+    font-size: 15px;
+    color: var(--accent);
+  }
+
+  .hero .code-block .prompt { color: var(--text-dim); }
+  .hero .code-block .cursor { display: inline-block; width: 8px; height: 20px; background: var(--accent); animation: blink 1s step-end infinite; margin-left: 4px; }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* ─── Section ──────────────────────────────────────── */
+  section {
+    padding: 100px 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  section h2 {
+    font-size: 32px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  section .subtitle {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 18px;
+    max-width: 600px;
+    margin: 0 auto 60px;
+  }
+
+  /* ─── Problem / Solution ──────────────────────────── */
+  .problem-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-top: 40px;
+  }
+  @media (max-width: 700px) { .problem-grid { grid-template-columns: 1fr; } }
+
+  .problem-box, .solution-box {
+    padding: 32px;
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+    background: var(--card);
+  }
+
+  .problem-box h3, .solution-box h3 {
+    font-size: 18px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .problem-box ul, .solution-box ul {
+    list-style: none;
+    color: var(--text-dim);
+  }
+
+  .problem-box li, .solution-box li {
+    padding: 6px 0;
+    font-size: 15px;
+  }
+
+  .problem-box li::before { content: '✗ '; color: #f87171; margin-right: 4px; }
+  .solution-box li::before { content: '✓ '; color: var(--accent); margin-right: 4px; }
+
+  /* ─── Comparison Table ─────────────────────────────── */
+  .comparison {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 40px;
+    font-size: 15px;
+  }
+
+  .comparison th, .comparison td {
+    padding: 16px 20px;
+    text-align: left;
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  .comparison th {
+    background: var(--card);
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-dim);
+  }
+  .comparison th:first-child { border-radius: 8px 0 0 0; }
+  .comparison th:last-child { border-radius: 0 8px 0 0; text-align: center; }
+
+  .comparison td:last-child { text-align: center; }
+  .comparison td:first-child { font-weight: 600; }
+
+  .comparison .check { color: var(--accent); font-size: 18px; }
+  .comparison .cross { color: #f87171; font-size: 18px; }
+
+  .comparison tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+  /* ─── Features Grid ────────────────────────────────── */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .feature-card {
+    padding: 28px;
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+    background: var(--card);
+    transition: all 0.2s;
+  }
+
+  .feature-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  }
+
+  .feature-card .icon { font-size: 28px; margin-bottom: 16px; }
+  .feature-card h3 { font-size: 18px; margin-bottom: 8px; }
+  .feature-card p { font-size: 14px; color: var(--text-dim); line-height: 1.6; }
+
+  /* ─── Supported Platforms ──────────────────────────── */
+  .platform-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 32px;
+  }
+
+  .platform-chip {
+    padding: 8px 18px;
+    border-radius: 100px;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    font-size: 14px;
+    color: var(--text-dim);
+    transition: all 0.2s;
+  }
+
+  .platform-chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ─── CTA ──────────────────────────────────────────── */
+  .cta-section {
+    text-align: center;
+    padding: 80px 24px;
+    border-top: 1px solid var(--card-border);
+  }
+
+  .cta-section h2 { margin-bottom: 12px; }
+  .cta-section p { color: var(--text-dim); font-size: 18px; margin-bottom: 32px; }
+
+  /* ─── Footer ───────────────────────────────────────── */
+  footer {
+    text-align: center;
+    padding: 40px 24px;
+    color: var(--text-dim);
+    font-size: 14px;
+    border-top: 1px solid var(--card-border);
+  }
+
+  footer a { color: var(--text); text-decoration: none; }
+  footer a:hover { color: var(--accent); }
+
+  /* ─── Stars Badge ──────────────────────────────────── */
+  .stars-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 100px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--card-border);
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  /* ─── Responsive ───────────────────────────────────── */
+  @media (max-width: 700px) {
+    .hero h1 { font-size: 36px; }
+    .hero .code-block { font-size: 13px; padding: 12px 16px; }
+    nav .links a:not(.github-link) { display: none; }
+    section { padding: 60px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── Nav ──────────────────────────────────────────── -->
+<nav>
+  <div class="logo"><span>⚓</span> ShipKit</div>
+  <div class="links">
+    <a href="#features">Features</a>
+    <a href="#comparison">Comparison</a>
+    <a href="#setup">Usage</a>
+    <a href="https://github.com/sagar-grv/shipkit" class="github-link" target="_blank" rel="noopener">
+      <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      GitHub
+    </a>
+  </div>
+</nav>
+
+<!-- ─── Hero ─────────────────────────────────────────── -->
+<div class="hero">
+  <div class="hero-content">
+    <div class="badge">⚡ v2.0.0 — Open Source</div>
+    <h1>
+      Replace a<br>
+      <span class="gradient">6-Person Engineering Team</span><br>
+      With One Command
+    </h1>
+    <p>
+      ShipKit connects your AI agent, CI/CD pipeline, security scanning,
+      and deployment — so a solo developer can ship like a team.
+    </p>
+    <div class="cta-group">
+      <a href="#setup" class="btn btn-primary">⚓ Get Started</a>
+      <a href="https://github.com/sagar-grv/shipkit" class="btn btn-secondary" target="_blank" rel="noopener">
+        View on GitHub →
+      </a>
+    </div>
+    <div class="code-block">
+      <span class="prompt">$</span>
+      npx shipkit-pipe setup
+      <span class="cursor"></span>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Problem / Solution ──────────────────────────── -->
+<section>
+  <h2>Built for Solo Developers</h2>
+  <p class="subtitle">
+    You shouldn't need a 6-person engineering team to ship production-quality software.
+  </p>
+  <div class="problem-grid">
+    <div class="problem-box">
+      <h3>❌ Without ShipKit</h3>
+      <ul>
+        <li>AI agent has no context about your project</li>
+        <li>No CI/CD — manual build, test, deploy</li>
+        <li>No security scanning on every PR</li>
+        <li>No session continuity — agent forgets everything</li>
+        <li>No pre-commit quality gates</li>
+        <li>Each project requires hours of manual setup</li>
+      </ul>
+    </div>
+    <div class="solution-box">
+      <h3>✅ With ShipKit</h3>
+      <ul>
+        <li>AI agent reads your stack, rules, and history</li>
+        <li>Automated CI/CD: lint → test → build → deploy</li>
+        <li>CodeQL + Dependabot on every commit</li>
+        <li>AI reads LAST_SESSION.md to resume context</li>
+        <li>Husky + lint-staged catches issues pre-commit</li>
+        <li>One command sets up everything in 2 minutes</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Features ────────────────────────────────────── -->
+<section id="features">
+  <h2>What's Inside</h2>
+  <p class="subtitle">Everything a production app needs — pre-configured and ready to go.</p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="icon">🤖</div>
+      <h3>AI Agent Protocol</h3>
+      <p>Your AI agent reads AGENTS.md at session start — it knows your tech stack, pipeline rules, and project state. Works with Claude Code, Cursor, Copilot, and any AI coding agent.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🔄</div>
+      <h3>CI/CD Pipeline</h3>
+      <p>GitHub Actions workflow: lint → type-check → test → build → deploy. Automatically runs on every push and pull request. Pre-configured for Vercel, Netlify, Railway, and more.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🔒</div>
+      <h3>Security by Default</h3>
+      <p>CodeQL vulnerability scanning on every PR. Dependabot for weekly dependency updates. Pre-push security review gate. Built-in ethical use license terms.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🧩</div>
+      <h3>Pre-Commit Hooks</h3>
+      <p>Husky + lint-staged run linting and formatting before every commit. Catch issues before they reach CI. Zero config — works automatically.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">📋</div>
+      <h3>Session Continuity</h3>
+      <p>Your AI agent tracks what was done, what's next, and what's broken. ROADMAP.md, BUGS.md, and LAST_SESSION.md keep everyone in sync.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🔍</div>
+      <h3>Security Reviewer</h3>
+      <p>A dedicated AI agent reviews every diff for secrets, SQL injection, RLS bypass, and OWASP Top 10 before you push. "review security" is one command.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Comparison Table ────────────────────────────── -->
+<section id="comparison">
+  <h2>AI Team: ShipKit vs. DIY</h2>
+  <p class="subtitle">ShipKit replaces 6 specialized roles with AI agents — all working from one shared protocol.</p>
+  <table class="comparison">
+    <thead>
+      <tr>
+        <th>Team Role</th>
+        <th>Without ShipKit</th>
+        <th>With ShipKit</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Product Manager</td>
+        <td>Meetings, specs, backlogs</td>
+        <td><span class="check">✓</span> Planner Agent</td>
+      </tr>
+      <tr>
+        <td>Developer</td>
+        <td>Manual setup, context switching</td>
+        <td><span class="check">✓</span> Builder Agent</td>
+      </tr>
+      <tr>
+        <td>QA Engineer</td>
+        <td>Manual testing, bug tracking</td>
+        <td><span class="check">✓</span> Tester Agent</td>
+      </tr>
+      <tr>
+        <td>Security Engineer</td>
+        <td>Expensive audits, breach risks</td>
+        <td><span class="check">✓</span> Security Reviewer</td>
+      </tr>
+      <tr>
+        <td>DevOps Engineer</td>
+        <td>Manual CI/CD setup</td>
+        <td><span class="check">✓</span> Auto CI/CD Pipelines</td>
+      </tr>
+      <tr>
+        <td>SRE / Incident Commander</td>
+        <td>On-call, manual monitoring</td>
+        <td><span class="check">✓</span> Monitor Agent</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ─── Supported Platforms ────────────────────────── -->
+<section>
+  <h2>Works With Any Stack</h2>
+  <p class="subtitle">
+    No vendor lock-in. ShipKit generates config files — you choose the tools.
+  </p>
+  <div class="platform-list">
+    <span class="platform-chip">Next.js</span>
+    <span class="platform-chip">React</span>
+    <span class="platform-chip">Vue / Nuxt</span>
+    <span class="platform-chip">Svelte / SvelteKit</span>
+    <span class="platform-chip">Remix</span>
+    <span class="platform-chip">Astro</span>
+    <span class="platform-chip">Angular</span>
+    <span class="platform-chip">Express</span>
+    <span class="platform-chip">FastAPI</span>
+    <span class="platform-chip">Django</span>
+    <span class="platform-chip">Supabase</span>
+    <span class="platform-chip">Firebase</span>
+    <span class="platform-chip">MongoDB</span>
+    <span class="platform-chip">PostgreSQL</span>
+    <span class="platform-chip">Vercel</span>
+    <span class="platform-chip">Netlify</span>
+    <span class="platform-chip">Railway</span>
+    <span class="platform-chip">Fly.io</span>
+    <span class="platform-chip">Render</span>
+    <span class="platform-chip">Cloudflare</span>
+    <span class="platform-chip">AWS</span>
+    <span class="platform-chip">GCP</span>
+    <span class="platform-chip">Claude Code</span>
+    <span class="platform-chip">Cursor</span>
+    <span class="platform-chip">Copilot</span>
+    <span class="platform-chip">OpenCode</span>
+    <span class="platform-chip">Cline</span>
+    <span class="platform-chip">Continue.dev</span>
+    <span class="platform-chip">CodeGPT</span>
+    <span class="platform-chip">Aider</span>
+  </div>
+</section>
+
+<!-- ─── How to Use ────────────────────────────────── -->
+<section id="setup">
+  <h2>Get Started in 2 Minutes</h2>
+  <p class="subtitle">Three commands. Zero configuration. Works in any project directory.</p>
+  <div style="max-width: 640px; margin: 0 auto;">
+    <div style="background: var(--card); border: 1px solid var(--card-border); border-radius: 12px; padding: 24px; margin-bottom: 16px;">
+      <div style="font-size: 14px; color: var(--accent); font-weight: 600; margin-bottom: 4px;">Step 1</div>
+      <div style="font-family: 'SF Mono', monospace; font-size: 16px; color: var(--text);">
+        cd your-project && npx shipkit-pipe setup
+      </div>
+      <div style="color: var(--text-dim); font-size: 13px; margin-top: 4px;">Interactive wizard — ~5 questions</div>
+    </div>
+    <div style="background: var(--card); border: 1px solid var(--card-border); border-radius: 12px; padding: 24px; margin-bottom: 16px;">
+      <div style="font-size: 14px; color: var(--accent); font-weight: 600; margin-bottom: 4px;">Step 2</div>
+      <div style="font-family: 'SF Mono', monospace; font-size: 16px; color: var(--text);">
+        git add -A && git commit -m "init shipkit"
+      </div>
+      <div style="color: var(--text-dim); font-size: 13px; margin-top: 4px;">Your pipeline, agent configs, and security checks are ready</div>
+    </div>
+    <div style="background: var(--card); border: 1px solid var(--card-border); border-radius: 12px; padding: 24px;">
+      <div style="font-size: 14px; color: var(--accent); font-weight: 600; margin-bottom: 4px;">Step 3</div>
+      <div style="font-family: 'SF Mono', monospace; font-size: 16px; color: var(--text);">
+        Open in your AI agent → say <span style="color: var(--accent);">"plan: login page"</span>
+      </div>
+      <div style="color: var(--text-dim); font-size: 13px; margin-top: 4px;">Your agent reads AGENTS.md and knows everything</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 40px; background: var(--card); border: 1px solid var(--card-border); border-radius: 12px; padding: 28px; text-align: center;">
+    <h3 style="margin-bottom: 8px; font-size: 20px;">What you get</h3>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: left; max-width: 500px; margin: 0 auto; font-size: 14px;">
+      <div><span class="check" style="margin-right: 6px;">✓</span> shipkit.json</div>
+      <div><span class="check" style="margin-right: 6px;">✓</span> AGENTS.md</div>
+      <div><span class="check" style="margin-right: 6px;">✓</span> GitHub Actions CI/CD</div>
+      <div><span class="check" style="margin-right: 6px;">✓</span> CodeQL Security Scan</div>
+      <div><span class="check" style="margin-right: 6px;">✓</span> Dependabot Updates</div>
+      <div><span class="check" style="margin-right: 6px;">✓</span> Playwright E2E Setup</div>
+      <div><span class="check" style="margin-right: 6px;">✓</span> Husky Pre-Commit Hooks</div>
+      <div><span class="check" style="margin-right: 6px;">✓</span> Agent Session Continuity</div>
+      <div><span class="check" style="margin-right: 6px;">✓</span> AI Security Reviewer Prompt</div>
+      <div><span class="check" style="margin-right: 6px;">✓</span> Monitor Agent Prompt</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA ────────────────────────────────────────── -->
+<div class="cta-section">
+  <h2>Ship Your MVP. Not Your Sanity.</h2>
+  <p>Open source. Free. Works with any stack, any AI agent, any deploy.</p>
+  <div class="cta-group">
+    <a href="https://github.com/sagar-grv/shipkit#readme" class="btn btn-primary" target="_blank" rel="noopener">
+      ⚓ Get Started on GitHub
+    </a>
+    <a href="https://github.com/sagar-grv/shipkit/stargazers" class="btn btn-secondary" target="_blank" rel="noopener">
+      ⭐ Star on GitHub
+    </a>
+  </div>
+</div>
+
+<!-- ─── Footer ───────────────────────────────────────── -->
+<footer>
+  <p>
+    Built by <a href="https://github.com/sagar-grv">sagar-grv</a>.
+    Open source under <a href="https://github.com/sagar-grv/shipkit/blob/main/LICENSE">Apache 2.0 + Ethical Use Terms</a>.
+    <br><br>
+    <span class="stars-badge">⭐ Star on GitHub</span>
+  </p>
+</footer>
+
+</body>
+</html>

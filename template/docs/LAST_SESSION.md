@@ -1,4 +1,4 @@
-# Last Session — {{DATE}}
+﻿# Last Session — {{DATE}}
 
 ## What Was Completed
 

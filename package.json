@@ -1,0 +1,41 @@
+{
+  "name": "shipkit-pipe",
+  "version": "2.0.0",
+  "description": "MVP to Production Pipeline — Connect your AI agent, CI/CD, security, and deploy. One command, any stack.",
+  "keywords": [
+    "shipkit",
+    "mvp-to-production",
+    "solo-dev",
+    "ai-agents",
+    "cicd",
+    "pipeline",
+    "production",
+    "devops",
+    "developer-tools"
+  ],
+  "homepage": "https://github.com/sagar-grv/shipkit#readme",
+  "bugs": {
+    "url": "https://github.com/sagar-grv/shipkit/issues"
+  },
+  "license": "Apache-2.0",
+  "author": "Sagar Giri <hello@sagargiri.com> (https://github.com/sagar-grv)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sagar-grv/shipkit.git"
+  },
+  "bin": {
+    "shipkit-pipe": "./bin/shipkit-pipe.js"
+  },
+  "scripts": {
+    "validate": "node bin/shipkit-pipe.js --help",
+    "validate:templates": "for f in template/agents/*.md template/docs/*.md template/github/*.yml template/github/workflows/*.yml template/husky/pre-commit; do test -f \"$f\" && echo \"✓ $f\" || { echo \"✗ $f\"; exit 1; }; done"
+  },
+  "files": [
+    "bin/",
+    "template/"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "preferUnplugged": true
+}

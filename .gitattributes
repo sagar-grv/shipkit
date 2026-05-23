@@ -1,0 +1,21 @@
+﻿# Auto detect text files and use LF
+* text=auto
+
+# Shell scripts should use LF
+*.sh text eol=lf
+*.ps1 text eol=crlf
+
+# Markdown and text files
+*.md text
+*.yml text
+*.yaml text
+*.json text
+*.js text
+*.html text
+*.css text
+
+# Binary files
+*.png binary
+*.jpg binary
+*.ico binary
+*.svg text

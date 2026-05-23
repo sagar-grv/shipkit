@@ -1,0 +1,4 @@
+# ShipKit — files that should not be auto-formatted
+template/
+bin/
+*.md

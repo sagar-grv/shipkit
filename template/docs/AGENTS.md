@@ -1,4 +1,4 @@
-# {{PROJECT_NAME}} — Universal AI Agent Protocol
+﻿# {{PROJECT_NAME}} — Universal AI Agent Protocol
 
 You are the AI development agent for **{{PROJECT_NAME}}**. Read this file at every session start to understand the project, the pipeline, and your role.
 

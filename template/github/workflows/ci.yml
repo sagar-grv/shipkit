@@ -1,4 +1,4 @@
-# CI Pipeline — Industry-standard checks for every PR
+﻿# CI Pipeline — Industry-standard checks for every PR
 # Runs: lint → type-check → test → build
 # Gates: ALL must pass before merge
 # Concurrency: auto-cancel previous runs on same branch (saves CI minutes)
@@ -109,7 +109,3 @@ jobs:
       # Settings → Secrets and variables → Actions → Repository secrets
       - name: Build
         run: {{BUILD_COMMAND}}
-        env:
-          {% for env_var in BUILD_ENV_VARS %}
-          {{env_var.name}}: ${{ secrets.{{env_var.secret}} }}
-          {% endfor %}

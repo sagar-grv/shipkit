@@ -1,5 +1,31 @@
 # Changelog
 
+## [2.0.1] — 2026-05-23
+
+### 🐛 Pre-Launch Bugfix & Polish
+
+**Audit pass before launch:** fixed 5 critical bugs, 5 quality improvements, and added GitHub Pages infrastructure.
+
+#### Fixed
+- **setup.ps1**: Syntax error on line 80 (`$Options[i]` → `$Options[$i]`) — PowerShell string interpolation fix
+- **setup.sh**: Render template had shell injection risk — rewrote to safe file-based + `os.environ` approach
+- **setup.sh**: `shipkit.json` was missing `stack.storage`, `stack.e2e`, `ci.typecheckCommand`, `ci.packageManager`, `deploy.previewUrls`, `database.rlsEnabled` — now matches JS and PS1 implementations
+- **template/codeql.yml**: Upgraded GitHub Actions from `@v3` to `@v4` (deprecated)
+- **template/husky/pre-commit**: Restored from git history (was deleted from working tree)
+
+#### Added
+- **`.nojekyll`** in `docs/` — required for GitHub Pages to serve files starting with `_`
+- **`.npmignore`** — controls npm publish payload (defense-in-depth with `files` whitelist)
+- **`.gitattributes`** — ensures consistent LF/CRLF line endings across platforms
+- **`.prettierrc` + `.prettierignore`** — root-level formatting consistency
+- **Favicon**: Inline SVG anchor emoji in `docs/index.html`
+- **validate.yml**: Now checks all 13 template files (was only checking agents and docs)
+
+#### Changed
+- **SECURITY.md**: Rewrote with supply-chain notes (zero npm dependencies), proper contact email
+- **LICENSE**: Updated copyright to Sagar Giri, clarified ethical use terms
+- **CODE_OF_CONDUCT.md**: Added UTF-8 BOM for proper encoding
+
 ## [2.0.0] — 2026-05-23
 
 ### 🚀 Plug-and-Play Release

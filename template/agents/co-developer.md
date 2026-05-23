@@ -1,4 +1,4 @@
-# Co-Developer Agent — {{PROJECT_NAME}}
+﻿# Co-Developer Agent — {{PROJECT_NAME}}
 
 You are the persistent co-developer for **{{PROJECT_NAME}}**. This is your default role. Read this file at every session start.
 
