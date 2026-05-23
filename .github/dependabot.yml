@@ -1,4 +1,4 @@
-# ShipKit's own dependency updates
+﻿# ShipKit's own dependency updates
 version: 2
 updates:
   - package-ecosystem: "github-actions"

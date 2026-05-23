@@ -77,7 +77,7 @@ function Read-Choice($Prompt, $Options, $Default) {
   Write-Host "${C.Yellow}$Prompt${C.Reset}"
   for ($i = 0; $i -lt $Options.Count; $i++) {
     $mark = if ($Options[$i] -eq $Default) { " ${C.Green}(default)${C.Reset}" } else { "" }
-    Write-Host "  [$($i+1)] $($Options[i])$mark"
+    Write-Host "  [$($i+1)] $($Options[$i])$mark"
   }
   $val = Read-Host "Enter number (1-$($Options.Count))"
   if ([string]::IsNullOrWhiteSpace($val)) { return $Default }
@@ -191,7 +191,7 @@ function Auto-Detect {
   }
 
   # Check for Docker
-  if (Test-Path (Join-Path $OutputDir "Dockerfile") -or (Test-Path (Join-Path $OutputDir "docker-compose.yml"))) {
+  if ((Test-Path (Join-Path $OutputDir "Dockerfile")) -or (Test-Path (Join-Path $OutputDir "docker-compose.yml"))) {
     $detected.hasDocker = $true
   }
 
@@ -207,9 +207,9 @@ function Auto-Detect {
   }
 
   # Check for existing config files
-  $detected.hasSupabase = Test-Path (Join-Path $OutputDir "supabase") -or (Test-Path (Join-Path $OutputDir "supabase.json"))
+  $detected.hasSupabase = (Test-Path (Join-Path $OutputDir "supabase")) -or (Test-Path (Join-Path $OutputDir "supabase.json"))
   $detected.hasFirebase = Test-Path (Join-Path $OutputDir "firebase.json")
-  $detected.hasVercel = Test-Path (Join-Path $OutputDir "vercel.json") -or (Test-Path (Join-Path $OutputDir ".vercel"))
+  $detected.hasVercel = (Test-Path (Join-Path $OutputDir "vercel.json")) -or (Test-Path (Join-Path $OutputDir ".vercel"))
   $detected.hasNetlify = Test-Path (Join-Path $OutputDir "netlify.toml")
   $detected.hasSentry = (Test-Path (Join-Path $OutputDir ".sentryclirc")) -or (Test-Path (Join-Path $OutputDir "sentry.client.config.ts")) -or (Test-Path (Join-Path $OutputDir "sentry.client.config.js"))
   $detected.hasHusky = Test-Path (Join-Path $OutputDir ".husky")
@@ -671,47 +671,47 @@ if (Get-Command npx -ErrorAction SilentlyContinue) {
 
 Write-Title "SETUP COMPLETE — $projName is ShipKit ready"
 
-Write-Host @"
-${C.Green}[DONE]${C.Reset} Generated $generatedCount files
-
-${C.Cyan}ShipKit Files:${C.Reset}
-  shipkit.json          ← Config for your AI agent (reads this at startup)
-  AGENTS.md             ← Universal AI agent protocol
-  ROADMAP.md            ← Feature tracker
-  BUGS.md               ← Bug tracker
-  LAST_SESSION.md       ← Session continuity
-  shipkit/              ← AI agent prompts
-  │-- planner.md        PM + Eng Lead
-  │-- co-developer.md   Builder (default agent)
-  │-- security-reviewer.md  Security Engineer
-  |-- monitor.md        SRE + Incident Commander
-  .github/              ← CI/CD + Security + Dependencies
-  .husky/pre-commit     ← Pre-commit hooks
-
-$(if ($agentConfigDst) { "  $agentConfigDst    ← $selectedAgent config file" } else { "" })
-
-${C.Yellow}Next Steps:${C.Reset}
-  1. Install deps:     ${C.Cyan}npm install --save-dev husky lint-staged prettier${C.Reset}
-  2. Init Husky:       ${C.Cyan}npx husky init${C.Reset}
-  3. Push to GitHub:   ${C.Cyan}git push origin main${C.Reset}
-  4. Open in your AI agent and say "${C.Cyan}plan: <feature>${C.Reset}"
-  5. Before pushing: say "${C.Cyan}review security${C.Reset}"
-  6. At session start: say "${C.Cyan}check errors${C.Reset}"
-
-${C.Cyan}Your AI Agent will automatically:${C.Reset}
-  • Read shipkit.json to learn your tech stack
-  • Follow AGENTS.md for the development protocol
-  • Plan features with planner.md
-  • Review security before each push
-  • Monitor production health every session
-
-${C.Bold}One team. Zero overhead. Production apps.${C.Reset}
-"@
+$doneLabel = "[DONE]"
+$warnLabel = "[WARN]"
+Write-Host ("{0}{1}{2} Generated {3} files" -f ${C.Green}, $doneLabel, ${C.Reset}, $generatedCount)
+Write-Host ""
+Write-Host ("{0}ShipKit Files:{1}" -f ${C.Cyan}, ${C.Reset})
+Write-Host "  shipkit.json           ->  Config for your AI agent (reads this at startup)"
+Write-Host "  AGENTS.md              ->  Universal AI agent protocol"
+Write-Host "  ROADMAP.md             ->  Feature tracker"
+Write-Host "  BUGS.md                ->  Bug tracker"
+Write-Host "  LAST_SESSION.md        ->  Session continuity"
+Write-Host "  shipkit/               ->  AI agent prompts"
+Write-Host "  │-- planner.md        PM + Eng Lead"
+Write-Host "  │-- co-developer.md   Builder (default agent)"
+Write-Host "  │-- security-reviewer.md  Security Engineer"
+Write-Host '  │-- monitor.md        SRE + Incident Commander'
+Write-Host "  .github/               ->  CI/CD + Security + Dependencies"
+Write-Host "  .husky/pre-commit      ->  Pre-commit hooks"
+Write-Host ""
+if ($agentConfigDst) {
+  Write-Host "  $agentConfigDst     ->  $selectedAgent config file"
+}
+Write-Host ""
+Write-Host ('{0}Next Steps:{1}' -f ${C.Yellow}, ${C.Reset})
+Write-Host ('  1. Install deps:     {0}npm install --save-dev husky lint-staged prettier{1}' -f ${C.Cyan}, ${C.Reset})
+Write-Host ('  2. Init Husky:       {0}npx husky init{1}' -f ${C.Cyan}, ${C.Reset})
+Write-Host ('  3. Push to GitHub:   {0}git push origin main{1}' -f ${C.Cyan}, ${C.Reset})
+Write-Host ('  4. Open in your AI agent and say "' + ${C.Cyan} + 'plan: <feature>' + ${C.Reset} + '"')
+Write-Host ('  5. Before pushing: say "' + ${C.Cyan} + 'review security' + ${C.Reset} + '"')
+Write-Host ('  6. At session start: say "' + ${C.Cyan} + 'check errors' + ${C.Reset} + '"')
+Write-Host ""
+Write-Host ("{0}Your AI Agent will automatically:{1}" -f ${C.Cyan}, ${C.Reset})
+Write-Host "  • Read shipkit.json to learn your tech stack"
+Write-Host "  • Follow AGENTS.md for the development protocol"
+Write-Host "  • Plan features with planner.md"
+Write-Host "  • Review security before each push"
+Write-Host "  • Monitor production health every session"
+Write-Host ""
+Write-Host ("{0}One team. Zero overhead. Production apps.{1}" -f ${C.Bold}, ${C.Reset})
 
 if ($skippedCount -gt 0) {
-  Write-Host @"
-${C.Yellow}[WARN]${C.Reset} $skippedCount files were skipped (already exist). Use -Force to overwrite.
-"@
+  Write-Host ("{0}{1}{2} {3} files were skipped (already exist). Use -Force to overwrite." -f ${C.Yellow}, $warnLabel, ${C.Reset}, $skippedCount)
 }
 
 return $Vars

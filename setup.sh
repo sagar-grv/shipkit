@@ -352,72 +352,105 @@ fi
 
 PROJECT_ROOT="$(cd "$OUTPUT_DIR" && pwd)"
 
-# Render template function (uses Python for template engine)
+# Export all template variables as SK_* env vars (safe — no quoting issues)
+# These are read by Python render_template via os.environ
+export_sk_vars() {
+  export SK_PROJECT_NAME="$PROJ_NAME"
+  export SK_PROJECT_DESCRIPTION="$PROJ_DESC"
+  export SK_DATE="$(date +%Y-%m-%d)"
+  export SK_STACK_FRONTEND="${DETECTED_FRONTEND:-Web application}"
+  export SK_STACK_DATABASE="$DB_CHOICE"
+  export SK_STACK_AUTH="$DB_CHOICE"
+  export SK_STACK_AI="AI-powered features"
+  export SK_STACK_DEPLOY="$DEPLOY_PLATFORM"
+  local storage_val="${DB_CHOICE}"
+  case "$storage_val" in
+    Supabase*) storage_val="Supabase Storage" ;;
+    Firebase*) storage_val="Firebase Storage" ;;
+    *) storage_val="Cloud storage (S3, etc.)" ;;
+  esac
+  export SK_STACK_STORAGE="$storage_val"
+  export SK_STACK_E2E="Playwright"
+  export SK_STACK_ANALYTICS="$MONITORING_CHOICE"
+  export SK_NODE_VERSION="${DETECTED_NODE:-20}"
+  export SK_BUILD_COMMAND="${DEFAULT_BUILD:-npm run build}"
+  export SK_TEST_COMMAND="${DEFAULT_TEST:-npm test}"
+  export SK_LINT_COMMAND="${DEFAULT_LINT:-npm run lint}"
+  export SK_TYPECHECK_COMMAND="npx tsc --noEmit"
+  export SK_PACKAGE_MANAGER="${DETECTED_PM:-npm}"
+  export SK_COVERAGE_ENABLED="true"
+  export SK_DATABASE_TYPE="$DB_CHOICE"
+  export SK_DATABASE_PROJECT_ID=""
+  export SK_DATABASE_REGION=""
+  export SK_RLS_ENABLED="true"
+  export SK_GITHUB_OWNER="$GH_OWNER"
+  export SK_GITHUB_REPO="$GH_REPO"
+  export SK_DEPLOY_PLATFORM="$DEPLOY_PLATFORM"
+  export SK_DEPLOY_PROJECT_ID="${DEPLOY_PROJECT_ID:-}"
+  export SK_PREVIEW_URLS_ENABLED="true"
+  export SK_MONITORING_PLATFORM="$MONITORING_CHOICE"
+  export SK_MONITORING_ORG=""
+  export SK_MONITORING_PROJECT=""
+  export SK_AI_AGENT="$SELECTED_AGENT"
+  export SK_AGENT_CONFIG_FILES="$AGENT_CONFIG_FILES"
+}
+
+# Render template function (uses Python — safe from shell injection)
+# Template is read from file by Python, env vars read via os.environ
 render_template() {
   local src="$1"
   local dst="$2"
-  local content
-  content=$(cat "$src")
 
-  # Replace {{VAR}} placeholders using Python
-  content=$(python3 -c "
-import sys, re
-content = '''$content'''
-vars = {
-    'PROJECT_NAME': '$PROJ_NAME',
-    'PROJECT_DESCRIPTION': '$PROJ_DESC',
-    'DATE': '$(date +%Y-%m-%d)',
-    'STACK_FRONTEND': '$DETECTED_FRONTEND',
-    'STACK_DATABASE': '$DB_CHOICE',
-    'STACK_AUTH': '$DB_CHOICE',
-    'STACK_AI': 'AI-powered features',
-    'STACK_DEPLOY': '$DEPLOY_PLATFORM',
-    'STACK_STORAGE': '${DB_CHOICE/Supabase*/Supabase Storage}',
-    'STACK_E2E': 'Playwright',
-    'STACK_ANALYTICS': '$MONITORING_CHOICE',
-    'NODE_VERSION': '$DETECTED_NODE',
-    'BUILD_COMMAND': '${DEFAULT_BUILD:-npm run build}',
-    'TEST_COMMAND': '${DEFAULT_TEST:-npm test}',
-    'LINT_COMMAND': '${DEFAULT_LINT:-npm run lint}',
-    'TYPECHECK_COMMAND': 'npx tsc --noEmit',
-    'PACKAGE_MANAGER': '$DETECTED_PM',
-    'COVERAGE_ENABLED': 'true',
-    'DATABASE_TYPE': '$DB_CHOICE',
-    'DATABASE_PROJECT_ID': '',
-    'DATABASE_REGION': '',
-    'RLS_ENABLED': 'true',
-    'GITHUB_OWNER': '$GH_OWNER',
-    'GITHUB_REPO': '$GH_REPO',
-    'DEPLOY_PLATFORM': '$DEPLOY_PLATFORM',
-    'DEPLOY_PROJECT_ID': '$DEPLOY_PROJECT_ID',
-    'PREVIEW_URLS_ENABLED': 'true',
-    'MONITORING_PLATFORM': '$MONITORING_CHOICE',
-    'MONITORING_ORG': '',
-    'MONITORING_PROJECT': '',
-    'AI_AGENT': '$SELECTED_AGENT',
-    'AGENT_CONFIG_FILES': '$AGENT_CONFIG_FILES',
-}
-for key, val in vars.items():
-    content = content.replace('{{' + key + '}}', val)
+  mkdir -p "$(dirname "$dst")"
+
+  python3 << 'PYEOF' "$src" "$dst"
+import os, re, sys
+
+template_path = sys.argv[1]
+output_path = sys.argv[2]
+
+# Read template from file (safe — no shell expansion)
+with open(template_path) as f:
+    content = f.read()
+
+# Read all SK_* env vars (exported by caller)
+vars_data = {}
+for key, val in os.environ.items():
+    if key.startswith("SK_"):
+        vars_data[key[3:]] = val
+
+# Replace {{VAR}} placeholders (safe — Python handles all special chars)
+for key, val in vars_data.items():
+    content = content.replace("{{" + key + "}}", str(val))
+
 # Handle {% if VAR %}...{% endif %}
 def replace_if(match):
     var_name = match.group(1)
     inner = match.group(2)
-    val = vars.get(var_name, '')
-    is_truthy = bool(val) and val.lower() not in ('false', '0', '')
-    return inner if is_truthy else ''
-content = re.sub(r'\{\%\s*if\s+(\w+)\s*\%\}(.*?)\{\%\s*endif\s*\%\}', replace_if, content, flags=re.DOTALL)
-print(content, end='')
-" 2>&1) || {
+    val = vars_data.get(var_name, "")
+    is_truthy = bool(val) and str(val).lower() not in ("false", "0", "")
+    return inner if is_truthy else ""
+
+content = re.sub(
+    r"\{%\s*if\s+(\w+)\s*%\}(.*?)\{%\s*endif\s*%\}",
+    replace_if, content, flags=re.DOTALL
+)
+
+with open(output_path, "w") as f:
+    f.write(content)
+PYEOF
+
+  if [ $? -eq 0 ]; then
+    step "Created ${dst#$PROJECT_ROOT/}"
+    echo "$dst"
+  else
     info "ERROR: Failed to render $src"
     return 1
-  }
-
-  mkdir -p "$(dirname "$dst")"
-  echo "$content" > "$dst"
-  step "Created ${dst#$PROJECT_ROOT/}"
-  echo "$dst"
+  fi
 }
+
+# Export all SK_* env vars for safe Python rendering
+export_sk_vars
 
 FILES_GENERATED=0
 FILES_SKIPPED=0
@@ -502,13 +535,17 @@ cat > "$SHIPKIT_JSON" << JSONEOF
     "database": "$DB_CHOICE",
     "auth": "$DB_CHOICE",
     "deploy": "$DEPLOY_PLATFORM",
+    "storage": "${DB_CHOICE/Supabase*/Supabase Storage}",
+    "e2e": "Playwright",
     "monitoring": "$MONITORING_CHOICE"
   },
   "ci": {
     "nodeVersion": "${DETECTED_NODE:-20}",
     "buildCommand": "npm run build",
     "testCommand": "npm test",
-    "lintCommand": "npm run lint"
+    "lintCommand": "npm run lint",
+    "typecheckCommand": "npx tsc --noEmit",
+    "packageManager": "${DETECTED_PM:-npm}"
   },
   "aiAgent": {
     "tool": "$SELECTED_AGENT",
@@ -520,10 +557,12 @@ cat > "$SHIPKIT_JSON" << JSONEOF
   },
   "deploy": {
     "platform": "$DEPLOY_PLATFORM",
-    "projectId": "${DEPLOY_PROJECT_ID:-}"
+    "projectId": "${DEPLOY_PROJECT_ID:-}",
+    "previewUrls": $([ "$DEPLOY_PLATFORM" = "Vercel" ] && echo "true" || echo "false")
   },
   "database": {
-    "type": "$DB_CHOICE"
+    "type": "$DB_CHOICE",
+    "rlsEnabled": $([ "$DB_CHOICE" = "${DB_CHOICE#Supabase}" ] && echo "false" || echo "true")
   },
   "version": "2.0.0"
 }

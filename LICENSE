@@ -187,7 +187,7 @@
       same "printed page" as the copyright notice for easier
       identification within third-party archives.
 
-   Copyright [2026] [Sagar Gurav]
+   Copyright 2026 Sagar Giri
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -208,16 +208,20 @@
    In addition to the terms of the Apache License, Version 2.0, the
    following restrictions apply:
 
-   1. You may not use the Work or Derivative Works for:
-      a. Weapons systems, military-grade applications
-      b. Surveillance systems that violate human rights or privacy
-      c. Systems that discriminate based on race, gender, religion,
-         sexual orientation, disability, or any protected characteristic
+   1. Prohibited Uses. You may not use the Work or Derivative Works for:
+      a. Weapons systems, military hardware, or combat applications.
+      b. Surveillance systems that violate human rights, privacy, or
+         are used for mass surveillance without legal safeguard.
+      c. Systems that discriminate, profile, or make decisions based
+         on race, ethnicity, gender, religion, sexual orientation,
+         disability, age, or any protected characteristic.
       d. Any application that violates international human rights law
+         as defined by the Universal Declaration of Human Rights.
 
-   2. You must retain attribution. Any distribution of the Work or
-      Derivative Works must include reasonable attribution to the
-      original author ("ShipKit by sagar-grv").
+   2. Attribution. Any distribution of the Work or Derivative Works
+      must include reasonable attribution to the original author
+      ("ShipKit by sagar-grv").
 
-   3. These additional terms apply to all Derivative Works. Any
-      distribution must include this section or a link to it.
+   3. Binding on Derivatives. These additional terms apply to all
+      Derivative Works. Any distribution must include this section
+      or a link to its text.

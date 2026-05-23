@@ -1,4 +1,4 @@
-# {{PROJECT_NAME}} — Bug Tracker
+﻿# {{PROJECT_NAME}} — Bug Tracker
 
 ## Active Bugs
 

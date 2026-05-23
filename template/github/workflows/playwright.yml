@@ -1,4 +1,4 @@
-# Playwright E2E — Runs against preview deployment on every PR
+﻿# Playwright E2E — Runs against preview deployment on every PR
 # Tests against the real preview deployment, not a local server
 # This catches platform-specific issues (edge functions, serverless, caching)
 
