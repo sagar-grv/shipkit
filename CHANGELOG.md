@@ -14,6 +14,8 @@
 - **template/husky/pre-commit**: Restored from git history (was deleted from working tree)
 
 #### Added
+- **Professional landing page** (`docs/index.html`) — dark theme, Google Fonts (DM Serif Display + DM Sans), CLI terminal mockup, asymmetric feature rows, scroll animations
+- **`docs/CNAME`** — custom domain placeholder (`shipkit.dev`)
 - **`.nojekyll`** in `docs/` — required for GitHub Pages to serve files starting with `_`
 - **`.npmignore`** — controls npm publish payload (defense-in-depth with `files` whitelist)
 - **`.gitattributes`** — ensures consistent LF/CRLF line endings across platforms
