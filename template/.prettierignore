@@ -1,2 +1,3 @@
-# Template files have {{PLACEHOLDER}} syntax — not valid JSON/TS
-pipeline/template/
+# Template files have {{PLACEHOLDER}} syntax — not valid JSON/MD
+shipkit/
+shipkit.json
