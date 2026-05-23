@@ -24,7 +24,7 @@
     "url": "git+https://github.com/sagar-grv/shipkit.git"
   },
   "bin": {
-    "shipkit-pipe": "./bin/shipkit-pipe.js"
+    "shipkit-pipe": "bin/shipkit-pipe.js"
   },
   "scripts": {
     "validate": "node bin/shipkit-pipe.js --help",
