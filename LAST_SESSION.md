@@ -2,12 +2,17 @@
 
 **Date:** 2026-05-23
 **Branch:** `main` (clean — all committed & pushed)
-**Latest commit:** `9a966ee` — feat: professional landing page + CNAME for custom domain
+**Latest commit:** `1b2cd57` — fix: npm pkg fix — bin path cleanup
 **Remote:** https://github.com/sagar-grv/shipkit.git
 
 ---
 
 ## What Was Completed
+
+### 📦 npm Published!
+- **`shipkit-pipe@2.0.0`** is live on npm: https://www.npmjs.com/package/shipkit-pipe
+- Used granular access token with bypass-2fa to publish
+- Run `npm pkg fix` to clean up bin path warning → committed as `1b2cd57`
 
 ### 🐛 Bug Fixes (setup.ps1)
 1. **Here-string parser bug** (PowerShell 5.1): `"@` closing delimiter not recognized when here-string content contained `${C.*}` variable references → Rewrote summary section with `Write-Host (-f)` calls instead
@@ -59,14 +64,7 @@ After DNS propagates: repo Settings → Pages → enter custom domain → Save
 
 **If your domain is different from `shipkit.dev`**, update `docs/CNAME` and `docs/index.html` (the og:image og:url meta tags).
 
-### 2. Publish npm
-```bash
-# From D:\shipkit
-npm adduser        # or npm login
-npm publish        # publishes shipkit-pipe
-```
-
-### 3. Test setup.sh on Ubuntu
+### 2. Test setup.sh on Ubuntu
 ```bash
 cd /path/to/test-project
 bash /path/to/shipkit/setup.sh --defaults

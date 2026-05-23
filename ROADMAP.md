@@ -9,7 +9,7 @@
 
 ## [v2.1.0] — Next
 - [ ] **Custom domain**: DNS setup, verify TLS
-- [ ] **npm publish** (`npm adduser && npm publish`)
+- [x] **npm publish** (`npm adduser && npm publish`) — ✅ `shipkit-pipe@2.0.0` live
 - [ ] **setup.sh verification** on Linux/macOS
 - [ ] **Post-launch analytics**: add download counter badge to README
 - [ ] **Homebrew tap** (optional): `brew install shipkit`
