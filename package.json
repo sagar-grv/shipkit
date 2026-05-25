@@ -1,6 +1,6 @@
 {
   "name": "shipkit-pipe",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Your automated dev team. One command sets up CI/CD, health monitoring, security scanning, and AI agent config. Only generates what your project needs.",
   "keywords": [
     "shipkit",
