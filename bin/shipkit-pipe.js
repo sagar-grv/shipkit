@@ -1,18 +1,21 @@
 #!/usr/bin/env node
 
 /**
- * ShipKit v3 — Your Automated Dev Team
- * ======================================
+ * ShipKit v3.1 — Your Automated Dev Team
+ * =======================================
  * One command. Auto-detects your project. Generates only what you need.
  * Verifies everything works. Monitors your site.
  *
  * Zero dependencies. Works with any stack, any IDE, any AI agent.
  *
  * Commands:
- *   npx shipkit-pipe           Detect & generate pipeline
- *   npx shipkit-pipe check     Verify everything works
- *   npx shipkit-pipe -i        Interactive mode
- *   npx shipkit-pipe --help    Help
+ *   npx shipkit-pipe             Detect & generate pipeline
+ *   npx shipkit-pipe check       Verify everything works
+ *   npx shipkit-pipe upgrade     Check for updates
+ *   npx shipkit-pipe --force     Overwrite existing files
+ *   npx shipkit-pipe --dry-run   Preview without writing
+ *   npx shipkit-pipe -i          Interactive mode
+ *   npx shipkit-pipe --help      Help
  */
 
 'use strict';
@@ -191,8 +194,13 @@ function detect(cwd) {
 
 function render(content, vars) {
   let r = content;
+  const escaped = {};
   for (const [k, v] of Object.entries(vars)) {
-    r = r.replace(new RegExp(`\\{\\{${k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\}\\}`, 'g'), String(v ?? ''));
+    // Escape {{ and }} in values to prevent template injection
+    escaped[k] = String(v ?? '').replace(/\{\{/g, '\\{\\{').replace(/\}\}/g, '\\}\\}');
+  }
+  for (const [k, v] of Object.entries(escaped)) {
+    r = r.replace(new RegExp(`\\{\\{${k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\}\\}`, 'g'), v);
   }
   return r.replace(/\{%\s*if\s+(\w+)\s*%\}([\s\S]*?)\{%\s*endif\s*%\}/g, (_, n, inner) => {
     const val = vars[n]; return (val && val !== 'false' && val !== '0' && val !== '') ? inner : '';
@@ -201,7 +209,7 @@ function render(content, vars) {
 
 // ─── Generate ───────────────────────────────────────────────────────────────
 
-function generate(cwd, d) {
+function generate(cwd, d, opts = {}) {
   const vars = {
     PROJECT_NAME: d.name,
     PROJECT_DESCRIPTION: d.desc || 'A web application',
@@ -270,7 +278,7 @@ function generate(cwd, d) {
     const srcPath = path.join(tmplDir, src);
     const dstPath = path.join(cwd, dst);
     if (!fs.existsSync(srcPath)) continue;
-    if (fs.existsSync(dstPath)) { skip++; continue; }
+    if (fs.existsSync(dstPath) && !opts.force) { skip++; continue; }
     fs.mkdirSync(path.dirname(dstPath), { recursive: true });
     fs.writeFileSync(dstPath, render(fs.readFileSync(srcPath, 'utf-8'), vars), 'utf-8');
     gen++;
@@ -278,7 +286,7 @@ function generate(cwd, d) {
 
   // shipkit.json — the project config AI agents read
   const sjPath = path.join(cwd, 'shipkit.json');
-  if (!fs.existsSync(sjPath)) {
+  if (!fs.existsSync(sjPath) || opts.force) {
     fs.writeFileSync(sjPath, JSON.stringify({
       project: { name: d.name, description: d.desc || '' },
       stack: { framework: d.frontend || 'Node.js', packageManager: d.pm, nodeVersion: d.nodeVer },
@@ -286,7 +294,7 @@ function generate(cwd, d) {
       deploy: { platform: d.deployPlatform || '', url: d.deployUrl || '' },
       github: { owner: d.ghOwner || '', repo: d.ghRepo || '' },
       ci: { steps: ciSteps },
-      version: '3.0.0',
+      version: '3.1.0',
     }, null, 2) + '\n', 'utf-8');
     gen++;
   } else { skip++; }
@@ -294,79 +302,118 @@ function generate(cwd, d) {
   return { gen, skip, vars };
 }
 
+// ─── Version Check ───────────────────────────────────────────────────────────
+
+let _latestVersion = null;
+
+async function checkVersion() {
+  try {
+    const res = await fetch('https://registry.npmjs.org/shipkit-pipe/latest', { signal: AbortSignal.timeout(3000) });
+    if (res.ok) {
+      const data = await res.json();
+      _latestVersion = data.version;
+    }
+  } catch {}
+}
+
+function warnIfOutdated(current) {
+  if (_latestVersion && _latestVersion !== current) {
+    warn(`Version ${_latestVersion} available. Run "${C.green}npx shipkit-pipe upgrade${C.reset}" to update`);
+  }
+}
+
+// ─── Upgrade Command ─────────────────────────────────────────────────────────
+
+function upgrade(current) {
+  console.log(`\n  ${C.bold}${C.cyan}⚓ ShipKit Upgrade${C.reset}\n`);
+  if (_latestVersion && current !== _latestVersion) {
+    console.log(`  ${C.yellow}${current} → ${_latestVersion}${C.reset}`);
+    console.log(`\n  Run: ${C.green}npm install -g shipkit-pipe@${_latestVersion}${C.reset}\n`);
+  } else {
+    console.log(`  ${C.green}✓ You're on the latest version (${current})${C.reset}\n`);
+  }
+}
+
 // ─── Check Command ──────────────────────────────────────────────────────────
 
-async function check(cwd) {
-  console.log(`\n  ${C.bold}${C.cyan}⚓ ShipKit Check${C.reset}\n`);
-
-  // 1. Project
+async function check(cwd, asJson = false) {
   const pkgPath = path.join(cwd, 'package.json');
   let pkg = {};
   if (fs.existsSync(pkgPath)) {
     pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
   }
-  step(`Project: ${pkg.name || path.basename(cwd)}`);
-
-  // 2. shipkit.json
   const sjPath = path.join(cwd, 'shipkit.json');
-  if (fs.existsSync(sjPath)) {
-    step('shipkit.json exists');
-  } else {
-    warn('No shipkit.json — run `npx shipkit-pipe` to generate');
-  }
-
-  // 3. CI workflow
   const ciPath = path.join(cwd, '.github', 'workflows', 'ci.yml');
-  if (fs.existsSync(ciPath)) {
-    step('CI workflow exists');
-    // Validate CI references scripts that exist
+  const healthPath = path.join(cwd, '.github', 'workflows', 'health.yml');
+  const agentsPath = path.join(cwd, 'AGENTS.md');
+
+  const result = {
+    project: pkg.name || path.basename(cwd),
+    shipkitJson: fs.existsSync(sjPath),
+    ciWorkflow: fs.existsSync(ciPath),
+    healthCheck: fs.existsSync(healthPath),
+    agentsMd: fs.existsSync(agentsPath),
+    ciWarnings: [],
+    deploy: { url: null, status: null },
+    vulnerabilities: { critical: 0, high: 0 },
+  };
+
+  // CI validation
+  if (result.ciWorkflow) {
     const ci = fs.readFileSync(ciPath, 'utf-8');
     const scripts = pkg.scripts || {};
-    if (ci.includes('run lint') && !scripts.lint) warn('CI has lint step but no "lint" script in package.json');
-    if (ci.includes('run test') && !scripts.test) warn('CI has test step but no "test" script in package.json');
-    if (ci.includes('run build') && !scripts.build) warn('CI has build step but no "build" script in package.json');
-  } else {
-    warn('No CI workflow — run `npx shipkit-pipe` to generate');
+    if (ci.includes('run lint') && !scripts.lint) result.ciWarnings.push('CI has lint step but no "lint" script');
+    if (ci.includes('run test') && !scripts.test) result.ciWarnings.push('CI has test step but no "test" script');
+    if (ci.includes('run build') && !scripts.build) result.ciWarnings.push('CI has build step but no "build" script');
   }
 
-  // 4. Health check
-  const healthPath = path.join(cwd, '.github', 'workflows', 'health.yml');
-  if (fs.existsSync(healthPath)) { step('Health check workflow exists'); }
-
-  // 5. Deploy URL check
+  // Deploy
   const config = fs.existsSync(sjPath) ? JSON.parse(fs.readFileSync(sjPath, 'utf-8')) : null;
   const deployUrl = config?.deploy?.url;
-
+  result.deploy.url = deployUrl || null;
   if (deployUrl) {
-    const s = spinner(`Pinging ${deployUrl}...`);
     try {
-      // Use built-in fetch (Node 18+)
       const res = await fetch(deployUrl, { method: 'HEAD', signal: AbortSignal.timeout(10000) });
-      if (res.ok) s.stop(`Site is up (${res.status}) — ${deployUrl}`);
-      else s.fail(`Site returned ${res.status} — ${deployUrl}`);
-    } catch (e) {
-      s.fail(`Cannot reach ${deployUrl}`);
-    }
+      result.deploy.status = res.ok ? 'up' : `error (${res.status})`;
+    } catch { result.deploy.status = 'unreachable'; }
+  }
+
+  // Vulnerabilities
+  try {
+    const auditRes = execSync('npm audit --json 2>/dev/null || echo "{}"', { cwd, encoding: 'utf-8', stdio: 'pipe', timeout: 15000 });
+    try {
+      const audit = JSON.parse(auditRes);
+      const vulns = audit.metadata?.vulnerabilities || {};
+      result.vulnerabilities.critical = vulns.critical || 0;
+      result.vulnerabilities.high = vulns.high || 0;
+    } catch {}
+  } catch {}
+
+  if (asJson) {
+    console.log(JSON.stringify(result, null, 2));
+    return;
+  }
+
+  console.log(`\n  ${C.bold}${C.cyan}⚓ ShipKit Check${C.reset}\n`);
+
+  step(`Project: ${result.project}`);
+  result.shipkitJson ? step('shipkit.json exists') : warn('No shipkit.json — run `npx shipkit-pipe` to generate');
+  result.ciWorkflow ? step('CI workflow exists') : warn('No CI workflow — run `npx shipkit-pipe` to generate');
+  for (const w of result.ciWarnings) warn(w);
+  result.healthCheck ? step('Health check workflow exists') : null;
+  result.agentsMd ? step('AGENTS.md exists') : dim('No AGENTS.md — your AI agent won\'t know your project config');
+
+  if (result.deploy.url) {
+    if (result.deploy.status === 'up') step(`Site is up — ${result.deploy.url}`);
+    else warn(`Site ${result.deploy.status} — ${result.deploy.url}`);
   } else {
     dim('No deploy URL configured — add "homepage" to package.json or deploy to Vercel/Netlify');
   }
 
-  // 6. Dependencies
-  const s2 = spinner('Checking dependencies...');
-  try {
-    const result = execSync('npm audit --json 2>/dev/null || echo "{}"', { cwd, encoding: 'utf-8', stdio: 'pipe', timeout: 15000 });
-    try {
-      const audit = JSON.parse(result);
-      const vulns = audit.metadata?.vulnerabilities || {};
-      const critical = (vulns.critical || 0) + (vulns.high || 0);
-      if (critical > 0) s2.fail(`${critical} critical/high vulnerabilities — run \`npm audit fix\``);
-      else s2.stop('No critical vulnerabilities');
-    } catch { s2.stop('Dependencies OK'); }
-  } catch { s2.stop('Dependencies OK (audit skipped)'); }
-
-  // 7. AGENTS.md
-  if (fs.existsSync(path.join(cwd, 'AGENTS.md'))) { step('AGENTS.md exists — AI agent can read your stack'); }
-  else { dim('No AGENTS.md — your AI agent won\'t know your project config'); }
+  const v = result.vulnerabilities;
+  const total = v.critical + v.high;
+  if (total > 0) warn(`${total} critical/high vulnerabilities — run \`npm audit fix\``);
+  else step('No critical vulnerabilities');
 
   console.log();
 }
@@ -383,7 +430,7 @@ async function ask(question, defaultVal) {
   });
 }
 
-async function interactive(cwd, d) {
+async function interactive(cwd, d, opts = {}) {
   console.log(`\n  ${C.bold}${C.cyan}⚓ ShipKit${C.reset} — interactive setup\n`);
   console.log(`  ${C.dim}Detected: ${d.frontend || 'Node.js'} | ${d.pm} | Node ${d.nodeVer}${C.reset}\n`);
 
@@ -403,7 +450,7 @@ async function interactive(cwd, d) {
   }
 
   console.log();
-  return generate(cwd, d);
+  return generate(cwd, d, opts);
 }
 
 // ─── Main ───────────────────────────────────────────────────────────────────
@@ -412,10 +459,24 @@ async function main() {
   const args = process.argv.slice(2);
   const cwd = process.cwd();
 
+  // Current version
+  const pkg = (() => { try { return require('../package.json'); } catch { return { version: '3.0.0' }; } })();
+  const currentVer = pkg.version;
+
+  // Background version check (non-blocking)
+  checkVersion();
+
   // Version
   if (args.includes('--version') || args.includes('-v')) {
-    const pkg = (() => { try { return require('../package.json'); } catch { return { version: '3.0.0' }; } })();
-    console.log(pkg.version);
+    console.log(currentVer);
+    process.exit(0);
+  }
+
+  // Uprade command
+  if (args[0] === 'upgrade') {
+    // Wait for version check to complete
+    await new Promise(r => setTimeout(r, 1500));
+    upgrade(currentVer);
     process.exit(0);
   }
 
@@ -428,11 +489,14 @@ async function main() {
   Only generates what your project actually needs. Zero dependencies.${C.reset}
 
   ${C.bold}Usage:${C.reset}
-    ${C.green}npx shipkit-pipe${C.reset}            Auto-detect & generate
-    ${C.green}npx shipkit-pipe check${C.reset}      Verify everything works
-    ${C.green}npx shipkit-pipe --dry-run${C.reset}  Preview without writing files
-    ${C.green}npx shipkit-pipe -i${C.reset}         Interactive (ask questions)
-    ${C.green}npx shipkit-pipe --help${C.reset}      This message
+    ${C.green}npx shipkit-pipe${C.reset}              Auto-detect & generate
+    ${C.green}npx shipkit-pipe check${C.reset}        Verify everything works
+    ${C.green}npx shipkit-pipe check --json${C.reset}  Machine-readable output
+    ${C.green}npx shipkit-pipe upgrade${C.reset}       Check for updates
+    ${C.green}npx shipkit-pipe --force${C.reset}       Overwrite existing files
+    ${C.green}npx shipkit-pipe --dry-run${C.reset}    Preview without writing files
+    ${C.green}npx shipkit-pipe -i${C.reset}           Interactive (ask questions)
+    ${C.green}npx shipkit-pipe --help${C.reset}        This message
 
   ${C.bold}What it does:${C.reset}
     • Reads your project files (package.json, lock files, git remote)
@@ -441,6 +505,7 @@ async function main() {
     • Sets up health monitoring (pings your site every 6h)
     • Creates AGENTS.md so your AI agent knows your project
     • Adds dependency updates + security scanning
+    • Auto-checks for new versions (non-blocking)
 
   ${C.bold}Works with:${C.reset} Any framework, any CI platform, any AI agent, any deploy target.
 
@@ -451,7 +516,8 @@ async function main() {
 
   // Check command
   if (args[0] === 'check') {
-    await check(cwd);
+    const asJson = args.includes('--json');
+    await check(cwd, asJson);
     process.exit(0);
   }
 
@@ -459,6 +525,7 @@ async function main() {
   const d = detect(cwd);
   const isInteractive = args.includes('-i') || args.includes('--interactive');
   const isDryRun = args.includes('--dry-run') || args.includes('--preview');
+  const isForce = args.includes('--force');
 
   // Dry run mode — show what would be generated
   if (isDryRun) {
@@ -493,8 +560,9 @@ async function main() {
 
   // Interactive mode
   if (isInteractive) {
-    const { gen, skip } = await interactive(cwd, d);
+    const { gen, skip } = await interactive(cwd, d, { force: isForce });
     console.log(`  ${C.green}✓ Generated ${gen} files${C.reset}${skip ? ` ${C.dim}(${skip} skipped)${C.reset}` : ''}\n`);
+    if (isForce) step('--force: overwrote existing files');
     console.log(`  ${C.dim}Next: git add -A && git commit -m "add shipkit pipeline" && git push${C.reset}\n`);
     process.exit(0);
   }
@@ -526,11 +594,15 @@ async function main() {
   if (d.deployUrl) step(`Deploy: ${d.deployPlatform} (${d.deployUrl})`);
   else dim('No deploy URL detected — health checks will be skipped');
 
+  // Warn about outdated version (non-blocking, only if we got the check result)
+  warnIfOutdated(currentVer);
+
   // Generate
   console.log();
   const s2 = spinner('Generating pipeline...');
-  const { gen, skip } = generate(cwd, d);
-  s2.stop(`Generated ${gen} files${skip ? ` (${skip} already exist)` : ''}`);
+  const { gen, skip } = generate(cwd, d, { force: isForce });
+  const forceMsg = isForce ? ' (--force)' : '';
+  s2.stop(`Generated ${gen} files${skip ? ` (${skip} already exist)${forceMsg}` : forceMsg}`);
 
   // Summary
   console.log(`\n  ${C.cyan}Files:${C.reset}`);

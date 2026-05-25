@@ -46,16 +46,66 @@ jobs:
           fi
           echo "All template files OK"
 
-  check-readme:
-    name: Check README
+  check-docs:
+    name: Check Docs & Security
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v5
       
-      - name: Verify README exists
+      - name: Verify essential files exist
         run: |
-          test -f README.md && echo "✓ README.md exists"
-          test -f LICENSE && echo "✓ LICENSE exists"
-          test -f setup.ps1 && echo "✓ setup.ps1 exists"
-          test -f setup.sh && echo "✓ setup.sh exists"
+          errors=0
+          for f in README.md LICENSE SECURITY.md setup.ps1 setup.sh; do
+            if [ -f "$f" ]; then
+              echo "  ✓ $f"
+            else
+              echo "  ✗ MISSING: $f"
+              errors=$((errors + 1))
+            fi
+          done
+          [ $errors -eq 0 ] || exit 1
+
+  template-smoke-test:
+    name: Template Smoke Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: validate-templates
+    steps:
+      - uses: actions/checkout@v5
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Link shipkit-pipe locally
+        run: npm link
+
+      - name: Create temp project and run shipkit-pipe
+        run: |
+          TMPDIR=$(mktemp -d)
+          cd "$TMPDIR"
+          git init
+          mkdir -p .github
+          echo '{"name":"test-project","scripts":{"lint":"echo ok","test":"echo ok","build":"echo ok"}}' > package.json
+          npx shipkit-pipe --dry-run
+          npx shipkit-pipe
+          echo "--- smoke test: checking generated files ---"
+          test -f shipkit.json && echo "✓ shipkit.json"
+          test -f AGENTS.md && echo "✓ AGENTS.md"
+          test -f LAST_SESSION.md && echo "✓ LAST_SESSION.md"
+          test -f .github/workflows/ci.yml && echo "✓ CI workflow"
+          test -f .github/dependabot.yml && echo "✓ Dependabot"
+          test -f .github/workflows/codeql.yml && echo "✓ CodeQL"
+
+      - name: Run shipkit-pipe check
+        run: |
+          TMPDIR=$(mktemp -d)
+          cd "$TMPDIR"
+          git init
+          echo '{"name":"check-test","scripts":{"test":"echo ok"}}' > package.json
+          npx shipkit-pipe
+          npx shipkit-pipe check
+          echo "--- json check ---"
+          npx shipkit-pipe check --json | grep -q '"project": "check-test"' && echo "✓ JSON check works"

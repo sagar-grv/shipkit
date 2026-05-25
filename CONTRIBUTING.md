@@ -1,56 +1,55 @@
 # Contributing to ShipKit
 
-ShipKit is built by solo developers, for solo developers — and every contribution makes it better.
+Thanks for your interest in contributing! ShipKit is an open-source project that helps solo developers ship faster.
 
-## How to Contribute
+## Ways to contribute
 
-### 🐛 Bug Reports
+- **Bug reports**: Open an issue with reproduction steps
+- **Feature requests**: Describe the problem you're solving
+- **Documentation**: Improve README, templates, or the landing page
+- **Code**: Fix bugs, add features, improve CLI or templates
+- **Templates**: Add CI templates for other platforms (Jenkins, CircleCI, etc.)
 
-Open an [issue](https://github.com/sagar-grv/shipkit/issues) with:
-- A clear title and description
-- Steps to reproduce
-- Expected vs actual behavior
-- Your environment (OS, AI agent, Node version, etc.)
+## Development setup
 
-### 💡 Feature Requests
+```bash
+git clone https://github.com/sagar-grv/shipkit.git
+cd shipkit
+npm link   # makes `shipkit-pipe` available globally
+```
 
-Open a [discussion](https://github.com/sagar-grv/shipkit/discussions) or issue with:
-- What you're trying to achieve
-- Why existing ShipKit doesn't solve it
-- A sketch of how it could work
+## Making changes
 
-### 🔧 Pull Requests
+1. Create a branch: `git checkout -b feat/your-feature`
+2. Make your changes
+3. Run tests: `npm test`
+4. Commit: `git commit -m "feat: your change"`
+5. Push: `git push -u origin feat/your-feature`
+6. Open a pull request
 
-1. Fork the repo
-2. Create a branch: `git checkout -b feat/your-feature`
-3. Make your changes
-4. Test them with a real project
-5. Run through the Security Reviewer checklist
-6. Push and open a PR
+## Code style
 
-### 📝 What We Need Help With
+- Keep zero npm dependencies in `bin/shipkit-pipe.js`
+- Use `'use strict'` and Node.js built-ins only
+- Templates use `{{VARIABLE}}` syntax (see template/render.js)
 
-| Area | Description | Difficulty |
-|---|---|---|
-| **CLI tool** | Build `npx shipkit` for one-command setup | Advanced |
-| **AI agent adapters** | Add config generators for more AI tools | Intermediate |
-| **More platform support** | GitLab, Bitbucket, Azure DevOps | Intermediate |
-| **Docker templates** | Dev environment with Docker Compose | Intermediate |
-| **Dashboard** | Web UI for pipeline status & metrics | Advanced |
-| **Documentation** | Translations, tutorials, video guides | Beginner |
-| **Testing** | Automated tests for setup scripts | Intermediate |
+## Adding a template
 
-## Style Guide
+1. Add the file under `template/` (e.g., `template/github/workflows/new-thing.yml`)
+2. Add it to the `files` array in `bin/shipkit-pipe.js` generate()
+3. Add it to the template smoke test in `.github/workflows/validate.yml`
+4. Update `template/docs/AGENTS.md` if the template affects AI agent behavior
 
-- Keep it simple. ShipKit's philosophy is "Ship features, not architecture."
-- One file, one responsibility.
-- Templates use `{{PLACEHOLDER}}` syntax — keep it consistent.
-- AI agent prompts must be plain Markdown (compatible with any AI tool).
+## Testing
 
-## Code of Conduct
+- `npm test` runs the CLI through its commands
+- `.github/workflows/validate.yml` runs template smoke tests in CI
+- Always run `npm test` before pushing
 
-This project follows the [Contributor Covenant](CODE_OF_CONDUCT.md). Be respectful, be kind, build great stuff.
+## Pull request guidelines
 
-## Questions?
-
-Open a [discussion](https://github.com/sagar-grv/shipkit/discussions) or reach out to [@sagar-grv](https://github.com/sagar-grv).
+- Keep PRs focused — one change per PR
+- Include a clear description of what and why
+- Update tests if needed
+- Update docs (README, template docs) if the change affects users
+- Make sure CI passes

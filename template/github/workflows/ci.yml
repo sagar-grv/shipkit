@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -29,6 +29,10 @@ jobs:
 
       - name: Install dependencies
         run: {{INSTALL_COMMAND}}
+
+      - name: Security audit
+        run: {{PACKAGE_MANAGER}} audit --audit-level=high || true
+        continue-on-error: true
 {% if HAS_LINT %}
 
       - name: Lint

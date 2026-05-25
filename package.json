@@ -1,6 +1,6 @@
 {
   "name": "shipkit-pipe",
-  "version": "3.0.4",
+  "version": "3.1.0",
   "description": "Your automated dev team. One command sets up CI/CD, health monitoring, security scanning, and AI agent config. Only generates what your project needs.",
   "keywords": [
     "shipkit",
@@ -29,7 +29,8 @@
     "shipkit-pipe": "bin/shipkit-pipe.js"
   },
   "scripts": {
-    "test": "node bin/shipkit-pipe.js --help && node bin/shipkit-pipe.js --version && node bin/shipkit-pipe.js --dry-run && node bin/shipkit-pipe.js check"
+    "test": "node bin/shipkit-pipe.js --help && node bin/shipkit-pipe.js --version && node bin/shipkit-pipe.js --dry-run && node bin/shipkit-pipe.js check && node bin/shipkit-pipe.js check --json && echo 'All tests passed'",
+    "prepublishOnly": "npm test && echo '✓ All checks passed — proceeding with publish'"
   },
   "files": [
     "bin/",
