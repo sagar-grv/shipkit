@@ -1,17 +1,19 @@
 {
   "name": "shipkit-pipe",
-  "version": "2.0.2",
-  "description": "MVP to Production Pipeline — Connect your AI agent, CI/CD, security, and deploy. One command, any stack.",
+  "version": "3.0.0",
+  "description": "Your automated dev team. One command sets up CI/CD, health monitoring, security scanning, and AI agent config. Only generates what your project needs.",
   "keywords": [
     "shipkit",
-    "mvp-to-production",
+    "cicd",
+    "devops",
     "solo-dev",
     "ai-agents",
-    "cicd",
-    "pipeline",
+    "github-actions",
+    "monitoring",
+    "health-check",
     "production",
-    "devops",
-    "developer-tools"
+    "developer-tools",
+    "automation"
   ],
   "homepage": "https://github.com/sagar-grv/shipkit#readme",
   "bugs": {
@@ -27,8 +29,7 @@
     "shipkit-pipe": "bin/shipkit-pipe.js"
   },
   "scripts": {
-    "validate": "node bin/shipkit-pipe.js --help",
-    "check": "bash -n bin/shipkit-pipe.js && bash -n setup.sh && echo 'OK' || echo 'FAIL'"
+    "test": "node bin/shipkit-pipe.js --help && node bin/shipkit-pipe.js --version"
   },
   "files": [
     "bin/",
@@ -36,11 +37,6 @@
   ],
   "engines": {
     "node": ">=18"
-  },
-  "preferUnplugged": true,
-  "main": "index.js",
-  "directories": {
-    "doc": "docs"
   },
   "type": "commonjs"
 }

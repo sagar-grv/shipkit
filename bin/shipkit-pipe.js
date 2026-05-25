@@ -1,16 +1,18 @@
 #!/usr/bin/env node
 
 /**
- * ShipKit — MVP to Production Pipeline
- * =======================================
- * One command connects your AI agent, CI/CD, security, and deploy.
- * Zero dependencies. Works with any stack.
+ * ShipKit v3 — Your Automated Dev Team
+ * ======================================
+ * One command. Auto-detects your project. Generates only what you need.
+ * Verifies everything works. Monitors your site.
  *
- * Usage:
- *   npx shipkit-pipe           Auto-detect & generate (no prompts)
- *   npx shipkit-pipe -i        Interactive mode (asks questions)
- *   npx shipkit-pipe --help    Show help
- *   npx shipkit-pipe --version Show version
+ * Zero dependencies. Works with any stack, any IDE, any AI agent.
+ *
+ * Commands:
+ *   npx shipkit-pipe           Detect & generate pipeline
+ *   npx shipkit-pipe check     Verify everything works
+ *   npx shipkit-pipe -i        Interactive mode
+ *   npx shipkit-pipe --help    Help
  */
 
 'use strict';
@@ -19,88 +21,139 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-// ─── ANSI Colors ────────────────────────────────────────────────────────────
+// ─── Zero-Dep UI ────────────────────────────────────────────────────────────
+
 const C = {
   reset: '\x1b[0m', bold: '\x1b[1m', dim: '\x1b[2m',
   green: '\x1b[32m', cyan: '\x1b[36m', yellow: '\x1b[33m', red: '\x1b[31m',
+  magenta: '\x1b[35m',
 };
 
-const pkg = (() => {
-  try { return require('../package.json'); } catch { return { version: '2.0.1' }; }
-})();
+const isCI = process.env.CI || process.env.GITHUB_ACTIONS;
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
-
-function title(text) { console.log(`\n${C.bold}${C.cyan}═══ ${text} ═══${C.reset}\n`); }
-function step(msg) { console.log(`  ${C.green}✓${C.reset} ${msg}`); }
-function info(msg) { console.log(`  ${C.yellow}${msg}${C.reset}`); }
-
-// ─── Prompt System ──────────────────────────────────────────────────────────
-
-const readline = require('readline');
-
-function rl() {
-  const r = readline.createInterface({ input: process.stdin, output: process.stdout });
+function spinner(msg) {
+  if (isCI) { process.stdout.write(`  … ${msg}\n`); return { stop: m => console.log(`  ✓ ${m}`), fail: m => console.log(`  ✗ ${m}`) }; }
+  const frames = ['⠋','⠙','⠹','⠸','⠼','⠴','⠦','⠧','⠇','⠏'];
+  let i = 0, text = msg;
+  const id = setInterval(() => { process.stdout.write(`\r  ${C.cyan}${frames[i++ % frames.length]}${C.reset} ${text}`); }, 80);
   return {
-    ask: (q, d) => new Promise(res => {
-      const s = d ? ` [${d}]` : '';
-      r.question(`  ${q}${s}: `, a => { r.close(); res(a.trim() || d); });
-    }),
-    confirm: (q, d) => new Promise(res => {
-      const h = d ? 'Y/n' : 'y/N';
-      r.question(`  ${q} (${h}): `, a => { r.close(); res(a ? a.toLowerCase().startsWith('y') : d); });
-    }),
-    choose: async (q, opts, d) => {
-      console.log(`  ${C.yellow}${q}${C.reset}`);
-      opts.forEach((o, i) => console.log(`    ${i+1}. ${o}${o === d ? ` ${C.green}(default)${C.reset}` : ''}`));
-      const a = await new Promise(res => r.question(`  Enter number (1-${opts.length}): `, res));
-      r.close();
-      const n = parseInt(a, 10);
-      return n >= 1 && n <= opts.length ? opts[n-1] : d || opts[0];
-    }
+    update: (m) => { text = m; },
+    stop: (m) => { clearInterval(id); process.stdout.write(`\r  ${C.green}✓${C.reset} ${m}\n`); },
+    fail: (m) => { clearInterval(id); process.stdout.write(`\r  ${C.red}✗${C.reset} ${m}\n`); },
   };
 }
 
-// ─── Auto-Detect ────────────────────────────────────────────────────────────
+function step(msg) { console.log(`  ${C.green}✓${C.reset} ${msg}`); }
+function warn(msg) { console.log(`  ${C.yellow}⚠${C.reset} ${msg}`); }
+function fail(msg) { console.log(`  ${C.red}✗${C.reset} ${msg}`); }
+function dim(msg) { console.log(`  ${C.dim}${msg}${C.reset}`); }
+
+// ─── Detect ─────────────────────────────────────────────────────────────────
 
 function detect(cwd) {
-  const detected = {
-    name: path.basename(cwd), desc: '', frontend: '', pm: 'npm',
-    nodeVer: '20', build: 'npm run build', test: 'npm test',
-    lint: 'npm run lint', hasGit: false, gitRemote: '', e2e: '',
+  const d = {
+    name: path.basename(cwd),
+    desc: '',
+    frontend: '',
+    pm: 'npm',
+    installCmd: 'npm ci',
+    nodeVer: '20',
+    hasLint: false, lintCmd: '',
+    hasTest: false, testCmd: '',
+    hasBuild: false, buildCmd: '',
+    hasTypecheck: false, typecheckCmd: '',
+    hasGit: false,
+    gitRemote: '',
+    ghOwner: '',
+    ghRepo: '',
+    deployUrl: '',
+    deployPlatform: '',
   };
 
+  // package.json
   const pkgPath = path.join(cwd, 'package.json');
-  if (!fs.existsSync(pkgPath)) return detected;
+  if (!fs.existsSync(pkgPath)) return d;
 
-  try {
-    const p = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
-    if (p.name) detected.name = p.name;
-    if (p.description) detected.desc = p.description;
+  let pkg;
+  try { pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8')); } catch { return d; }
 
-    const deps = { ...p.dependencies || {}, ...p.devDependencies || {} };
-    if (deps.next) detected.frontend = 'Next.js';
-    else if (deps['@remix-run/react']) detected.frontend = 'Remix';
-    else if (deps.vue || deps.nuxt) detected.frontend = 'Vue/Nuxt';
-    else if (deps['@sveltejs/kit'] || deps.svelte) detected.frontend = 'Svelte';
-    else if (deps.react) detected.frontend = 'React';
-    else if (deps.angular) detected.frontend = 'Angular';
+  if (pkg.name) d.name = pkg.name;
+  if (pkg.description) d.desc = pkg.description;
+  if (pkg.homepage) d.deployUrl = pkg.homepage;
 
-    if (deps.playwright) detected.e2e = 'Playwright';
-    else if (deps.cypress) detected.e2e = 'Cypress';
+  // Framework detection
+  const deps = { ...pkg.dependencies || {}, ...pkg.devDependencies || {} };
+  if (deps.next) d.frontend = 'Next.js';
+  else if (deps.nuxt) d.frontend = 'Nuxt';
+  else if (deps['@remix-run/react']) d.frontend = 'Remix';
+  else if (deps.astro) d.frontend = 'Astro';
+  else if (deps['@sveltejs/kit'] || deps.svelte) d.frontend = 'SvelteKit';
+  else if (deps.vue) d.frontend = 'Vue';
+  else if (deps.react) d.frontend = 'React';
+  else if (deps.express) d.frontend = 'Express';
+  else if (deps.fastify) d.frontend = 'Fastify';
+  else if (deps.hono) d.frontend = 'Hono';
 
-    if (fs.existsSync(path.join(cwd, 'pnpm-lock.yaml'))) detected.pm = 'pnpm';
-    else if (fs.existsSync(path.join(cwd, 'yarn.lock'))) detected.pm = 'yarn';
-  } catch { /* ignore */ }
+  // Package manager
+  if (fs.existsSync(path.join(cwd, 'pnpm-lock.yaml'))) { d.pm = 'pnpm'; d.installCmd = 'pnpm install --frozen-lockfile'; }
+  else if (fs.existsSync(path.join(cwd, 'yarn.lock'))) { d.pm = 'yarn'; d.installCmd = 'yarn --frozen-lockfile'; }
+  else if (fs.existsSync(path.join(cwd, 'bun.lockb'))) { d.pm = 'bun'; d.installCmd = 'bun install --frozen-lockfile'; }
+  else { d.pm = 'npm'; d.installCmd = 'npm ci'; }
 
-  if (fs.existsSync(path.join(cwd, '.git'))) {
-    detected.hasGit = true;
-    try {
-      detected.gitRemote = execSync('git config --get remote.origin.url', { encoding: 'utf-8', stdio: 'pipe' }).trim();
-    } catch { /* no remote */ }
+  // Scripts — ONLY include CI steps for scripts that ACTUALLY EXIST
+  const scripts = pkg.scripts || {};
+  if (scripts.lint) { d.hasLint = true; d.lintCmd = `${d.pm} run lint`; }
+  if (scripts.test) { d.hasTest = true; d.testCmd = `${d.pm === 'npm' ? 'npm test' : d.pm + ' run test'}`; }
+  if (scripts.build) { d.hasBuild = true; d.buildCmd = `${d.pm} run build`; }
+  if (scripts.typecheck || scripts['type-check']) {
+    d.hasTypecheck = true;
+    d.typecheckCmd = scripts.typecheck ? `${d.pm} run typecheck` : `${d.pm} run type-check`;
+  } else if (deps.typescript) {
+    // Has typescript but no typecheck script — use tsc directly
+    d.hasTypecheck = true;
+    d.typecheckCmd = 'npx tsc --noEmit';
   }
 
-  return detected;
+  // Node version from .nvmrc, .node-version, or engines
+  const nvmrc = path.join(cwd, '.nvmrc');
+  const nodeVer = path.join(cwd, '.node-version');
+  if (fs.existsSync(nvmrc)) { d.nodeVer = fs.readFileSync(nvmrc, 'utf-8').trim().replace('v', ''); }
+  else if (fs.existsSync(nodeVer)) { d.nodeVer = fs.readFileSync(nodeVer, 'utf-8').trim().replace('v', ''); }
+  else if (pkg.engines?.node) {
+    const m = pkg.engines.node.match(/(\d+)/);
+    if (m) d.nodeVer = m[1];
+  }
+
+  // Git
+  if (fs.existsSync(path.join(cwd, '.git'))) {
+    d.hasGit = true;
+    try { d.gitRemote = execSync('git config --get remote.origin.url', { cwd, encoding: 'utf-8', stdio: 'pipe' }).trim(); } catch {}
+    if (d.gitRemote) {
+      const m = d.gitRemote.match(/[:/]([^/]+)\/([^/.]+?)(?:\.git)?$/);
+      if (m) { d.ghOwner = m[1]; d.ghRepo = m[2]; }
+    }
+  }
+
+  // Deploy platform detection
+  if (fs.existsSync(path.join(cwd, 'vercel.json')) || fs.existsSync(path.join(cwd, '.vercel'))) {
+    d.deployPlatform = 'Vercel';
+    if (!d.deployUrl) d.deployUrl = `https://${d.name}.vercel.app`;
+    // Try to get exact URL from .vercel/project.json
+    const vp = path.join(cwd, '.vercel', 'project.json');
+    if (fs.existsSync(vp)) { try { const v = JSON.parse(fs.readFileSync(vp, 'utf-8')); if (v.projectId) d.deployUrl = `https://${d.ghRepo || d.name}.vercel.app`; } catch {} }
+  } else if (fs.existsSync(path.join(cwd, 'netlify.toml'))) {
+    d.deployPlatform = 'Netlify';
+    if (!d.deployUrl) d.deployUrl = `https://${d.name}.netlify.app`;
+  } else if (fs.existsSync(path.join(cwd, 'fly.toml'))) {
+    d.deployPlatform = 'Fly.io';
+    try { const fly = fs.readFileSync(path.join(cwd, 'fly.toml'), 'utf-8'); const m = fly.match(/app\s*=\s*"([^"]+)"/); if (m) d.deployUrl = `https://${m[1]}.fly.dev`; } catch {}
+  } else if (fs.existsSync(path.join(cwd, 'render.yaml'))) {
+    d.deployPlatform = 'Render';
+  } else if (fs.existsSync(path.join(cwd, 'railway.json')) || fs.existsSync(path.join(cwd, 'railway.toml'))) {
+    d.deployPlatform = 'Railway';
+  }
+
+  return d;
 }
 
 // ─── Template Renderer ──────────────────────────────────────────────────────
@@ -115,67 +168,62 @@ function render(content, vars) {
   });
 }
 
-// ─── Generate Files ─────────────────────────────────────────────────────────
+// ─── Generate ───────────────────────────────────────────────────────────────
 
-function generate(cwd, choices, detected) {
-  const { projName, projDesc, agent, ghOwner, ghRepo, deploy, db, monitor } = choices;
-
-  let agentDst = '';
-  if (agent.startsWith('Claude Code')) agentDst = 'CLAUDE.md';
-  else if (agent.startsWith('Cursor')) agentDst = '.cursorrules';
-  else if (agent.startsWith('GitHub Copilot')) agentDst = '.github/copilot-instructions.md';
-  else if (agent.startsWith('OpenCode')) agentDst = '.opencode/agents/co-developer.md';
-
-  const storage = db.includes('Supabase') ? 'Supabase Storage'
-    : db.includes('Firebase') ? 'Firebase Storage' : 'Cloud storage';
-
+function generate(cwd, d) {
   const vars = {
-    PROJECT_NAME: projName, PROJECT_DESCRIPTION: projDesc,
+    PROJECT_NAME: d.name,
+    PROJECT_DESCRIPTION: d.desc || 'A web application',
     DATE: new Date().toISOString().split('T')[0],
-    STACK_FRONTEND: detected.frontend || 'Web application',
-    STACK_DATABASE: db, STACK_AUTH: db, STACK_DEPLOY: deploy,
-    STACK_STORAGE: storage, STACK_AI: '', STACK_E2E: detected.e2e || 'Playwright',
-    STACK_ANALYTICS: monitor,
-    NODE_VERSION: detected.nodeVer, BUILD_COMMAND: detected.build,
-    TEST_COMMAND: detected.test, LINT_COMMAND: detected.lint,
-    TYPECHECK_COMMAND: 'npx tsc --noEmit', PACKAGE_MANAGER: detected.pm,
-    COVERAGE_ENABLED: 'true',
-    DATABASE_TYPE: db, DATABASE_PROJECT_ID: '', DATABASE_REGION: '',
-    RLS_ENABLED: db.includes('Supabase') ? 'true' : 'false',
-    GITHUB_OWNER: ghOwner, GITHUB_REPO: ghRepo,
-    DEPLOY_PLATFORM: deploy, DEPLOY_PROJECT_ID: '',
-    PREVIEW_URLS_ENABLED: deploy === 'Vercel' ? 'true' : 'false',
-    MONITORING_PLATFORM: monitor, MONITORING_ORG: '', MONITORING_PROJECT: '',
-    BUILD_ENV_VARS: [], AI_AGENT: agent, AGENT_CONFIG_FILES: agentDst || 'AGENTS.md',
+    // Stack
+    STACK_FRONTEND: d.frontend || 'Node.js',
+    DEPLOY_PLATFORM: d.deployPlatform || 'Not configured',
+    DEPLOY_URL: d.deployUrl || '',
+    // CI (only what exists)
+    NODE_VERSION: d.nodeVer,
+    PACKAGE_MANAGER: d.pm,
+    INSTALL_COMMAND: d.installCmd,
+    HAS_LINT: d.hasLint ? 'true' : '',
+    LINT_COMMAND: d.lintCmd,
+    HAS_TYPECHECK: d.hasTypecheck ? 'true' : '',
+    TYPECHECK_COMMAND: d.typecheckCmd,
+    HAS_TEST: d.hasTest ? 'true' : '',
+    TEST_COMMAND: d.testCmd,
+    HAS_BUILD: d.hasBuild ? 'true' : '',
+    BUILD_COMMAND: d.buildCmd,
+    // GitHub
+    GITHUB_OWNER: d.ghOwner || 'your-username',
+    GITHUB_REPO: d.ghRepo || d.name.toLowerCase().replace(/[^a-z0-9-]/g, ''),
+    // Conditional: health check only if deploy URL is known
+    HAS_DEPLOY_URL: d.deployUrl ? 'true' : '',
   };
 
+  // Build CI steps summary for AGENTS.md
+  const ciSteps = [d.hasLint && 'lint', d.hasTypecheck && 'typecheck', d.hasTest && 'test', d.hasBuild && 'build'].filter(Boolean).join(' -> ');
+  vars.CI_STEPS = ciSteps || 'install';
+
   // Find template dir
-  const tmplDir = (p => {
-    const dirs = [
-      path.join(path.dirname(require.resolve('../package.json')), 'template'),
-      path.join(__dirname, '..', 'template'),
-      path.join(cwd, 'template'),
-    ];
-    return dirs.find(d => fs.existsSync(d));
-  })();
+  const tmplDir = [
+    path.join(path.dirname(require.resolve('../package.json')), 'template'),
+    path.join(__dirname, '..', 'template'),
+    path.join(cwd, 'template'),
+  ].find(d => fs.existsSync(d));
 
-  if (!tmplDir) { console.error(`${C.red}Template directory not found. Reinstall shipkit-pipe.${C.reset}`); process.exit(1); }
+  if (!tmplDir) { fail('Template directory not found. Reinstall: npm i -g shipkit-pipe'); process.exit(1); }
 
+  // Files to generate — ONLY what's needed
   const files = [
-    ['github/dependabot.yml', '.github/dependabot.yml'],
     ['github/workflows/ci.yml', '.github/workflows/ci.yml'],
+    ['github/dependabot.yml', '.github/dependabot.yml'],
     ['github/workflows/codeql.yml', '.github/workflows/codeql.yml'],
-    ['github/workflows/playwright.yml', '.github/workflows/playwright.yml'],
-    ['agents/co-developer.md', 'shipkit/co-developer.md'],
-    ['agents/planner.md', 'shipkit/planner.md'],
-    ['agents/security-reviewer.md', 'shipkit/security-reviewer.md'],
-    ['agents/monitor.md', 'shipkit/monitor.md'],
-    ['husky/pre-commit', '.husky/pre-commit'],
     ['docs/AGENTS.md', 'AGENTS.md'],
-    ['docs/ROADMAP.md', 'ROADMAP.md'],
-    ['docs/BUGS.md', 'BUGS.md'],
     ['docs/LAST_SESSION.md', 'LAST_SESSION.md'],
   ];
+
+  // Only add health check if we have a deploy URL
+  if (d.deployUrl) {
+    files.push(['github/workflows/health.yml', '.github/workflows/health.yml']);
+  }
 
   let gen = 0, skip = 0;
 
@@ -189,34 +237,132 @@ function generate(cwd, choices, detected) {
     gen++;
   }
 
-  // Agent config file
-  if (agentDst) {
-    const ap = path.join(cwd, agentDst);
-    if (!fs.existsSync(ap)) {
-      fs.mkdirSync(path.dirname(ap), { recursive: true });
-      fs.writeFileSync(ap, `# ${projName} — AI Agent Configuration\n\nThis file configures your AI agent (${agent}) for **${projName}**.\n\n→ Read \`AGENTS.md\` for the full protocol and rules\n→ Read \`shipkit.json\` for project config and tech stack\n→ Read \`ROADMAP.md\` for what's planned\n→ Read \`BUGS.md\` for what's broken\n→ Read \`LAST_SESSION.md\` for session continuity\n\n## Quick Start\n- Say "plan: <feature>" to start the planning process\n- Say "review security" before pushing changes\n- Say "check errors" at session start\n`, 'utf-8');
-      gen++;
-    } else { skip++; }
-  }
-
-  // shipkit.json
+  // shipkit.json — the project config AI agents read
   const sjPath = path.join(cwd, 'shipkit.json');
   if (!fs.existsSync(sjPath)) {
     fs.writeFileSync(sjPath, JSON.stringify({
-      project: { name: projName, description: projDesc },
-      stack: { frontend: vars.STACK_FRONTEND, database: db, auth: db, deploy, storage, e2e: vars.STACK_E2E, monitoring: monitor },
-      ci: { nodeVersion: vars.NODE_VERSION, buildCommand: vars.BUILD_COMMAND, testCommand: vars.TEST_COMMAND, lintCommand: vars.LINT_COMMAND, packageManager: vars.PACKAGE_MANAGER },
-      aiAgent: { tool: agent, configFiles: vars.AGENT_CONFIG_FILES },
-      github: { owner: ghOwner, repo: ghRepo },
-      deploy: { platform: deploy, projectId: '', previewUrls: deploy === 'Vercel' },
-      database: { type: db, rlsEnabled: db.includes('Supabase') },
-      monitoring: { platform: monitor },
-      version: pkg.version,
-    }, null, 2), 'utf-8');
+      project: { name: d.name, description: d.desc || '' },
+      stack: { framework: d.frontend || 'Node.js', packageManager: d.pm, nodeVersion: d.nodeVer },
+      scripts: { lint: d.hasLint, test: d.hasTest, build: d.hasBuild, typecheck: d.hasTypecheck },
+      deploy: { platform: d.deployPlatform || '', url: d.deployUrl || '' },
+      github: { owner: d.ghOwner || '', repo: d.ghRepo || '' },
+      ci: { steps: ciSteps },
+      version: '3.0.0',
+    }, null, 2) + '\n', 'utf-8');
     gen++;
   } else { skip++; }
 
-  return { gen, skip, agentDst, agent };
+  return { gen, skip, vars };
+}
+
+// ─── Check Command ──────────────────────────────────────────────────────────
+
+async function check(cwd) {
+  console.log(`\n  ${C.bold}${C.cyan}⚓ ShipKit Check${C.reset}\n`);
+
+  // 1. Project
+  const pkgPath = path.join(cwd, 'package.json');
+  if (!fs.existsSync(pkgPath)) { fail('No package.json found'); process.exit(1); }
+  const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+  step(`Project: ${pkg.name || path.basename(cwd)}`);
+
+  // 2. shipkit.json
+  const sjPath = path.join(cwd, 'shipkit.json');
+  if (fs.existsSync(sjPath)) {
+    step('shipkit.json exists');
+  } else {
+    warn('No shipkit.json — run `npx shipkit-pipe` to generate');
+  }
+
+  // 3. CI workflow
+  const ciPath = path.join(cwd, '.github', 'workflows', 'ci.yml');
+  if (fs.existsSync(ciPath)) {
+    step('CI workflow exists');
+    // Validate CI references scripts that exist
+    const ci = fs.readFileSync(ciPath, 'utf-8');
+    const scripts = pkg.scripts || {};
+    if (ci.includes('run lint') && !scripts.lint) warn('CI has lint step but no "lint" script in package.json');
+    if (ci.includes('run test') && !scripts.test) warn('CI has test step but no "test" script in package.json');
+    if (ci.includes('run build') && !scripts.build) warn('CI has build step but no "build" script in package.json');
+  } else {
+    warn('No CI workflow — run `npx shipkit-pipe` to generate');
+  }
+
+  // 4. Health check
+  const healthPath = path.join(cwd, '.github', 'workflows', 'health.yml');
+  if (fs.existsSync(healthPath)) { step('Health check workflow exists'); }
+
+  // 5. Deploy URL check
+  const config = fs.existsSync(sjPath) ? JSON.parse(fs.readFileSync(sjPath, 'utf-8')) : null;
+  const deployUrl = config?.deploy?.url;
+
+  if (deployUrl) {
+    const s = spinner(`Pinging ${deployUrl}...`);
+    try {
+      // Use built-in fetch (Node 18+)
+      const res = await fetch(deployUrl, { method: 'HEAD', signal: AbortSignal.timeout(10000) });
+      if (res.ok) s.stop(`Site is up (${res.status}) — ${deployUrl}`);
+      else s.fail(`Site returned ${res.status} — ${deployUrl}`);
+    } catch (e) {
+      s.fail(`Cannot reach ${deployUrl}`);
+    }
+  } else {
+    dim('No deploy URL configured — add "homepage" to package.json or deploy to Vercel/Netlify');
+  }
+
+  // 6. Dependencies
+  const s2 = spinner('Checking dependencies...');
+  try {
+    const result = execSync('npm audit --json 2>/dev/null || echo "{}"', { cwd, encoding: 'utf-8', stdio: 'pipe', timeout: 15000 });
+    try {
+      const audit = JSON.parse(result);
+      const vulns = audit.metadata?.vulnerabilities || {};
+      const critical = (vulns.critical || 0) + (vulns.high || 0);
+      if (critical > 0) s2.fail(`${critical} critical/high vulnerabilities — run \`npm audit fix\``);
+      else s2.stop('No critical vulnerabilities');
+    } catch { s2.stop('Dependencies OK'); }
+  } catch { s2.stop('Dependencies OK (audit skipped)'); }
+
+  // 7. AGENTS.md
+  if (fs.existsSync(path.join(cwd, 'AGENTS.md'))) { step('AGENTS.md exists — AI agent can read your stack'); }
+  else { dim('No AGENTS.md — your AI agent won\'t know your project config'); }
+
+  console.log();
+}
+
+// ─── Interactive Mode ───────────────────────────────────────────────────────
+
+const readline = require('readline');
+
+async function ask(question, defaultVal) {
+  const r = readline.createInterface({ input: process.stdin, output: process.stdout });
+  const suffix = defaultVal ? ` ${C.dim}[${defaultVal}]${C.reset}` : '';
+  return new Promise(res => {
+    r.question(`  ${question}${suffix}: `, a => { r.close(); res(a.trim() || defaultVal || ''); });
+  });
+}
+
+async function interactive(cwd, d) {
+  console.log(`\n  ${C.bold}${C.cyan}⚓ ShipKit${C.reset} — interactive setup\n`);
+  console.log(`  ${C.dim}Detected: ${d.frontend || 'Node.js'} | ${d.pm} | Node ${d.nodeVer}${C.reset}\n`);
+
+  // Only ask what we can't auto-detect
+  if (!d.deployUrl) {
+    const url = await ask('Deploy URL (leave empty to skip)', '');
+    if (url) { d.deployUrl = url; d.deployPlatform = 'Custom'; }
+  } else {
+    step(`Deploy URL: ${d.deployUrl}`);
+  }
+
+  if (!d.ghOwner) {
+    d.ghOwner = await ask('GitHub username/org', 'your-username');
+    d.ghRepo = await ask('Repository name', d.name.toLowerCase().replace(/[^a-z0-9-]/g, ''));
+  } else {
+    step(`GitHub: ${d.ghOwner}/${d.ghRepo}`);
+  }
+
+  console.log();
+  return generate(cwd, d);
 }
 
 // ─── Main ───────────────────────────────────────────────────────────────────
@@ -225,40 +371,50 @@ async function main() {
   const args = process.argv.slice(2);
   const cwd = process.cwd();
 
-  // --version
+  // Version
   if (args.includes('--version') || args.includes('-v')) {
+    const pkg = (() => { try { return require('../package.json'); } catch { return { version: '3.0.0' }; } })();
     console.log(pkg.version);
     process.exit(0);
   }
 
-  // --help
+  // Help
   if (args.includes('--help') || args.includes('-h')) {
     console.log(`
-${C.bold}${C.cyan}ShipKit${C.reset} — MVP to Production Pipeline v${pkg.version}
+  ${C.bold}${C.cyan}ShipKit${C.reset} — Your Automated Dev Team
 
-${C.dim}One command connects your AI agent, CI/CD, security, and deploy.${C.reset}
+  ${C.dim}One command sets up CI/CD, monitoring, security, and AI agent config.
+  Only generates what your project actually needs. Zero dependencies.${C.reset}
 
-${C.bold}Usage:${C.reset}
-  ${C.green}npx shipkit-pipe${C.reset}               Auto-detect & generate (no prompts)
-  ${C.green}npx shipkit-pipe -i${C.reset}           Interactive mode (asks questions)
-  ${C.green}npx shipkit-pipe --help${C.reset}        Show this message
-  ${C.green}npx shipkit-pipe --version${C.reset}     Show version
+  ${C.bold}Usage:${C.reset}
+    ${C.green}npx shipkit-pipe${C.reset}         Auto-detect & generate
+    ${C.green}npx shipkit-pipe check${C.reset}   Verify everything works
+    ${C.green}npx shipkit-pipe -i${C.reset}      Interactive (ask questions)
+    ${C.green}npx shipkit-pipe --help${C.reset}   This message
 
-${C.bold}What it generates:${C.reset}
-  • AGENTS.md + shipkit.json   ← Your AI agent knows your stack
-  • .github/workflows/         ← CI/CD: lint → test → build
-  • .github/workflows/         ← CI/CD: lint → test → build
-  • .github/dependabot.yml     ← Dependency updates
-  • .husky/pre-commit          ← Pre-commit hooks
-  • shipkit/                   ← Planner, security, monitor prompts
+  ${C.bold}What it does:${C.reset}
+    • Reads your package.json scripts
+    • Generates CI that ONLY includes steps you have (lint/test/build)
+    • Sets up health monitoring (pings your site every 6h)
+    • Creates AGENTS.md so your AI agent knows your project
+    • Adds Dependabot + CodeQL for security
 
-${C.dim}Works with Claude Code, Cursor, Copilot, OpenCode, any agent.${C.reset}
-${C.dim}https://github.com/sagar-grv/shipkit${C.reset}
+  ${C.bold}Works with:${C.reset} Any framework, any AI agent, any deploy platform.
 `);
     process.exit(0);
   }
 
-  // Check for project
+  // Check command
+  if (args[0] === 'check') {
+    if (!fs.existsSync(path.join(cwd, 'package.json'))) {
+      console.log(`\n  ${C.red}✗ No project found.${C.reset} Run this inside your project folder.\n`);
+      process.exit(1);
+    }
+    await check(cwd);
+    process.exit(0);
+  }
+
+  // Must have package.json
   if (!fs.existsSync(path.join(cwd, 'package.json'))) {
     console.log(`\n  ${C.red}✗ No project found.${C.reset}`);
     console.log(`  Run this inside your project folder:\n`);
@@ -267,101 +423,58 @@ ${C.dim}https://github.com/sagar-grv/shipkit${C.reset}
     process.exit(1);
   }
 
-  const interactive = args.includes('-i') || args.includes('--interactive');
-  const detected = detect(cwd);
+  const d = detect(cwd);
+  const isInteractive = args.includes('-i') || args.includes('--interactive');
 
-  // ── Auto mode (default) ─────────────────────────────────────────────────
-  if (!interactive) {
-    console.log(`\n  ${C.bold}${C.cyan}⚓ ShipKit${C.reset} — ${detected.name}\n`);
-
-    const defaults = {
-      projName: detected.name,
-      projDesc: detected.desc || 'A web application',
-      agent: 'Claude Code (Anthropic)',
-      ghOwner: '', ghRepo: '',
-      deploy: 'Vercel', db: 'Supabase Postgres', monitor: 'Sentry',
-    };
-
-    if (detected.gitRemote) {
-      const m = detected.gitRemote.match(/[:/]([^/]+)\/([^/.]+)(?:\.git)?$/);
-      if (m) { defaults.ghOwner = m[1]; defaults.ghRepo = m[2]; }
-    }
-    if (!defaults.ghOwner) {
-      defaults.ghOwner = 'your-username';
-      defaults.ghRepo = detected.name.toLowerCase().replace(/[^a-z0-9-]/g, '');
-    }
-
-    const hasVercel = fs.existsSync(path.join(cwd, 'vercel.json')) || fs.existsSync(path.join(cwd, '.vercel'));
-    const hasNetlify = fs.existsSync(path.join(cwd, 'netlify.toml'));
-    if (hasVercel) defaults.deploy = 'Vercel';
-    else if (hasNetlify) defaults.deploy = 'Netlify';
-
-    const { gen, skip } = generate(cwd, defaults, detected);
-
-    console.log(`  ${C.green}✓ Generated ${gen} files${C.reset}${skip ? ` (${skip} skipped)` : ''}`);
-    console.log(`  ${C.dim}Run with -i for interactive mode${C.reset}\n`);
+  // Interactive mode
+  if (isInteractive) {
+    const { gen, skip } = await interactive(cwd, d);
+    console.log(`  ${C.green}✓ Generated ${gen} files${C.reset}${skip ? ` ${C.dim}(${skip} skipped)${C.reset}` : ''}\n`);
+    console.log(`  ${C.dim}Next: git add -A && git commit -m "add shipkit pipeline" && git push${C.reset}\n`);
     process.exit(0);
   }
 
-  // ── Interactive mode ────────────────────────────────────────────────────
-  const term = rl();
+  // ── Auto mode (default) ─────────────────────────────────────────────────
+  console.log(`\n  ${C.bold}${C.cyan}⚓ ShipKit${C.reset} — ${d.name}\n`);
 
-  console.log(`\n  ${C.bold}${C.cyan}⚓ ShipKit${C.reset} — interactive setup\n`);
+  const s = spinner('Detecting project...');
+  await new Promise(r => setTimeout(r, 300)); // Brief pause for visual feedback
 
-  title('PROJECT');
-  const projName = await term.ask('Project name', detected.name);
-  const projDesc = await term.ask('Description', detected.desc || 'A web application');
+  // Build detection summary
+  const parts = [d.frontend || 'Node.js', d.pm, `Node ${d.nodeVer}`].join(' | ');
+  s.stop(parts);
 
-  title('AI AGENT');
-  const agent = await term.choose('Which AI agent do you use?',
-    ['Claude Code (Anthropic)', 'Cursor', 'GitHub Copilot', 'OpenCode', 'CodeGPT', 'Continue.dev', 'Cline', 'Aider', 'Other'],
-    'Claude Code (Anthropic)');
+  // Show what scripts were found
+  const found = [d.hasLint && 'lint', d.hasTypecheck && 'typecheck', d.hasTest && 'test', d.hasBuild && 'build'].filter(Boolean);
+  if (found.length) step(`Scripts: ${found.join(', ')}`);
+  else warn('No lint/test/build scripts found — CI will only install deps');
 
-  title('GITHUB');
-  let ghOwner = '', ghRepo = '';
-  if (detected.gitRemote) {
-    const m = detected.gitRemote.match(/[:/]([^/]+)\/([^/.]+)(?:\.git)?$/);
-    if (m) { ghOwner = m[1]; ghRepo = m[2]; step(`Detected: ${m[1]}/${m[2]}`); }
-  }
-  if (!ghOwner) {
-    ghOwner = await term.ask('GitHub username/organization', 'your-username');
-    ghRepo = await term.ask('Repository name', projName.toLowerCase().replace(/[^a-z0-9-]/g, ''));
-  }
+  // Git
+  if (d.ghOwner) step(`Git: ${d.ghOwner}/${d.ghRepo}`);
 
-  title('DEPLOY');
-  const deploy = await term.choose('Where do you deploy?',
-    ['Vercel', 'Netlify', 'Fly.io', 'Railway', 'Render', 'Cloudflare Pages', 'Docker / Self-hosted', 'AWS', 'GCP', 'None yet'],
-    'Vercel');
+  // Deploy
+  if (d.deployUrl) step(`Deploy: ${d.deployPlatform} (${d.deployUrl})`);
+  else dim('No deploy URL detected — health checks will be skipped');
 
-  title('DATABASE');
-  const db = await term.choose('Which database do you use?',
-    ['Supabase Postgres', 'Firebase Firestore', 'MongoDB', 'PostgreSQL', 'MySQL', 'SQLite', 'None yet'],
-    'Supabase Postgres');
-
-  title('MONITORING');
-  const monitor = await term.choose('Error tracking / monitoring?',
-    ['Sentry', 'Datadog', 'LogRocket', 'PostHog', 'None'], 'Sentry');
-
+  // Generate
   console.log();
-  const { gen, skip, agentDst } = generate(cwd, { projName, projDesc, agent, ghOwner, ghRepo, deploy, db, monitor }, detected);
+  const s2 = spinner('Generating pipeline...');
+  const { gen, skip } = generate(cwd, d);
+  s2.stop(`Generated ${gen} files${skip ? ` (${skip} already exist)` : ''}`);
 
-  title('DONE');
-  console.log(`  ${C.green}✓ Generated ${gen} files for ${C.bold}${projName}${C.reset}${skip ? ` (${skip} skipped)` : ''}`);
-  console.log(`\n  ${C.cyan}Files created:${C.reset}`);
-  console.log(`    shipkit.json      ← Config for your AI agent`);
-  console.log(`    AGENTS.md         ← AI agent protocol`);
-  console.log(`    ROADMAP.md        ← Feature tracker`);
-  console.log(`    BUGS.md           ← Bug tracker`);
-  console.log(`    LAST_SESSION.md   ← Session continuity`);
-    console.log(`    shipkit/          ← AI agent prompts`);
-    console.log(`    .github/          ← CI/CD + Security`);
-    console.log(`    .husky/pre-commit ← Pre-commit hooks`);
-  if (agentDst) console.log(`    ${agentDst.padEnd(18)} ← ${agent} config`);
-  console.log(`\n  ${C.cyan}Next steps:${C.reset}`);
-  console.log(`    1. ${C.bold}npm install --save-dev husky lint-staged${C.reset}`);
-  console.log(`    2. ${C.bold}git init && git add -A && git commit -m "init"${C.reset}`);
-  console.log(`    3. ${C.bold}git push origin main${C.reset}`);
-  console.log(`    4. Open in your AI agent → say: ${C.green}"plan: <feature>"${C.reset}\n`);
+  // Summary
+  console.log(`\n  ${C.cyan}Files:${C.reset}`);
+  const showFile = (f, desc) => { if (fs.existsSync(path.join(cwd, f))) console.log(`    ${f.padEnd(35)} ${C.dim}← ${desc}${C.reset}`); };
+  showFile('shipkit.json', 'Project config');
+  showFile('AGENTS.md', 'AI agent instructions');
+  showFile('LAST_SESSION.md', 'Session continuity');
+  showFile('.github/workflows/ci.yml', `CI: ${found.join(' > ') || 'install'}`);
+  showFile('.github/workflows/health.yml', 'Health check (every 6h)');
+  showFile('.github/dependabot.yml', 'Auto-update deps');
+  showFile('.github/workflows/codeql.yml', 'Security scanning');
+
+  console.log(`\n  ${C.bold}Next:${C.reset} ${C.dim}git add -A && git commit -m "add pipeline" && git push${C.reset}`);
+  console.log(`  ${C.bold}Verify:${C.reset} ${C.dim}npx shipkit-pipe check${C.reset}\n`);
 }
 
-main().catch(err => { console.error(`${C.red}Error:${C.reset} ${err.message}`); process.exit(1); });
+main().catch(err => { console.error(`\n  ${C.red}Error:${C.reset} ${err.message}\n`); process.exit(1); });

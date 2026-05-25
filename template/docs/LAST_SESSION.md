@@ -1,30 +1,12 @@
-﻿# Last Session — {{DATE}}
+﻿# Last Session — {{PROJECT_NAME}}
 
-## What Was Completed
+**Date:** {{DATE}}
 
-- _Pipeline setup complete_
+## What was done
+- (first session — nothing yet)
 
-## What's Next
+## What's next
+- (open your AI agent and say what you want to build)
 
-- _(add what you plan to work on next)_
-
-## Key Decisions
-
-- _(add decisions made during the session)_
-
-## Files Changed
-
-- _(list files modified)_
-
-## DORA Metrics
-
-| Metric | Value |
-|--------|-------|
-| Deploy Frequency | 0 deploys/week |
-| Lead Time | — |
-| Change Failure Rate | 0% |
-| MTTR | — |
-
-## Blockers
-
-- _(none)_
+## Decisions
+- (none yet)
