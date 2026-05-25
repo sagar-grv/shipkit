@@ -1,4 +1,4 @@
-﻿# ShipKit — Validate templates and docs
+# ShipKit — Validate templates and docs
 name: Validate
 
 on:
@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       
       - name: Check template files
         run: |
@@ -51,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       
       - name: Verify essential files exist
         run: |
@@ -72,7 +72,7 @@ jobs:
     timeout-minutes: 5
     needs: validate-templates
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
