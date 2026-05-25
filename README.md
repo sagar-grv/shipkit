@@ -33,6 +33,8 @@ npx shipkit-pipe
 # That's it. Your pipeline is ready.
 ```
 
+📖 **Detailed usage guide, scenarios, and troubleshooting → [USAGE.md](USAGE.md)**
+
 **What gets generated:**
 
 | File | Purpose |
