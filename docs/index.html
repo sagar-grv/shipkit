@@ -47,6 +47,14 @@ code,.font-mono,.terminal-font{font-family:'JetBrains Mono',monospace!important}
 </style>
 </head>
 <body>
+<noscript>
+  <div style="position:fixed;inset:0;z-index:9999;background:#09090b;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;font-family:system-ui,sans-serif">
+    <div style="font-size:3rem;margin-bottom:1rem">⚓</div>
+    <h1 style="color:#fafafa;font-size:1.5rem;font-weight:800;margin-bottom:0.5rem">ShipKit requires JavaScript</h1>
+    <p style="color:#a1a1aa;max-width:400px;margin-bottom:1rem">The landing page uses Alpine.js for interactivity. Please enable JavaScript to view the full experience.</p>
+    <p style="color:#71717a;font-size:0.875rem">Alternatively, run <code style="background:#27272a;padding:0.25rem 0.5rem;border-radius:0.25rem">npx shipkit-pipe</code> directly in your terminal.</p>
+  </div>
+</noscript>
 
 <nav x-data="{ open: false, scrolled: false }"
      @scroll.window="scrolled = window.scrollY > 20"
@@ -61,7 +69,7 @@ code,.font-mono,.terminal-font{font-family:'JetBrains Mono',monospace!important}
         <a href="#demo" class="text-[#a1a1aa] hover:text-white transition-colors">Live demo</a>
         <a href="#install" class="text-[#a1a1aa] hover:text-white transition-colors">Install</a>
         <a href="#faq" class="text-[#a1a1aa] hover:text-white transition-colors">FAQ</a>
-        <a href="https://github.com/sagar-grv/shipkit" target="_blank" class="inline-flex items-center gap-1.5 bg-[#27272a] border border-[#3f3f46] rounded-lg px-3 py-1.5 text-sm text-white hover:border-[#facc15] transition-colors no-underline!">
+         <a href="https://github.com/sagar-grv/shipkit" target="_blank" class="inline-flex items-center gap-1.5 bg-[#27272a] border border-[#3f3f46] rounded-lg px-3 py-1.5 text-sm text-white hover:border-[#facc15] transition-colors !no-underline">
           <svg class="w-4 h-4 fill-[#facc15]" viewBox="0 0 16 16"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/></svg> Star</a>
       </div>
       <button @click="open = !open" class="md:hidden p-2 text-[#a1a1aa] hover:text-white">
@@ -105,7 +113,7 @@ code,.font-mono,.terminal-font{font-family:'JetBrains Mono',monospace!important}
   </div>
 </section>
 
-<section class="border-y border-[#3f3f46] bg-[#18181b]">
+<section x-data class="border-y border-[#3f3f46] bg-[#18181b]">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
       <div x-intersect:enter="startCount(0,7,2000,$el.querySelector('.stat-value'))" class="opacity-0 translate-y-4 transition-all duration-500">
@@ -417,7 +425,7 @@ code,.font-mono,.terminal-font{font-family:'JetBrains Mono',monospace!important}
       <h2 class="text-3xl sm:text-4xl font-black mb-3">Install in one line</h2>
       <p class="text-[#a1a1aa] max-w-xl mx-auto">No signup. No wizard. No survey. Choose your method.</p>
     </div>
-    <div class="max-w-2xl mx-auto" x-data="{ tab: 'npx', copiedText: false }">
+    <div class="max-w-2xl mx-auto" x-data="{ tab: 'npx' }">
       <div class="flex gap-1 mb-6 bg-[#09090b] rounded-xl p-1 border border-[#3f3f46]">
         <button @click="tab='npx'" :class="tab==='npx' ? 'bg-[#27272a] text-white border-[#3f3f46]' : 'text-[#71717a] border-transparent'" class="flex-1 px-4 py-2 text-sm rounded-lg border transition-all font-medium">npx</button>
         <button @click="tab='bash'" :class="tab==='bash' ? 'bg-[#27272a] text-white border-[#3f3f46]' : 'text-[#71717a] border-transparent'" class="flex-1 px-4 py-2 text-sm rounded-lg border transition-all font-medium">curl bash</button>
@@ -427,40 +435,40 @@ code,.font-mono,.terminal-font{font-family:'JetBrains Mono',monospace!important}
       <div x-show="tab==='npx'" class="bg-[#09090b] border border-[#3f3f46] rounded-xl overflow-hidden">
         <div class="flex items-center justify-between px-5 py-3.5 terminal-font text-sm text-[#4ade80]">
           <span>$ npx shipkit-pipe</span>
-          <button @click="navigator.clipboard.writeText('npx shipkit-pipe').then(() => { copiedText = true; setTimeout(() => copiedText = false, 2000) })" class="text-[#71717a] hover:text-white transition-colors">
-            <svg x-show="!copiedText" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-            <svg x-show="copiedText" class="w-4 h-4 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
-          </button>
+          <span x-data="{ c: false }"><button @click="navigator.clipboard.writeText('npx shipkit-pipe').then(() => { c = true; setTimeout(() => c = false, 2000) })" class="text-[#71717a] hover:text-white transition-colors" type="button">
+            <svg x-show="!c" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            <svg x-show="c" class="w-4 h-4 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+          </button></span>
         </div>
         <div class="px-5 pb-4 text-xs text-[#71717a]">No install needed. Works with Node 18+.</div>
       </div>
       <div x-show="tab==='bash'" x-cloak class="bg-[#09090b] border border-[#3f3f46] rounded-xl overflow-hidden">
         <div class="flex items-center justify-between px-5 py-3.5 terminal-font text-sm text-[#4ade80]">
           <span>$ curl -fsSL https://raw.githubusercontent.com/sagar-grv/shipkit/main/setup.sh | bash</span>
-          <button @click="navigator.clipboard.writeText('curl -fsSL https://raw.githubusercontent.com/sagar-grv/shipkit/main/setup.sh | bash').then(() => { copiedText = true; setTimeout(() => copiedText = false, 2000) })" class="text-[#71717a] hover:text-white transition-colors">
-            <svg x-show="!copiedText" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-            <svg x-show="copiedText" class="w-4 h-4 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
-          </button>
+          <span x-data="{ c: false }"><button @click="navigator.clipboard.writeText('curl -fsSL https://raw.githubusercontent.com/sagar-grv/shipkit/main/setup.sh | bash').then(() => { c = true; setTimeout(() => c = false, 2000) })" class="text-[#71717a] hover:text-white transition-colors" type="button">
+            <svg x-show="!c" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            <svg x-show="c" class="w-4 h-4 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+          </button></span>
         </div>
         <div class="px-5 pb-4 text-xs text-[#71717a]">Linux/macOS. No Node.js? This works.</div>
       </div>
       <div x-show="tab==='powershell'" x-cloak class="bg-[#09090b] border border-[#3f3f46] rounded-xl overflow-hidden">
         <div class="flex items-center justify-between px-5 py-3.5 terminal-font text-sm text-[#4ade80]">
           <span>PS&gt; irm https://raw.githubusercontent.com/sagar-grv/shipkit/main/setup.ps1 | powershell</span>
-          <button @click="navigator.clipboard.writeText('irm https://raw.githubusercontent.com/sagar-grv/shipkit/main/setup.ps1 | powershell').then(() => { copiedText = true; setTimeout(() => copiedText = false, 2000) })" class="text-[#71717a] hover:text-white transition-colors">
-            <svg x-show="!copiedText" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-            <svg x-show="copiedText" class="w-4 h-4 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
-          </button>
+          <span x-data="{ c: false }"><button @click="navigator.clipboard.writeText('irm https://raw.githubusercontent.com/sagar-grv/shipkit/main/setup.ps1 | powershell').then(() => { c = true; setTimeout(() => c = false, 2000) })" class="text-[#71717a] hover:text-white transition-colors" type="button">
+            <svg x-show="!c" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            <svg x-show="c" class="w-4 h-4 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+          </button></span>
         </div>
         <div class="px-5 pb-4 text-xs text-[#71717a]">Windows PowerShell 5.1+ (no Node.js needed).</div>
       </div>
       <div x-show="tab==='global'" x-cloak class="bg-[#09090b] border border-[#3f3f46] rounded-xl overflow-hidden">
         <div class="flex items-center justify-between px-5 py-3.5 terminal-font text-sm text-[#4ade80]">
           <span>$ npm install -g shipkit-pipe</span>
-          <button @click="navigator.clipboard.writeText('npm install -g shipkit-pipe').then(() => { copiedText = true; setTimeout(() => copiedText = false, 2000) })" class="text-[#71717a] hover:text-white transition-colors">
-            <svg x-show="!copiedText" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-            <svg x-show="copiedText" class="w-4 h-4 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
-          </button>
+          <span x-data="{ c: false }"><button @click="navigator.clipboard.writeText('npm install -g shipkit-pipe').then(() => { c = true; setTimeout(() => c = false, 2000) })" class="text-[#71717a] hover:text-white transition-colors" type="button">
+            <svg x-show="!c" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            <svg x-show="c" class="w-4 h-4 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+          </button></span>
         </div>
         <div class="px-5 pb-4 text-xs text-[#71717a]">Global install. 19KB. Zero dependencies.</div>
       </div>
@@ -510,7 +518,7 @@ code,.font-mono,.terminal-font{font-family:'JetBrains Mono',monospace!important}
     <h2 class="text-4xl sm:text-5xl font-black mb-4">Ship with confidence.</h2>
     <p class="text-lg text-[#a1a1aa] max-w-lg mx-auto mb-8">Your project gets an automated team in 3 seconds. Free. Open source. Forever.</p>
     <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
-      <a href="https://github.com/sagar-grv/shipkit" target="_blank" class="inline-flex items-center gap-2.5 bg-gradient-to-r from-[#06b6d4] to-[#4ade80] text-black font-bold px-7 py-3.5 rounded-xl text-base hover:scale-105 transition-transform shadow-lg hover:shadow-[#22d3ee]/30 no-underline!">
+      <a href="https://github.com/sagar-grv/shipkit" target="_blank" class="inline-flex items-center gap-2.5 bg-gradient-to-r from-[#06b6d4] to-[#4ade80] text-black font-bold px-7 py-3.5 rounded-xl text-base hover:scale-105 transition-transform shadow-lg hover:shadow-[#22d3ee]/30 !no-underline">
         <svg class="w-5 h-5" viewBox="0 0 16 16"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/></svg> Star on GitHub</a>
       <div class="inline-flex items-center gap-3 bg-[#18181b] border border-[#3f3f46] rounded-xl px-5 py-3 terminal-font text-sm"><span class="text-[#71717a]">$</span><span class="text-[#4ade80]">npx shipkit-pipe</span></div>
     </div>
@@ -574,8 +582,9 @@ function terminalDemo() {
 }
 function updateDemoStack(stack) {
   const demo = document.querySelector('[x-data="terminalDemo()"]');
-  if (!demo || !demo.__x) return;
-  const term = demo.__x.$data;
+  if (!demo) return;
+  let term;
+  try { term = Alpine.$data(demo); } catch { return; }
   const outputs = {
     next: [{ type: 'output', text: '  ⚓ ShipKit — my-next-app', cls: 'text-[#22d3ee]' },{ type: 'dim', text: '' },{ type: 'success', text: '  ✓ Next.js | pnpm | Node 20' },{ type: 'success', text: '  ✓ Scripts: lint, test, build' },{ type: 'success', text: '  ✓ Deploy: Vercel (my-next-app.vercel.app)' },{ type: 'dim', text: '  ✓ Generated CI: lint > test > build' }],
     react: [{ type: 'output', text: '  ⚓ ShipKit — my-react-app', cls: 'text-[#22d3ee]' },{ type: 'dim', text: '' },{ type: 'success', text: '  ✓ React | npm | Node 20' },{ type: 'success', text: '  ✓ Scripts: test, build' },{ type: 'dim', text: '  ✓ Generated CI: test > build' }],
