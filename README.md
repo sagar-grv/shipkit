@@ -7,6 +7,8 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![CI](https://github.com/sagar-grv/shipkit/actions/workflows/validate.yml/badge.svg)](https://github.com/sagar-grv/shipkit/actions)
 
+▶️ **[Watch overview video](https://github.com/sagar-grv/shipkit/releases/download/v3.1.0/shipkit-overview.mp4)** — AI-generated explainer (NotebookLM)
+
 ```bash
 npx shipkit-pipe              # Auto-detect & generate
 npx shipkit-pipe --dry-run    # Preview without writing
