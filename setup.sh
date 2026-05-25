@@ -52,7 +52,7 @@ if ! command -v node &>/dev/null; then
 fi
 
 # Helpers
-title() { echo -e "\n${BOLD}${CYAN}===== $1 =====${NC}\n"; }
+title() { $DEFAULTS && return; echo -e "\n${BOLD}${CYAN}===== $1 =====${NC}\n"; }
 step() { echo -e "${GREEN}[*]${NC} $1"; }
 info() { echo -e "  ${YELLOW}$1${NC}"; }
 err()  { echo -e "  ${RED}$1${NC}"; }
