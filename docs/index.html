@@ -4,623 +4,749 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>ShipKit — One Command. Automated Dev Team.</title>
-<meta name="description" content="One command sets up CI/CD, health monitoring, security scanning, and AI agent config. Auto-detects any project. Zero config. Works everywhere.">
+<meta name="description" content="One command sets up CI/CD, health monitoring, security scanning, and AI agent config. Auto-detects any project. Zero config.">
 <meta property="og:title" content="ShipKit — Your Automated Dev Team">
 <meta property="og:description" content="One command. Smart CI/CD. Health monitoring. Security. Works in any directory, any stack, any AI agent.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://sagar-grv.github.io/shipkit/">
 <meta property="og:image" content="https://sagar-grv.github.io/shipkit/og-image.svg">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#09090b">
+<meta name="theme-color" content="#08080c">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚓</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/intersect@3.x.x/dist/cdn.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+:root{--bg:#08080c;--bg2:#0c0c14;--bg3:#12121e;--bg4:#1a1a2a;--border:#1e1e30;--border2:#2a2a40;--text:#eeedf2;--text2:#8b8a9a;--text3:#5b5a6a;--accent:#00d4ff;--accent2:#06b6d4;--accent-dim:rgba(0,212,255,0.08);--accent-glow:rgba(0,212,255,0.15);--gold:#fbbf24;--green:#22c55e;--font-head:'Sora',sans-serif;--font-body:'Outfit',sans-serif;--font-mono:'JetBrains Mono',monospace}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#09090b;--bg2:#18181b;--bg3:#27272a;--border:#3f3f46;--text:#fafafa;--text2:#a1a1aa;--text3:#71717a;--accent:#22d3ee;--accent2:#06b6d4;--green:#4ade80;--yellow:#facc15}
-body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
-code,.font-mono,.terminal-font{font-family:'JetBrains Mono',monospace!important}
-.gradient-text{background:linear-gradient(135deg,#22d3ee,#4ade80);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.gradient-text-2{background:linear-gradient(135deg,#22d3ee,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;line-height:1.6}
+code,.code{font-family:var(--font-mono)}
+h1,h2,h3,h4,h5,h6{font-family:var(--font-head);line-height:1.2}
+a{color:var(--accent);text-decoration:none}
+a:hover{opacity:.85}
+.container{max-width:1120px;margin:0 auto;padding:0 24px}
+@media(min-width:768px){.container{padding:0 32px}}
+.section{padding:80px 0}
+@media(min-width:768px){.section{padding:100px 0}}
+.section-dark{background:var(--bg2)}
+.section-border{border-top:1px solid var(--border)}
+/* background patterns */
+.bg-grid{background-image:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px);background-size:48px 48px}
+.bg-glow{position:absolute;inset:0;pointer-events:none;background:radial-gradient(800px circle at 50% 0%,rgba(0,212,255,0.05),transparent 70%)}
+.gradient-text{background:linear-gradient(135deg,var(--accent),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.gradient-text2{background:linear-gradient(135deg,var(--accent),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.label{display:inline-flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:100px;padding:6px 16px;font-size:13px;color:var(--text2)}
+.label-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse-dot 2s ease-in-out infinite}
 @keyframes pulse-dot{0%,100%{opacity:.4}50%{opacity:1}}
-@keyframes gradient-flow{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(34,211,238,0.1)}50%{box-shadow:0 0 40px rgba(34,211,238,0.3)}}
+@keyframes fade-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-.animate-gradient{background-size:200% 200%;animation:gradient-flow 4s ease infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes glow-pulse{0%,100%{box-shadow:0 0 0 0 var(--accent-dim)}50%{box-shadow:0 0 24px 4px var(--accent-glow)}}
+@keyframes gradient-shift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 .animate-float{animation:float 4s ease-in-out infinite}
-.animate-glow{animation:glow 3s ease-in-out infinite}
-.cursor-blink{animation:blink 1s step-end infinite}
+/* nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:50;transition:all .3s}
+nav.scrolled{background:rgba(8,8,12,.85);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:56px}
+.nav-logo{display:flex;align-items:center;gap:8px;font-family:var(--font-head);font-weight:700;font-size:16px;color:var(--text)}
+.nav-logo span{font-size:20px}
+.nav-links{display:none;align-items:center;gap:24px}
+.nav-links a{font-size:14px;color:var(--text2);transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-star{display:inline-flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-size:13px;color:var(--text);transition:border-color .2s}
+.nav-star:hover{border-color:var(--gold)}
+.nav-star svg{width:14px;height:14px;fill:var(--gold)}
+.nav-toggle{display:block;background:none;border:none;color:var(--text2);padding:8px;cursor:pointer}
+.nav-toggle svg{width:22px;height:22px}
+.mobile-menu{display:none;padding:12px 0 20px}
+.mobile-menu.open{display:block}
+.mobile-menu a{display:block;padding:10px 12px;font-size:14px;color:var(--text2);border-radius:8px}
+.mobile-menu a:hover{background:var(--bg3);color:var(--text)}
+@media(min-width:768px){.nav-links{display:flex}.nav-toggle{display:none}}
+/* hero */
+.hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden}
+.hero-content{position:relative;z-index:2;text-align:center;padding:100px 0 80px;animation:fade-up .8s ease}
+.hero h1{font-size:clamp(2rem,6vw,3.75rem);font-weight:800;letter-spacing:-.03em;margin-bottom:16px}
+.hero p{font-size:clamp(1rem,2vw,1.2rem);color:var(--text2);max-width:600px;margin:0 auto 36px;line-height:1.7}
+.hero-actions{display:flex;flex-direction:column;align-items:center;gap:16px;margin-bottom:20px}
+.hero-cmd{display:inline-flex;align-items:center;gap:12px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 20px;font-family:var(--font-mono);font-size:15px;animation:glow-pulse 3s ease-in-out infinite}
+.hero-cmd .dollar{color:var(--text3)}
+.hero-cmd .cmd{color:var(--green)}
+.hero-cmd button{background:none;border:none;color:var(--text3);cursor:pointer;padding:4px;transition:color .2s}
+.hero-cmd button:hover{color:var(--text)}
+@media(min-width:640px){.hero-actions{flex-direction:row;justify-content:center}}
+.hero-try{display:inline-flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 22px;font-size:14px;color:var(--text);transition:border-color .3s}
+.hero-try:hover{border-color:var(--accent)}
+.hero-footnote{font-size:13px;color:var(--text3)}
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;padding:48px 0}
+@media(min-width:640px){.stats{grid-template-columns:repeat(4,1fr)}}
+.stat{text-align:center;animation:fade-up .6s ease forwards;opacity:0}
+.stat:nth-child(1){animation-delay:.1s}
+.stat:nth-child(2){animation-delay:.2s}
+.stat:nth-child(3){animation-delay:.3s}
+.stat:nth-child(4){animation-delay:.4s}
+.stat-val{font-size:clamp(1.8rem,4vw,2.5rem);font-weight:800;font-family:var(--font-head);background:linear-gradient(135deg,var(--accent),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-val:nth-child(even){background:linear-gradient(135deg,var(--accent),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-label{font-size:14px;color:var(--text3);margin-top:4px}
+/* section headers */
+.section-header{text-align:center;margin-bottom:56px;animation:fade-up .6s ease}
+.section-header h2{font-size:clamp(1.5rem,3.5vw,2.25rem);font-weight:800;margin-bottom:12px}
+.section-header p{color:var(--text2);max-width:520px;margin:0 auto}
+/* features grid */
+.features-grid{display:grid;gap:16px}
+@media(min-width:640px){.features-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1024px){.features-grid{grid-template-columns:repeat(3,1fr)}}
+.feature-card{background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:28px;transition:all .3s;animation:fade-up .6s ease forwards;opacity:0}
+.feature-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 8px 32px var(--accent-dim)}
+.feature-card:nth-child(2){animation-delay:.1s}
+.feature-card:nth-child(3){animation-delay:.2s}
+.feature-card:nth-child(4){animation-delay:.3s}
+.feature-card:nth-child(5){animation-delay:.4s}
+.feature-card:nth-child(6){animation-delay:.5s}
+.feature-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:16px}
+.feature-card h3{font-size:17px;font-weight:700;margin-bottom:8px}
+.feature-card p{font-size:14px;color:var(--text2);line-height:1.7}
+.feature-card strong{color:var(--text)}
+/* demo terminal */
+.terminal{border:1px solid var(--border);border-radius:16px;overflow:hidden;background:#06060a;max-width:720px;margin:0 auto;animation:fade-up .6s ease}
+.terminal-header{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--bg3);border-bottom:1px solid var(--border)}
+.terminal-dot{width:10px;height:10px;border-radius:50%}
+.terminal-title{font-size:12px;color:var(--text3);margin:0 auto}
+.terminal-body{font-family:var(--font-mono);font-size:14px;line-height:1.8;padding:20px;color:var(--text2);min-height:280px;max-height:380px;overflow-y:auto}
 .terminal-body::-webkit-scrollbar{width:4px}
 .terminal-body::-webkit-scrollbar-track{background:transparent}
 .terminal-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-.hidden-input{position:absolute;left:-9999px;opacity:0;width:0;height:0}
-.bg-grid{background-image:linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px);background-size:40px 40px}
-.bg-glow{background:radial-gradient(600px circle at 50% 0%,rgba(34,211,238,0.06),transparent 70%)}
-.card-hover{transition:all .3s ease}
-.card-hover:hover{border-color:rgba(34,211,238,0.4)!important;transform:translateY(-4px);box-shadow:0 12px 40px rgba(34,211,238,0.08)}
-[x-cloak]{display:none!important}
+.terminal-line{margin-bottom:2px}
+.terminal-prompt{color:var(--green)}
+.terminal-output{color:var(--text2)}
+.terminal-info{color:var(--accent)}
+.terminal-success{color:var(--green)}
+.terminal-dim{color:var(--text3)}
+.terminal-input-line{display:flex;align-items:center;gap:4px;margin-top:4px}
+.terminal-input-line .cursor{display:inline-block;width:2px;height:16px;background:var(--accent);animation:blink 1s step-end infinite}
+.terminal-input{background:none;border:none;color:var(--text);font-family:var(--font-mono);font-size:14px;outline:none;flex:1}
+.terminal-suggestions{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px 16px}
+.terminal-suggestions button{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-size:12px;color:var(--text2);cursor:pointer;transition:all .2s;font-family:var(--font-mono)}
+.terminal-suggestions button:hover{border-color:var(--accent);color:var(--text)}
+.terminal-suggestions .dollar{color:var(--text3)}
+.stack-picker{margin-top:24px;text-align:center;animation:fade-up .6s ease;animation-delay:.2s;opacity:0;animation-fill-mode:forwards}
+.stack-picker p{font-size:14px;color:var(--text3);margin-bottom:12px}
+.stack-btns{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.stack-btns button{padding:8px 18px;font-size:13px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;transition:all .2s;font-family:var(--font-body)}
+.stack-btns button:hover{border-color:var(--accent);color:var(--text)}
+.stack-btns button.active{border-color:var(--accent);color:var(--text);background:var(--accent-dim)}
+/* steps */
+.steps-grid{display:grid;gap:24px;position:relative}
+@media(min-width:768px){.steps-grid{grid-template-columns:repeat(4,1fr)}}
+.step{text-align:center;animation:fade-up .6s ease forwards;opacity:0}
+.step:nth-child(2){animation-delay:.1s}
+.step:nth-child(3){animation-delay:.2s}
+.step:nth-child(4){animation-delay:.3s}
+.step-num{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 16px;font-family:var(--font-head);font-weight:700}
+.step h4{font-size:16px;font-weight:700;margin-bottom:6px}
+.step p{font-size:14px;color:var(--text2);line-height:1.6}
+/* comparison */
+.compare-grid{display:grid;gap:16px;max-width:800px;margin:0 auto}
+@media(min-width:768px){.compare-grid{grid-template-columns:1fr 1fr}}
+.compare-card{border-radius:16px;padding:28px;animation:fade-up .6s ease forwards;opacity:0}
+.compare-card.before{background:var(--bg3);border:1px solid var(--border)}
+.compare-card.after{background:var(--bg3);border:1px solid var(--accent);animation-delay:.2s}
+.compare-card h4{font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.compare-card ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.compare-card li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--text2);line-height:1.5}
+.compare-card .icon{flex-shrink:0;margin-top:2px;font-size:14px}
+/* table */
+.detect-table{max-width:680px;margin:0 auto;border:1px solid var(--border);border-radius:16px;overflow:hidden;background:var(--bg3)}
+.detect-table table{width:100%;border-collapse:collapse;font-size:14px}
+.detect-table th{text-align:left;padding:14px 20px;font-family:var(--font-head);font-weight:600;background:var(--bg4);border-bottom:1px solid var(--border)}
+.detect-table td{padding:14px 20px;border-top:1px solid var(--border);color:var(--text2)}
+.detect-table td:first-child{font-weight:600;color:var(--text)}
+.detect-table tr:hover td{background:rgba(255,255,255,.02)}
+.detect-table .method{display:none;color:var(--text3);font-family:var(--font-mono);font-size:12px}
+@media(min-width:640px){.detect-table .method{display:table-cell}}
+/* install tabs */
+.install-tabs{max-width:600px;margin:0 auto}
+.tab-bar{display:flex;gap:4px;margin-bottom:20px;background:var(--bg3);border-radius:10px;padding:4px;border:1px solid var(--border)}
+.tab-btn{flex:1;padding:10px 16px;font-size:13px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--text3);cursor:pointer;transition:all .2s;font-family:var(--font-body);font-weight:500}
+.tab-btn.active{background:var(--bg4);color:var(--text);border-color:var(--border)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.tab-code{background:#06060a;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tab-code-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;font-family:var(--font-mono);font-size:14px;color:var(--green)}
+.tab-code-header button{background:none;border:none;color:var(--text3);cursor:pointer;padding:4px;transition:color .2s}
+.tab-code-header button:hover{color:var(--text)}
+.tab-code-header button.copied{color:var(--green)}
+.tab-footer{padding:12px 16px;font-size:12px;color:var(--text3)}
+/* accordion (faq) */
+.accordion{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+.accordion-item{border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .3s}
+.accordion-item.open{border-color:var(--accent)}
+.accordion-btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;background:var(--bg3);border:none;color:var(--text);font-size:15px;font-weight:600;font-family:var(--font-body);cursor:pointer;text-align:left;transition:background .2s}
+.accordion-btn:hover{background:var(--bg4)}
+.accordion-arrow{width:16px;height:16px;color:var(--text3);transition:transform .3s;flex-shrink:0}
+.accordion-item.open .accordion-arrow{transform:rotate(180deg)}
+.accordion-body{padding:0 20px 0;max-height:0;overflow:hidden;transition:all .3s ease}
+.accordion-item.open .accordion-body{max-height:300px;padding:0 20px 20px}
+.accordion-body p{font-size:14px;color:var(--text2);line-height:1.7}
+.accordion-body code{font-family:var(--font-mono);font-size:12px;background:var(--bg4);padding:2px 6px;border-radius:4px}
+/* cta */
+.cta{text-align:center;padding:100px 0;position:relative;overflow:hidden}
+.cta h2{font-size:clamp(1.5rem,3.5vw,2.5rem);font-weight:800;margin-bottom:16px}
+.cta p{color:var(--text2);max-width:480px;margin:0 auto 32px;font-size:17px}
+.cta-actions{display:flex;flex-direction:column;align-items:center;gap:16px}
+@media(min-width:640px){.cta-actions{flex-direction:row;justify-content:center}}
+.cta-primary{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#08080c;font-weight:700;padding:14px 28px;border-radius:12px;font-size:16px;transition:transform .2s}
+.cta-primary:hover{transform:scale(1.05);opacity:1}
+.cta-secondary{display:inline-flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 20px;font-family:var(--font-mono);font-size:14px;color:var(--green)}
+/* footer */
+footer{border-top:1px solid var(--border);padding:32px 0}
+.footer-inner{display:flex;flex-direction:column;align-items:center;gap:20px}
+@media(min-width:640px){.footer-inner{flex-direction:row;justify-content:space-between}}
+.footer-brand{display:flex;align-items:center;gap:8px;font-size:14px}
+.footer-brand span{font-size:20px}
+.footer-links{display:flex;gap:20px}
+.footer-links a{font-size:14px;color:var(--text3);transition:color .2s}
+.footer-links a:hover{color:var(--text2)}
+.footer-copy{text-align:center;font-size:12px;color:var(--text3);margin-top:16px}
+@media(min-width:640px){.footer-copy{text-align:right;margin-top:0}}
+/* scroll animation system */
+.reveal{opacity:1;transform:none}
+.reveal-animate{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+.reveal-animate.revealed{opacity:1;transform:translateY(0)}
 </style>
 </head>
 <body>
-<noscript>
-  <div style="position:fixed;inset:0;z-index:9999;background:#09090b;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;font-family:system-ui,sans-serif">
-    <div style="font-size:3rem;margin-bottom:1rem">⚓</div>
-    <h1 style="color:#fafafa;font-size:1.5rem;font-weight:800;margin-bottom:0.5rem">ShipKit requires JavaScript</h1>
-    <p style="color:#a1a1aa;max-width:400px;margin-bottom:1rem">The landing page uses Alpine.js for interactivity. Please enable JavaScript to view the full experience.</p>
-    <p style="color:#71717a;font-size:0.875rem">Alternatively, run <code style="background:#27272a;padding:0.25rem 0.5rem;border-radius:0.25rem">npx shipkit-pipe</code> directly in your terminal.</p>
-  </div>
-</noscript>
 
-<nav x-data="{ open: false, scrolled: false }"
-     @scroll.window="scrolled = window.scrollY > 20"
-     class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
-     :class="scrolled ? 'bg-[#09090b]/90 backdrop-blur-xl border-b border-[#3f3f46]' : 'bg-transparent'">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-16">
-      <a href="#" class="flex items-center gap-2 font-bold text-base"><span class="text-xl">⚓</span><span>ShipKit</span><span class="text-xs text-[#71717a] font-normal" data-version>v3.1.0</span></a>
-      <div class="hidden md:flex items-center gap-6 text-sm">
-        <a href="#features" class="text-[#a1a1aa] hover:text-white transition-colors">Features</a>
-        <a href="#how" class="text-[#a1a1aa] hover:text-white transition-colors">How it works</a>
-        <a href="#demo" class="text-[#a1a1aa] hover:text-white transition-colors">Live demo</a>
-        <a href="#install" class="text-[#a1a1aa] hover:text-white transition-colors">Install</a>
-        <a href="#faq" class="text-[#a1a1aa] hover:text-white transition-colors">FAQ</a>
-         <a href="https://github.com/sagar-grv/shipkit" target="_blank" class="inline-flex items-center gap-1.5 bg-[#27272a] border border-[#3f3f46] rounded-lg px-3 py-1.5 text-sm text-white hover:border-[#facc15] transition-colors !no-underline">
-          <svg class="w-4 h-4 fill-[#facc15]" viewBox="0 0 16 16"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/></svg> Star</a>
+<nav id="nav">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo"><span>⚓</span>ShipKit</a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#demo">Demo</a>
+        <a href="#how">How it works</a>
+        <a href="#install">Install</a>
+        <a href="#faq">FAQ</a>
+        <a href="https://github.com/sagar-grv/shipkit" target="_blank" class="nav-star">
+          <svg viewBox="0 0 16 16"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/></svg> Star</a>
       </div>
-      <button @click="open = !open" class="md:hidden p-2 text-[#a1a1aa] hover:text-white">
-        <svg x-show="!open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-        <svg x-show="open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      <button class="nav-toggle" id="navToggle" aria-label="Menu">
+        <svg id="menuIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        <svg id="closeIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
     </div>
-    <div x-show="open" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="md:hidden pb-4 space-y-2">
-      <a href="#features" @click="open = false" class="block px-3 py-2 text-sm text-[#a1a1aa] hover:text-white rounded-lg hover:bg-[#27272a]">Features</a>
-      <a href="#how" @click="open = false" class="block px-3 py-2 text-sm text-[#a1a1aa] hover:text-white rounded-lg hover:bg-[#27272a]">How it works</a>
-      <a href="#demo" @click="open = false" class="block px-3 py-2 text-sm text-[#a1a1aa] hover:text-white rounded-lg hover:bg-[#27272a]">Live demo</a>
-      <a href="#install" @click="open = false" class="block px-3 py-2 text-sm text-[#a1a1aa] hover:text-white rounded-lg hover:bg-[#27272a]">Install</a>
-      <a href="#faq" @click="open = false" class="block px-3 py-2 text-sm text-[#a1a1aa] hover:text-white rounded-lg hover:bg-[#27272a]">FAQ</a>
-      <a href="https://github.com/sagar-grv/shipkit" target="_blank" class="block px-3 py-2 text-sm text-[#22d3ee] hover:text-white">GitHub →</a>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="#features" class="mobile-link">Features</a>
+      <a href="#demo" class="mobile-link">Demo</a>
+      <a href="#how" class="mobile-link">How it works</a>
+      <a href="#install" class="mobile-link">Install</a>
+      <a href="#faq" class="mobile-link">FAQ</a>
+      <a href="https://github.com/sagar-grv/shipkit" target="_blank" class="mobile-link">GitHub →</a>
     </div>
   </div>
 </nav>
 
-<section class="min-h-screen flex items-center relative overflow-hidden bg-grid">
-  <div class="absolute inset-0 bg-glow pointer-events-none"></div>
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-32 md:py-40 text-center relative z-10">
-    <div x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')" class="opacity-0 translate-y-6 transition-all duration-700">
-      <span class="inline-flex items-center gap-2 bg-[#18181b] border border-[#3f3f46] rounded-full px-4 py-1.5 text-xs text-[#a1a1aa] mb-6">
-        <span class="w-2 h-2 rounded-full bg-[#4ade80] animate-pulse"></span>v3 — Smart detection, zero config</span>
-    </div>
-    <h1 class="text-4xl sm:text-7xl font-black tracking-tight leading-[1.05] mb-5 transition-all duration-700 delay-100 opacity-0 translate-y-6" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-      Your project deserves<br><span class="gradient-text">an automated team</span></h1>
-    <p class="text-lg sm:text-xl text-[#a1a1aa] max-w-2xl mx-auto mb-10 leading-relaxed transition-all duration-700 delay-200 opacity-0 translate-y-6" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-      One command sets up CI/CD, health monitoring, security scanning, and AI agent config. Reads your project. Generates only what you need. No questions asked.</p>
-    <div x-data="{ copied: false }" class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6 transition-all duration-700 delay-300 opacity-0 translate-y-6" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-      <div class="inline-flex items-center gap-3 bg-[#18181b] border border-[#3f3f46] rounded-xl px-5 py-3 terminal-font text-sm sm:text-base animate-glow">
-        <span class="text-[#71717a]">$</span><span class="text-[#4ade80]">npx shipkit-pipe</span>
-        <button @click="navigator.clipboard.writeText('npx shipkit-pipe'); copied = true; setTimeout(() => copied = false, 2000)" class="text-[#71717a] hover:text-white transition-colors p-0.5" title="Copy">
-          <svg x-show="!copied" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-          <svg x-show="copied" class="w-4 h-4 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+<section class="hero bg-grid">
+  <div class="bg-glow"></div>
+  <div class="container hero-content">
+    <div class="label" style="margin:0 auto 24px"><span class="label-dot"></span>v3 — Smart detection, zero config</div>
+    <h1>Your project deserves<br><span class="gradient-text">an automated team</span></h1>
+    <p>One command sets up CI/CD, health monitoring, security scanning, and AI agent config. Reads your project. Generates only what you need. No questions asked.</p>
+    <div class="hero-actions">
+      <div class="hero-cmd" id="heroCmd">
+        <span class="dollar">$</span>
+        <span class="cmd">npx shipkit-pipe</span>
+        <button id="heroCopyBtn" aria-label="Copy command">
+          <svg id="heroCopyIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <svg id="heroCheckIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none"><path d="M20 6L9 17l-5-5"/></svg>
         </button>
       </div>
-      <a href="#demo" class="inline-flex items-center gap-2 bg-[#27272a] border border-[#3f3f46] rounded-xl px-5 py-3 text-sm hover:border-[#22d3ee] transition-colors">Try it live <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      <a href="#demo" class="hero-try">Try it live <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
     </div>
-    <p class="text-xs text-[#71717a]">No install. No config. No questions. Just works.</p>
+    <p class="hero-footnote">No install. No config. No questions. Just works.</p>
   </div>
 </section>
 
-<section x-data class="border-y border-[#3f3f46] bg-[#18181b]">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-      <div x-intersect:enter="startCount(0,7,2000,$el.querySelector('.stat-value'))" class="opacity-0 translate-y-4 transition-all duration-500">
-        <div class="stat-value text-3xl sm:text-4xl font-black gradient-text">0</div>
-        <div class="text-sm text-[#71717a] mt-1">Files generated</div>
-      </div>
-      <div x-intersect:enter="startCount(0,4,2000,$el.querySelector('.stat-value'))" class="opacity-0 translate-y-4 transition-all duration-500 delay-100">
-        <div class="stat-value text-3xl sm:text-4xl font-black gradient-text-2">0</div>
-        <div class="text-sm text-[#71717a] mt-1">Platforms supported</div>
-      </div>
-      <div x-intersect:enter="startCount(0,10,2000,$el.querySelector('.stat-value'))" class="opacity-0 translate-y-4 transition-all duration-500 delay-200">
-        <div class="stat-value text-3xl sm:text-4xl font-black gradient-text">0</div>
-        <div class="text-sm text-[#71717a] mt-1">Frameworks detected</div>
-      </div>
-      <div x-intersect:enter="startCount(0,3,2000,$el.querySelector('.stat-value'))" class="opacity-0 translate-y-4 transition-all duration-500 delay-300">
-        <div class="stat-value text-3xl sm:text-4xl font-black gradient-text-2">0</div>
-        <div class="text-sm text-[#71717a] mt-1">CI platforms</div>
-      </div>
+<section class="section-dark section-border">
+  <div class="container">
+    <div class="stats">
+      <div class="stat"><div class="stat-val" id="stat1">0</div><div class="stat-label">Files generated</div></div>
+      <div class="stat"><div class="stat-val" id="stat2">0</div><div class="stat-label">Platforms supported</div></div>
+      <div class="stat"><div class="stat-val" id="stat3">0</div><div class="stat-label">Frameworks detected</div></div>
+      <div class="stat"><div class="stat-val" id="stat4">0</div><div class="stat-label">CI platforms</div></div>
     </div>
   </div>
 </section>
 
-<section id="demo" class="py-20 sm:py-28">
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-12 transition-all duration-700 opacity-0 translate-y-6" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-      <h2 class="text-3xl sm:text-4xl font-black mb-3">Try it live</h2>
-      <p class="text-[#a1a1aa] max-w-xl mx-auto">Type commands into the terminal below and see what ShipKit generates for your stack.</p>
+<section id="demo" class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <h2>Try it live</h2>
+      <p>Type commands into the terminal below and see what ShipKit generates for your stack.</p>
     </div>
-    <div x-data="terminalDemo()" @click="$refs.hiddenInput.focus()" class="bg-[#0a0a0d] border border-[#3f3f46] rounded-2xl overflow-hidden shadow-2xl cursor-text transition-all duration-300 hover:border-[#22d3ee]/30 opacity-0 translate-y-6 transition-all duration-700" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-      <div class="flex items-center gap-2 px-4 py-3 bg-[#18181b] border-b border-[#3f3f46]">
-        <span class="w-3 h-3 rounded-full bg-[#ef4444]"></span><span class="w-3 h-3 rounded-full bg-[#eab308]"></span><span class="w-3 h-3 rounded-full bg-[#22c55e]"></span>
-        <span class="mx-auto text-xs text-[#71717a]">shipkit-pipe — interactive demo</span>
-        <button @click="reset()" class="text-xs text-[#71717a] hover:text-white transition-colors">⟳ Reset</button>
+    <div class="terminal reveal" id="termContainer">
+      <div class="terminal-header">
+        <span class="terminal-dot" style="background:#ef4444"></span>
+        <span class="terminal-dot" style="background:#eab308"></span>
+        <span class="terminal-dot" style="background:#22c55e"></span>
+        <span class="terminal-title">shipkit-pipe — interactive demo</span>
+        <button id="resetTermBtn" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;margin-left:auto">⟳ Reset</button>
       </div>
-      <div class="terminal-font text-sm leading-relaxed p-5 sm:p-6 text-[#a1a1aa] min-h-[300px] max-h-[420px] overflow-y-auto" x-ref="output">
-        <template x-for="(line, i) in lines" :key="i">
-          <div>
-            <span x-show="line.type === 'prompt'" class="text-[#4ade80]">$ </span>
-            <span x-show="line.type === 'prompt'" x-text="line.text" class="text-white"></span>
-            <span x-show="line.type === 'output'" x-text="line.text" :class="line.cls || ''"></span>
-            <span x-show="line.type === 'dim'" x-text="line.text" class="text-[#71717a]"></span>
-            <span x-show="line.type === 'error'" x-text="line.text" class="text-[#f87171]"></span>
-            <span x-show="line.type === 'success'" x-text="line.text" class="text-[#4ade80]"></span>
-            <span x-show="line.type === 'info'" x-text="line.text" class="text-[#22d3ee]"></span>
-          </div>
-        </template>
-        <div class="flex items-center gap-1"><span class="text-[#4ade80]">$</span><span x-text="currentInput" class="text-white"></span><span class="w-2 h-4 bg-[#22d3ee] cursor-blink"></span></div>
+      <div class="terminal-body" id="termBody">
+        <div class="terminal-line terminal-dim">Type a command or click a suggestion. Try: npx shipkit-pipe, check, help</div>
+        <div class="terminal-input-line"><span class="terminal-prompt">$</span><input type="text" id="termInput" class="terminal-input" placeholder="type a command..." autocomplete="off" spellcheck="false"><span class="cursor"></span></div>
       </div>
-      <input type="text" x-ref="hiddenInput" x-model="currentInput" @keydown.enter="executeCommand" @keydown.prevent.stop="$event.key === 'ArrowUp' ? prevHistory() : $event.key === 'ArrowDown' ? nextHistory() : null" class="hidden-input" autocomplete="off" spellcheck="false">
-      <div class="flex flex-wrap gap-2 px-5 pb-4">
-        <template x-for="cmd in suggestions" :key="cmd">
-          <button @click="currentInput = cmd; $nextTick(() => $refs.hiddenInput.focus())" class="text-xs bg-[#27272a] border border-[#3f3f46] rounded-md px-2.5 py-1 text-[#a1a1aa] hover:border-[#22d3ee] hover:text-white transition-colors"><span class="text-[#71717a]">$</span> <span x-text="cmd"></span></button>
-        </template>
+      <div class="terminal-suggestions" id="termSuggestions">
+        <button data-cmd="npx shipkit-pipe"><span class="dollar">$</span> npx shipkit-pipe</button>
+        <button data-cmd="npx shipkit-pipe --dry-run"><span class="dollar">$</span> npx shipkit-pipe --dry-run</button>
+        <button data-cmd="npx shipkit-pipe check"><span class="dollar">$</span> npx shipkit-pipe check</button>
+        <button data-cmd="help"><span class="dollar">$</span> help</button>
       </div>
     </div>
-    <div class="mt-8 text-center" x-data="{ stack: 'next' }">
-      <p class="text-sm text-[#71717a] mb-3">Or pick a stack to auto-generate:</p>
-      <div class="flex flex-wrap justify-center gap-2">
-        <button @click="stack='next'; updateDemoStack('next')" :class="stack==='next' ? 'border-[#22d3ee] text-white' : 'border-[#3f3f46] text-[#a1a1aa]'" class="px-4 py-2 text-sm rounded-lg border bg-[#18181b] hover:border-[#22d3ee] hover:text-white transition-all">Next.js</button>
-        <button @click="stack='react'; updateDemoStack('react')" :class="stack==='react' ? 'border-[#22d3ee] text-white' : 'border-[#3f3f46] text-[#a1a1aa]'" class="px-4 py-2 text-sm rounded-lg border bg-[#18181b] hover:border-[#22d3ee] hover:text-white transition-all">React</button>
-        <button @click="stack='vue'; updateDemoStack('vue')" :class="stack==='vue' ? 'border-[#22d3ee] text-white' : 'border-[#3f3f46] text-[#a1a1aa]'" class="px-4 py-2 text-sm rounded-lg border bg-[#18181b] hover:border-[#22d3ee] hover:text-white transition-all">Vue</button>
-        <button @click="stack='python'; updateDemoStack('python')" :class="stack==='python' ? 'border-[#22d3ee] text-white' : 'border-[#3f3f46] text-[#a1a1aa]'" class="px-4 py-2 text-sm rounded-lg border bg-[#18181b] hover:border-[#22d3ee] hover:text-white transition-all">Python</button>
-        <button @click="stack='go'; updateDemoStack('go')" :class="stack==='go' ? 'border-[#22d3ee] text-white' : 'border-[#3f3f46] text-[#a1a1aa]'" class="px-4 py-2 text-sm rounded-lg border bg-[#18181b] hover:border-[#22d3ee] hover:text-white transition-all">Go</button>
-        <button @click="stack='monorepo'; updateDemoStack('monorepo')" :class="stack==='monorepo' ? 'border-[#22d3ee] text-white' : 'border-[#3f3f46] text-[#a1a1aa]'" class="px-4 py-2 text-sm rounded-lg border bg-[#18181b] hover:border-[#22d3ee] hover:text-white transition-all">Monorepo</button>
-        <button @click="stack='empty'; updateDemoStack('empty')" :class="stack==='empty' ? 'border-[#22d3ee] text-white' : 'border-[#3f3f46] text-[#a1a1aa]'" class="px-4 py-2 text-sm rounded-lg border bg-[#18181b] hover:border-[#22d3ee] hover:text-white transition-all">Empty dir</button>
+    <div class="stack-picker reveal">
+      <p>Or pick a stack to auto-generate:</p>
+      <div class="stack-btns" id="stackBtns">
+        <button data-stack="next" class="active">Next.js</button>
+        <button data-stack="react">React</button>
+        <button data-stack="vue">Vue</button>
+        <button data-stack="python">Python</button>
+        <button data-stack="go">Go</button>
+        <button data-stack="monorepo">Monorepo</button>
+        <button data-stack="empty">Empty dir</button>
       </div>
     </div>
   </div>
 </section>
 
-<section id="features" class="py-20 sm:py-28 bg-[#18181b] border-y border-[#3f3f46]">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-16 transition-all duration-700 opacity-0 translate-y-6" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-      <h2 class="text-3xl sm:text-4xl font-black mb-3">What your automated team does</h2>
-      <p class="text-[#a1a1aa] max-w-xl mx-auto">Six systems that run automatically after you push. You never check manually again.</p>
+<section id="features" class="section section-dark section-border">
+  <div class="container">
+    <div class="section-header reveal">
+      <h2>What your automated team does</h2>
+      <p>Six systems that run automatically after you push. You never check manually again.</p>
     </div>
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-      <div class="opacity-0 translate-y-8 transition-all duration-500 bg-[#09090b] border border-[#3f3f46] rounded-2xl p-6 sm:p-7 card-hover" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-        <div class="w-10 h-10 rounded-xl bg-[#22d3ee]/10 flex items-center justify-center text-xl mb-4">⚡</div>
-        <h3 class="font-bold text-lg mb-2">Smart CI/CD</h3>
-        <p class="text-sm text-[#a1a1aa] leading-relaxed">Generates CI that matches YOUR scripts. Only includes steps that exist. Lint script? Lint step. <strong class="text-white">Your CI never fails because of bad config.</strong></p>
-      </div>
-      <div class="opacity-0 translate-y-8 transition-all duration-500 delay-100 bg-[#09090b] border border-[#3f3f46] rounded-2xl p-6 sm:p-7 card-hover" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-        <div class="w-10 h-10 rounded-xl bg-[#4ade80]/10 flex items-center justify-center text-xl mb-4">🏥</div>
-        <h3 class="font-bold text-lg mb-2">Health Monitoring</h3>
-        <p class="text-sm text-[#a1a1aa] leading-relaxed">Pings your production site every 6 hours. Down? Auto-creates a GitHub Issue. Recovers? Auto-closes it. <strong class="text-white">You know before your users.</strong></p>
-      </div>
-      <div class="opacity-0 translate-y-8 transition-all duration-500 delay-200 bg-[#09090b] border border-[#3f3f46] rounded-2xl p-6 sm:p-7 card-hover" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-        <div class="w-10 h-10 rounded-xl bg-[#a78bfa]/10 flex items-center justify-center text-xl mb-4">🔒</div>
-        <h3 class="font-bold text-lg mb-2">Security Scanning</h3>
-        <p class="text-sm text-[#a1a1aa] leading-relaxed">CodeQL scans every push for vulnerabilities. Dependabot keeps deps updated. <strong class="text-white">No manual checking.</strong></p>
-      </div>
-      <div class="opacity-0 translate-y-8 transition-all duration-500 delay-300 bg-[#09090b] border border-[#3f3f46] rounded-2xl p-6 sm:p-7 card-hover" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-        <div class="w-10 h-10 rounded-xl bg-[#facc15]/10 flex items-center justify-center text-xl mb-4">🤖</div>
-        <h3 class="font-bold text-lg mb-2">AI Agent Memory</h3>
-        <p class="text-sm text-[#a1a1aa] leading-relaxed">Generates <code class="text-xs bg-[#27272a] px-1.5 py-0.5 rounded">AGENTS.md</code> so your AI agent knows your stack, rules, and last session.</p>
-      </div>
-      <div class="opacity-0 translate-y-8 transition-all duration-500 delay-[400ms] bg-[#09090b] border border-[#3f3f46] rounded-2xl p-6 sm:p-7 card-hover" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-        <div class="w-10 h-10 rounded-xl bg-[#22d3ee]/10 flex items-center justify-center text-xl mb-4">📦</div>
-        <h3 class="font-bold text-lg mb-2">Auto-detect Everything</h3>
-        <p class="text-sm text-[#a1a1aa] leading-relaxed">Framework, package manager, Node version, deploy platform, git remote — all detected from existing files. <strong class="text-white">Zero config.</strong></p>
-      </div>
-      <div class="opacity-0 translate-y-8 transition-all duration-500 delay-500 bg-[#09090b] border border-[#3f3f46] rounded-2xl p-6 sm:p-7 card-hover" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-        <div class="w-10 h-10 rounded-xl bg-[#4ade80]/10 flex items-center justify-center text-xl mb-4">✅</div>
-        <h3 class="font-bold text-lg mb-2">Verify Command</h3>
-        <p class="text-sm text-[#a1a1aa] leading-relaxed">Run <code class="text-xs bg-[#27272a] px-1.5 py-0.5 rounded">npx shipkit-pipe check</code> anytime. Pings your site, validates CI, checks vulnerabilities. <strong class="text-white">One command tells you if everything works.</strong></p>
-      </div>
+    <div class="features-grid">
+      <div class="feature-card" style="transition-delay:0s"><div class="feature-icon" style="background:rgba(0,212,255,.1)">⚡</div><h3>Smart CI/CD</h3><p>Generates CI that matches <strong>your</strong> scripts. Only includes steps that exist. Lint script? Lint step. Your CI never fails because of bad config.</p></div>
+      <div class="feature-card" style="transition-delay:.1s"><div class="feature-icon" style="background:rgba(34,197,94,.1)">🏥</div><h3>Health Monitoring</h3><p>Pings your production site every 6 hours. Down? Auto-creates a GitHub Issue. Recovers? Auto-closes it. You know before your users.</p></div>
+      <div class="feature-card" style="transition-delay:.2s"><div class="feature-icon" style="background:rgba(167,139,250,.1)">🔒</div><h3>Security Scanning</h3><p>CodeQL scans every push for vulnerabilities. Dependabot keeps deps updated. No manual checking.</p></div>
+      <div class="feature-card" style="transition-delay:.3s"><div class="feature-icon" style="background:rgba(251,191,36,.1)">🤖</div><h3>AI Agent Memory</h3><p>Generates <code>AGENTS.md</code> so your AI agent knows your stack, rules, and last session. No more starting from scratch.</p></div>
+      <div class="feature-card" style="transition-delay:.4s"><div class="feature-icon" style="background:rgba(0,212,255,.1)">📦</div><h3>Auto-detect Everything</h3><p>Framework, package manager, Node version, deploy platform, git remote — all detected from existing files. <strong>Zero config.</strong></p></div>
+      <div class="feature-card" style="transition-delay:.5s"><div class="feature-icon" style="background:rgba(34,197,94,.1)">✅</div><h3>Verify Command</h3><p>Run <code>npx shipkit-pipe check</code> anytime. Pings your site, validates CI, checks vulnerabilities. One command tells you everything works.</p></div>
     </div>
   </div>
 </section>
 
-<section class="py-20 sm:py-28">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-16 transition-all duration-700 opacity-0 translate-y-6" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-      <h2 class="text-3xl sm:text-4xl font-black mb-3">Works everywhere. No excuses.</h2>
-      <p class="text-[#a1a1aa] max-w-xl mx-auto">Empty folder, monorepo, full-stack app, API server — ShipKit detects what you have.</p>
+<section class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <h2>Works everywhere. No excuses.</h2>
+      <p>Empty folder, monorepo, full-stack app, API server — ShipKit detects what you have.</p>
     </div>
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-      <div class="opacity-0 translate-y-6 transition-all duration-500 bg-[#18181b] border border-[#3f3f46] rounded-xl p-5 text-center card-hover" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')"><div class="text-3xl mb-2">📁</div><h4 class="font-semibold text-sm">Empty project</h4><p class="text-xs text-[#71717a] mt-1">Starting fresh</p></div>
-      <div class="opacity-0 translate-y-6 transition-all duration-500 delay-100 bg-[#18181b] border border-[#3f3f46] rounded-xl p-5 text-center card-hover" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')"><div class="text-3xl mb-2">⚛️</div><h4 class="font-semibold text-sm">React / Next.js</h4><p class="text-xs text-[#71717a] mt-1">Lint, test, build</p></div>
-      <div class="opacity-0 translate-y-6 transition-all duration-500 delay-200 bg-[#18181b] border border-[#3f3f46] rounded-xl p-5 text-center card-hover" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')"><div class="text-3xl mb-2">📦</div><h4 class="font-semibold text-sm">Monorepo</h4><p class="text-xs text-[#71717a] mt-1">Multi-package</p></div>
-      <div class="opacity-0 translate-y-6 transition-all duration-500 delay-300 bg-[#18181b] border border-[#3f3f46] rounded-xl p-5 text-center card-hover" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')"><div class="text-3xl mb-2">🐍</div><h4 class="font-semibold text-sm">Python / Go / Rust</h4><p class="text-xs text-[#71717a] mt-1">Non-Node projects</p></div>
-      <div class="opacity-0 translate-y-6 transition-all duration-500 delay-[400ms] bg-[#18181b] border border-[#3f3f46] rounded-xl p-5 text-center card-hover" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')"><div class="text-3xl mb-2">🐳</div><h4 class="font-semibold text-sm">Docker</h4><p class="text-xs text-[#71717a] mt-1">Containerized</p></div>
-      <div class="opacity-0 translate-y-6 transition-all duration-500 delay-500 bg-[#18181b] border border-[#3f3f46] rounded-xl p-5 text-center card-hover" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')"><div class="text-3xl mb-2">🌐</div><h4 class="font-semibold text-sm">Any deploy</h4><p class="text-xs text-[#71717a] mt-1">Vercel, Fly.io, etc.</p></div>
-    </div>
-  </div>
-</section>
-
-<section id="how" class="py-20 sm:py-28 bg-[#18181b] border-y border-[#3f3f46]">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-16 transition-all duration-700 opacity-0 translate-y-6" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-      <h2 class="text-3xl sm:text-4xl font-black mb-3">Three seconds. Four steps.</h2>
-      <p class="text-[#a1a1aa] max-w-xl mx-auto">From install to working pipeline — no wizard, no prompts, no signup.</p>
-    </div>
-    <div class="grid md:grid-cols-4 gap-6 relative">
-      <div class="hidden md:block absolute top-12 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-[#22d3ee]/40 via-[#4ade80]/40 to-[#22d3ee]/40"></div>
-      <div class="opacity-0 translate-y-8 transition-all duration-500 text-center relative" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-        <div class="w-12 h-12 rounded-xl bg-[#22d3ee]/10 border border-[#22d3ee]/30 flex items-center justify-center text-xl mx-auto mb-4 relative z-10">1️⃣</div>
-        <h4 class="font-bold mb-2">Run the command</h4>
-        <p class="text-sm text-[#a1a1aa]"><code class="text-xs bg-[#27272a] px-1.5 py-0.5 rounded">npx shipkit-pipe</code></p>
-      </div>
-      <div class="opacity-0 translate-y-8 transition-all duration-500 delay-100 text-center relative" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-        <div class="w-12 h-12 rounded-xl bg-[#4ade80]/10 border border-[#4ade80]/30 flex items-center justify-center text-xl mx-auto mb-4 relative z-10">2️⃣</div>
-        <h4 class="font-bold mb-2">Auto-detect</h4>
-        <p class="text-sm text-[#a1a1aa]">Reads package.json, lock files, git remote</p>
-      </div>
-      <div class="opacity-0 translate-y-8 transition-all duration-500 delay-200 text-center relative" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-        <div class="w-12 h-12 rounded-xl bg-[#22d3ee]/10 border border-[#22d3ee]/30 flex items-center justify-center text-xl mx-auto mb-4 relative z-10">3️⃣</div>
-        <h4 class="font-bold mb-2">Generate</h4>
-        <p class="text-sm text-[#a1a1aa]">CI, health checks, security, AI agent files</p>
-      </div>
-      <div class="opacity-0 translate-y-8 transition-all duration-500 delay-300 text-center relative" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-        <div class="w-12 h-12 rounded-xl bg-[#4ade80]/10 border border-[#4ade80]/30 flex items-center justify-center text-xl mx-auto mb-4 relative z-10">4️⃣</div>
-        <h4 class="font-bold mb-2">Push and forget</h4>
-        <p class="text-sm text-[#a1a1aa]">CI on every PR. Health every 6h. Depts auto-update.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="py-20 sm:py-28">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-12 transition-all duration-700 opacity-0 translate-y-6" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-      <h2 class="text-3xl sm:text-4xl font-black mb-3">It reads your files. Not your mind.</h2>
-      <p class="text-[#a1a1aa] max-w-xl mx-auto">ShipKit never asks what it can detect. Here's what it reads:</p>
-    </div>
-    <div class="max-w-3xl mx-auto overflow-hidden rounded-2xl border border-[#3f3f46] bg-[#18181b] opacity-0 translate-y-6 transition-all duration-700" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-      <table class="w-full text-sm">
-        <thead><tr class="border-b border-[#3f3f46] bg-[#27272a]"><th class="text-left px-5 py-3 font-semibold">What it detects</th><th class="text-left px-5 py-3 font-semibold">Reads from</th><th class="text-right px-5 py-3 font-semibold hidden sm:table-cell">Method</th></tr></thead>
-        <tbody class="divide-y divide-[#3f3f46]">
-          <tr class="hover:bg-[#27272a]/50 transition-colors"><td class="px-5 py-3.5">Framework</td><td class="px-5 py-3.5 text-[#a1a1aa]">package.json deps</td><td class="px-5 py-3.5 text-[#71717a] hidden sm:table-cell">next, react, vue → match</td></tr>
-          <tr class="hover:bg-[#27272a]/50 transition-colors"><td class="px-5 py-3.5">Scripts</td><td class="px-5 py-3.5 text-[#a1a1aa]">package.json scripts</td><td class="px-5 py-3.5 text-[#71717a] hidden sm:table-cell">Only includes steps you have</td></tr>
-          <tr class="hover:bg-[#27272a]/50 transition-colors"><td class="px-5 py-3.5">Package manager</td><td class="px-5 py-3.5 text-[#a1a1aa]">Lock files</td><td class="px-5 py-3.5 text-[#71717a] hidden sm:table-cell">pnpm-lock / yarn.lock / bun.lockb</td></tr>
-          <tr class="hover:bg-[#27272a]/50 transition-colors"><td class="px-5 py-3.5">Node version</td><td class="px-5 py-3.5 text-[#a1a1aa]">.nvmrc / .node-version</td><td class="px-5 py-3.5 text-[#71717a] hidden sm:table-cell">Reads exact version string</td></tr>
-          <tr class="hover:bg-[#27272a]/50 transition-colors"><td class="px-5 py-3.5">Git platform</td><td class="px-5 py-3.5 text-[#a1a1aa]">git remote origin URL</td><td class="px-5 py-3.5 text-[#71717a] hidden sm:table-cell">GitHub / GitLab / Bitbucket</td></tr>
-          <tr class="hover:bg-[#27272a]/50 transition-colors"><td class="px-5 py-3.5">Deploy URL</td><td class="px-5 py-3.5 text-[#a1a1aa]">vercel.json / fly.toml</td><td class="px-5 py-3.5 text-[#71717a] hidden sm:table-cell">Parses config files</td></tr>
-          <tr class="hover:bg-[#27272a]/50 transition-colors"><td class="px-5 py-3.5">Monorepo</td><td class="px-5 py-3.5 text-[#a1a1aa]">Subdirectories</td><td class="px-5 py-3.5 text-[#71717a] hidden sm:table-cell">Scans frontend/ backend/ web/</td></tr>
-          <tr class="hover:bg-[#27272a]/50 transition-colors"><td class="px-5 py-3.5">Non-Node projects</td><td class="px-5 py-3.5 text-[#a1a1aa]">pyproject.toml / go.mod</td><td class="px-5 py-3.5 text-[#71717a] hidden sm:table-cell">Python, Go, Rust, Docker</td></tr>
+    <div class="detect-table reveal">
+      <table>
+        <thead><tr><th>What it detects</th><th>Reads from</th><th class="method">Method</th></tr></thead>
+        <tbody>
+          <tr><td>Framework</td><td>package.json deps</td><td class="method">next, react, vue → match</td></tr>
+          <tr><td>Scripts</td><td>package.json scripts</td><td class="method">Only includes steps you have</td></tr>
+          <tr><td>Package manager</td><td>Lock files</td><td class="method">pnpm-lock / yarn.lock / bun.lockb</td></tr>
+          <tr><td>Node version</td><td>.nvmrc / .node-version</td><td class="method">Reads exact version string</td></tr>
+          <tr><td>Git platform</td><td>git remote origin URL</td><td class="method">GitHub / GitLab / Bitbucket</td></tr>
+          <tr><td>Deploy URL</td><td>vercel.json / fly.toml</td><td class="method">Parses config files</td></tr>
+          <tr><td>Monorepo</td><td>Subdirectories</td><td class="method">Scans frontend/ backend/ web/</td></tr>
+          <tr><td>Non-Node projects</td><td>pyproject.toml / go.mod</td><td class="method">Python, Go, Rust, Docker</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 </section>
 
-<section class="py-20 sm:py-28 bg-[#18181b] border-y border-[#3f3f46]">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-12 transition-all duration-700 opacity-0 translate-y-6" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-      <h2 class="text-3xl sm:text-4xl font-black mb-3">Security gates. Automatic.</h2>
-      <p class="text-[#a1a1aa] max-w-xl mx-auto">Four layers of protection that run without you lifting a finger.</p>
+<section id="how" class="section section-dark section-border">
+  <div class="container">
+    <div class="section-header reveal">
+      <h2>Three seconds. Four steps.</h2>
+      <p>From install to working pipeline — no wizard, no prompts, no signup.</p>
     </div>
-    <div class="max-w-3xl mx-auto grid gap-3">
-      <div class="opacity-0 translate-y-6 transition-all duration-500 bg-[#09090b] border border-[#3f3f46] rounded-xl p-4 sm:p-5 flex items-start gap-4 card-hover" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-        <span class="w-8 h-8 rounded-lg bg-[#22d3ee]/10 flex items-center justify-center shrink-0 text-sm">⚡</span>
-        <div><h4 class="font-semibold text-sm">CI Pipeline</h4><p class="text-xs text-[#a1a1aa] mt-0.5">Lint → typecheck → test → build on every push/PR.</p></div>
-        <span class="ml-auto shrink-0 text-xs bg-[#22d3ee]/10 text-[#22d3ee] px-2 py-0.5 rounded-full font-medium">Push / PR</span>
-      </div>
-      <div class="opacity-0 translate-y-6 transition-all duration-500 delay-100 bg-[#09090b] border border-[#3f3f46] rounded-xl p-4 sm:p-5 flex items-start gap-4 card-hover" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-        <span class="w-8 h-8 rounded-lg bg-[#a78bfa]/10 flex items-center justify-center shrink-0 text-sm">🔒</span>
-        <div><h4 class="font-semibold text-sm">CodeQL Security</h4><p class="text-xs text-[#a1a1aa] mt-0.5">100+ vulnerability classes — injection, XSS, crypto, path traversal.</p></div>
-        <span class="ml-auto shrink-0 text-xs bg-[#a78bfa]/10 text-[#a78bfa] px-2 py-0.5 rounded-full font-medium">Every push</span>
-      </div>
-      <div class="opacity-0 translate-y-6 transition-all duration-500 delay-200 bg-[#09090b] border border-[#3f3f46] rounded-xl p-4 sm:p-5 flex items-start gap-4 card-hover" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-        <span class="w-8 h-8 rounded-lg bg-[#facc15]/10 flex items-center justify-center shrink-0 text-sm">📦</span>
-        <div><h4 class="font-semibold text-sm">Dependabot</h4><p class="text-xs text-[#a1a1aa] mt-0.5">Weekly dependency updates. Groups minor/patch. Auto-PRs.</p></div>
-        <span class="ml-auto shrink-0 text-xs bg-[#facc15]/10 text-[#facc15] px-2 py-0.5 rounded-full font-medium">Weekly</span>
-      </div>
-      <div class="opacity-0 translate-y-6 transition-all duration-500 delay-300 bg-[#09090b] border border-[#3f3f46] rounded-xl p-4 sm:p-5 flex items-start gap-4 card-hover" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-        <span class="w-8 h-8 rounded-lg bg-[#4ade80]/10 flex items-center justify-center shrink-0 text-sm">🏥</span>
-        <div><h4 class="font-semibold text-sm">Health Check</h4><p class="text-xs text-[#a1a1aa] mt-0.5">Pings every 6h. Down? Auto-creates issue. Recovered? Auto-closes.</p></div>
-        <span class="ml-auto shrink-0 text-xs bg-[#4ade80]/10 text-[#4ade80] px-2 py-0.5 rounded-full font-medium">Every 6h</span>
-      </div>
+    <div class="steps-grid">
+      <div class="step"><div class="step-num" style="background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.3)">1</div><h4>Run the command</h4><p><code class="code" style="background:var(--bg4);padding:2px 8px;border-radius:4px;font-size:13px">npx shipkit-pipe</code></p></div>
+      <div class="step"><div class="step-num" style="background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3)">2</div><h4>Auto-detect</h4><p>Reads package.json, lock files, git remote, deploy config</p></div>
+      <div class="step"><div class="step-num" style="background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.3)">3</div><h4>Generate</h4><p>CI, health checks, security scanning, AI agent files</p></div>
+      <div class="step"><div class="step-num" style="background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3)">4</div><h4>Push and forget</h4><p>CI on every PR. Health check every 6h. Deps auto-update.</p></div>
     </div>
   </div>
 </section>
 
-<section class="py-20 sm:py-28">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-12 transition-all duration-700 opacity-0 translate-y-6" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-      <h2 class="text-3xl sm:text-4xl font-black mb-3">Before ShipKit vs After</h2>
-      <p class="text-[#a1a1aa] max-w-xl mx-auto">The difference is one command.</p>
+<section class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <h2>Before ShipKit vs After</h2>
+      <p>The difference is one command.</p>
     </div>
-    <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-6">
-      <div class="opacity-0 translate-y-6 transition-all duration-500 bg-[#18181b] border border-[#3f3f46] rounded-2xl p-6" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-        <div class="text-[#f87171] font-bold text-sm mb-4">✗ Before ShipKit</div>
-        <ul class="space-y-3 text-sm text-[#a1a1aa]">
-          <li class="flex items-start gap-3"><span class="text-[#f87171] mt-0.5">✗</span> Manually configure CI/CD for every project</li>
-          <li class="flex items-start gap-3"><span class="text-[#f87171] mt-0.5">✗</span> CI fails because config doesn't match your scripts</li>
-          <li class="flex items-start gap-3"><span class="text-[#f87171] mt-0.5">✗</span> No health monitoring — users tell you it's down</li>
-          <li class="flex items-start gap-3"><span class="text-[#f87171] mt-0.5">✗</span> Manual CodeQL + Dependabot setup</li>
-          <li class="flex items-start gap-3"><span class="text-[#f87171] mt-0.5">✗</span> Write separate prompts for AI agent every session</li>
-          <li class="flex items-start gap-3"><span class="text-[#f87171] mt-0.5">✗</span> GitLab/Bitbucket? Write CI from scratch</li>
+    <div class="compare-grid">
+      <div class="compare-card before reveal">
+        <h4><span class="icon" style="color:#ef4444">✗</span> Before ShipKit</h4>
+        <ul>
+          <li><span class="icon" style="color:#ef4444">✗</span> Manually configure CI/CD for every project</li>
+          <li><span class="icon" style="color:#ef4444">✗</span> CI fails because config doesn't match your scripts</li>
+          <li><span class="icon" style="color:#ef4444">✗</span> No health monitoring — users tell you it's down</li>
+          <li><span class="icon" style="color:#ef4444">✗</span> Manual CodeQL + Dependabot setup</li>
+          <li><span class="icon" style="color:#ef4444">✗</span> Write separate prompts for AI agent every session</li>
+          <li><span class="icon" style="color:#ef4444">✗</span> GitLab/Bitbucket? Write CI from scratch</li>
         </ul>
       </div>
-      <div class="opacity-0 translate-y-6 transition-all duration-500 delay-200 bg-[#09090b] border border-[#22d3ee]/30 rounded-2xl p-6" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-        <div class="text-[#4ade80] font-bold text-sm mb-4">✓ After <span class="gradient-text font-bold">npx shipkit-pipe</span></div>
-        <ul class="space-y-3 text-sm text-[#a1a1aa]">
-          <li class="flex items-start gap-3"><span class="text-[#4ade80] mt-0.5">✓</span> CI auto-generated from your scripts</li>
-          <li class="flex items-start gap-3"><span class="text-[#4ade80] mt-0.5">✓</span> Smart CI — only steps that exist, never fails</li>
-          <li class="flex items-start gap-3"><span class="text-[#4ade80] mt-0.5">✓</span> Health check pings every 6h, auto-creates issues</li>
-          <li class="flex items-start gap-3"><span class="text-[#4ade80] mt-0.5">✓</span> Security + deps generated automatically</li>
-          <li class="flex items-start gap-3"><span class="text-[#4ade80] mt-0.5">✓</span> AGENTS.md + shipkit.json — agent knows your stack</li>
-          <li class="flex items-start gap-3"><span class="text-[#4ade80] mt-0.5">✓</span> Auto-detects platform, generates right format</li>
+      <div class="compare-card after reveal">
+        <h4><span class="icon" style="color:#22c55e">✓</span> After <span class="gradient-text">npx shipkit-pipe</span></h4>
+        <ul>
+          <li><span class="icon" style="color:#22c55e">✓</span> CI auto-generated from your scripts</li>
+          <li><span class="icon" style="color:#22c55e">✓</span> Smart CI — only steps that exist, never fails</li>
+          <li><span class="icon" style="color:#22c55e">✓</span> Health check pings every 6h, auto-creates issues</li>
+          <li><span class="icon" style="color:#22c55e">✓</span> Security + deps generated automatically</li>
+          <li><span class="icon" style="color:#22c55e">✓</span> AGENTS.md — agent knows your stack</li>
+          <li><span class="icon" style="color:#22c55e">✓</span> Auto-detects platform, generates right format</li>
         </ul>
       </div>
     </div>
   </div>
 </section>
 
-<section class="py-20 sm:py-28 bg-[#18181b] border-y border-[#3f3f46]">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-12 transition-all duration-700 opacity-0 translate-y-6" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-      <h2 class="text-3xl sm:text-4xl font-black mb-3">Why doesn't it ask anything?</h2>
-      <p class="text-[#a1a1aa] max-w-xl mx-auto">Because your project already tells ShipKit everything it needs to know.</p>
+<section class="section section-dark section-border">
+  <div class="container">
+    <div class="section-header reveal">
+      <h2>Why doesn't it ask anything?</h2>
+      <p>Because your project already tells ShipKit everything it needs to know.</p>
     </div>
-    <div class="max-w-3xl mx-auto space-y-4">
-      <div x-data="{ open: false }" class="bg-[#09090b] border border-[#3f3f46] rounded-xl overflow-hidden transition-all duration-200" :class="open ? 'border-[#22d3ee]/40' : ''">
-        <button @click="open = !open" class="w-full text-left px-5 py-4 flex items-center justify-between gap-4"><span class="font-semibold text-sm">📋 package.json scripts</span><svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 text-[#71717a] transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button>
-        <div x-show="open" x-collapse class="px-5 pb-4 text-sm text-[#a1a1aa] leading-relaxed">If you have a <code class="text-xs bg-[#27272a] px-1.5 py-0.5 rounded">lint</code> script, CI gets a lint step. No <code>test</code> script? No test step. Your CI never fails because of missing commands.</div>
-      </div>
-      <div x-data="{ open: false }" class="bg-[#09090b] border border-[#3f3f46] rounded-xl overflow-hidden transition-all duration-200" :class="open ? 'border-[#22d3ee]/40' : ''">
-        <button @click="open = !open" class="w-full text-left px-5 py-4 flex items-center justify-between gap-4"><span class="font-semibold text-sm">📂 Lock files</span><svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 text-[#71717a] transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button>
-        <div x-show="open" x-collapse class="px-5 pb-4 text-sm text-[#a1a1aa] leading-relaxed"><code class="text-xs bg-[#27272a] px-1.5 py-0.5 rounded">pnpm-lock.yaml</code> → pnpm. <code>yarn.lock</code> → yarn. <code>bun.lockb</code> → bun. No guessing.</div>
-      </div>
-      <div x-data="{ open: false }" class="bg-[#09090b] border border-[#3f3f46] rounded-xl overflow-hidden transition-all duration-200" :class="open ? 'border-[#22d3ee]/40' : ''">
-        <button @click="open = !open" class="w-full text-left px-5 py-4 flex items-center justify-between gap-4"><span class="font-semibold text-sm">🔗 Git remote</span><svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 text-[#71717a] transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button>
-        <div x-show="open" x-collapse class="px-5 pb-4 text-sm text-[#a1a1aa] leading-relaxed">Reads <code class="text-xs bg-[#27272a] px-1.5 py-0.5 rounded">origin</code> URL to get your GitHub owner/repo. Supports GitHub, GitLab, and Bitbucket.</div>
-      </div>
-      <div x-data="{ open: false }" class="bg-[#09090b] border border-[#3f3f46] rounded-xl overflow-hidden transition-all duration-200" :class="open ? 'border-[#22d3ee]/40' : ''">
-        <button @click="open = !open" class="w-full text-left px-5 py-4 flex items-center justify-between gap-4"><span class="font-semibold text-sm">🚀 Deploy config</span><svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 text-[#71717a] transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button>
-        <div x-show="open" x-collapse class="px-5 pb-4 text-sm text-[#a1a1aa] leading-relaxed">Found <code class="text-xs bg-[#27272a] px-1.5 py-0.5 rounded">vercel.json</code>? Health checks ping your Vercel URL. Found <code>fly.toml</code>? It knows your Fly.io app name.</div>
-      </div>
-      <div x-data="{ open: false }" class="bg-[#09090b] border border-[#3f3f46] rounded-xl overflow-hidden transition-all duration-200" :class="open ? 'border-[#22d3ee]/40' : ''">
-        <button @click="open = !open" class="w-full text-left px-5 py-4 flex items-center justify-between gap-4"><span class="font-semibold text-sm">💡 Want to customize?</span><svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 text-[#71717a] transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button>
-        <div x-show="open" x-collapse class="px-5 pb-4 text-sm text-[#a1a1aa] leading-relaxed">Run <code class="text-xs bg-[#27272a] px-1.5 py-0.5 rounded">npx shipkit-pipe -i</code> for interactive mode. But 95% of users never need it.</div>
-      </div>
+    <div class="accordion" id="faqAccordion">
+      <div class="accordion-item reveal"><button class="accordion-btn">📋 package.json scripts<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><p>If you have a <code>lint</code> script, CI gets a lint step. No <code>test</code> script? No test step. Your CI never fails because of missing commands.</p></div></div>
+      <div class="accordion-item reveal"><button class="accordion-btn">📂 Lock files<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><p><code>pnpm-lock.yaml</code> → pnpm. <code>yarn.lock</code> → yarn. <code>bun.lockb</code> → bun. No guessing.</p></div></div>
+      <div class="accordion-item reveal"><button class="accordion-btn">🔗 Git remote<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><p>Reads <code>origin</code> URL to get your GitHub owner/repo. Supports GitHub, GitLab, and Bitbucket.</p></div></div>
+      <div class="accordion-item reveal"><button class="accordion-btn">🚀 Deploy config<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><p>Found <code>vercel.json</code>? Health checks ping your Vercel URL. Found <code>fly.toml</code>? It knows your Fly.io app name.</p></div></div>
+      <div class="accordion-item reveal"><button class="accordion-btn">💡 Want to customize?<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><p>Run <code>npx shipkit-pipe -i</code> for interactive mode. But 95% of users never need it.</p></div></div>
     </div>
   </div>
 </section>
 
-<section id="check" class="py-20 sm:py-28">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-12 transition-all duration-700 opacity-0 translate-y-6" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-      <h2 class="text-3xl sm:text-4xl font-black mb-3">Verify everything works</h2>
-      <p class="text-[#a1a1aa] max-w-xl mx-auto">One command tells you the state of your whole pipeline.</p>
+<section id="security" class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <h2>Security gates. Automatic.</h2>
+      <p>Four layers of protection that run without you lifting a finger.</p>
     </div>
-    <div class="max-w-2xl mx-auto bg-[#0a0a0d] border border-[#3f3f46] rounded-2xl overflow-hidden opacity-0 translate-y-6 transition-all duration-700" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-      <div class="flex items-center gap-2 px-4 py-3 bg-[#18181b] border-b border-[#3f3f46]">
-        <span class="w-3 h-3 rounded-full bg-[#ef4444]"></span><span class="w-3 h-3 rounded-full bg-[#eab308]"></span><span class="w-3 h-3 rounded-full bg-[#22c55e]"></span>
-        <span class="mx-auto text-xs text-[#71717a]">shipkit-pipe check</span>
-      </div>
-      <div class="terminal-font text-sm leading-loose p-5 sm:p-6 text-[#a1a1aa]" x-data="checkDemo()" x-init="startTyping()">
-        <template x-for="(line, i) in lines" :key="i">
-          <div>
-            <span x-show="line.type === 'prompt'" class="text-[#4ade80]">$ </span>
-            <span x-show="line.type === 'prompt'" x-text="line.text" class="text-white"></span>
-            <span x-show="line.type === 'output'" x-text="line.text" :style="'color:#' + line.color"></span>
-            <span x-show="line.type === 'dim'" x-text="line.text" class="text-[#71717a]"></span>
-          </div>
-        </template>
-        <span x-show="typing" class="w-2 h-4 bg-[#22d3ee] cursor-blink inline-block"></span>
-      </div>
+    <div style="max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:12px">
+      <div class="reveal" style="display:flex;align-items:center;gap:16px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px 20px"><div style="width:32px;height:32px;border-radius:8px;background:rgba(0,212,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">⚡</div><div><h4 style="font-size:14px;font-weight:700;margin-bottom:2px">CI Pipeline</h4><p style="font-size:13px;color:var(--text2)">Lint → typecheck → test → build on every push/PR.</p></div><span style="margin-left:auto;flex-shrink:0;font-size:11px;background:rgba(0,212,255,.1);color:var(--accent);padding:4px 10px;border-radius:100px;font-weight:600">Push / PR</span></div>
+      <div class="reveal" style="display:flex;align-items:center;gap:16px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px 20px"><div style="width:32px;height:32px;border-radius:8px;background:rgba(167,139,250,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">🔒</div><div><h4 style="font-size:14px;font-weight:700;margin-bottom:2px">CodeQL Security</h4><p style="font-size:13px;color:var(--text2)">100+ vulnerability classes — injection, XSS, crypto, path traversal.</p></div><span style="margin-left:auto;flex-shrink:0;font-size:11px;background:rgba(167,139,250,.1);color:#a78bfa;padding:4px 10px;border-radius:100px;font-weight:600">Every push</span></div>
+      <div class="reveal" style="display:flex;align-items:center;gap:16px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px 20px"><div style="width:32px;height:32px;border-radius:8px;background:rgba(251,191,36,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">📦</div><div><h4 style="font-size:14px;font-weight:700;margin-bottom:2px">Dependabot</h4><p style="font-size:13px;color:var(--text2)">Weekly dependency updates. Groups minor/patch. Auto-PRs.</p></div><span style="margin-left:auto;flex-shrink:0;font-size:11px;background:rgba(251,191,36,.1);color:var(--gold);padding:4px 10px;border-radius:100px;font-weight:600">Weekly</span></div>
+      <div class="reveal" style="display:flex;align-items:center;gap:16px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px 20px"><div style="width:32px;height:32px;border-radius:8px;background:rgba(34,197,94,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">🏥</div><div><h4 style="font-size:14px;font-weight:700;margin-bottom:2px">Health Check</h4><p style="font-size:13px;color:var(--text2)">Pings every 6h. Down? Auto-creates issue. Recovered? Auto-closes.</p></div><span style="margin-left:auto;flex-shrink:0;font-size:11px;background:rgba(34,197,94,.1);color:var(--green);padding:4px 10px;border-radius:100px;font-weight:600">Every 6h</span></div>
     </div>
   </div>
 </section>
 
-<section id="install" class="py-20 sm:py-28 bg-[#18181b] border-y border-[#3f3f46]">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-12 transition-all duration-700 opacity-0 translate-y-6" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-      <h2 class="text-3xl sm:text-4xl font-black mb-3">Install in one line</h2>
-      <p class="text-[#a1a1aa] max-w-xl mx-auto">No signup. No wizard. No survey. Choose your method.</p>
+<section id="install" class="section section-dark section-border">
+  <div class="container">
+    <div class="section-header reveal">
+      <h2>Install in one line</h2>
+      <p>No signup. No wizard. No survey. Choose your method.</p>
     </div>
-    <div class="max-w-2xl mx-auto" x-data="{ tab: 'npx' }">
-      <div class="flex gap-1 mb-6 bg-[#09090b] rounded-xl p-1 border border-[#3f3f46]">
-        <button @click="tab='npx'" :class="tab==='npx' ? 'bg-[#27272a] text-white border-[#3f3f46]' : 'text-[#71717a] border-transparent'" class="flex-1 px-4 py-2 text-sm rounded-lg border transition-all font-medium">npx</button>
-        <button @click="tab='bash'" :class="tab==='bash' ? 'bg-[#27272a] text-white border-[#3f3f46]' : 'text-[#71717a] border-transparent'" class="flex-1 px-4 py-2 text-sm rounded-lg border transition-all font-medium">curl bash</button>
-        <button @click="tab='powershell'" :class="tab==='powershell' ? 'bg-[#27272a] text-white border-[#3f3f46]' : 'text-[#71717a] border-transparent'" class="flex-1 px-4 py-2 text-sm rounded-lg border transition-all font-medium">PowerShell</button>
-        <button @click="tab='global'" :class="tab==='global' ? 'bg-[#27272a] text-white border-[#3f3f46]' : 'text-[#71717a] border-transparent'" class="flex-1 px-4 py-2 text-sm rounded-lg border transition-all font-medium">npm i -g</button>
+    <div class="install-tabs reveal">
+      <div class="tab-bar" id="tabBar">
+        <button class="tab-btn active" data-tab="npx">npx</button>
+        <button class="tab-btn" data-tab="bash">curl bash</button>
+        <button class="tab-btn" data-tab="powershell">PowerShell</button>
+        <button class="tab-btn" data-tab="global">npm i -g</button>
       </div>
-      <div x-show="tab==='npx'" class="bg-[#09090b] border border-[#3f3f46] rounded-xl overflow-hidden">
-        <div class="flex items-center justify-between px-5 py-3.5 terminal-font text-sm text-[#4ade80]">
-          <span>$ npx shipkit-pipe</span>
-          <span x-data="{ c: false }"><button @click="navigator.clipboard.writeText('npx shipkit-pipe').then(() => { c = true; setTimeout(() => c = false, 2000) })" class="text-[#71717a] hover:text-white transition-colors" type="button">
-            <svg x-show="!c" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-            <svg x-show="c" class="w-4 h-4 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
-          </button></span>
-        </div>
-        <div class="px-5 pb-4 text-xs text-[#71717a]">No install needed. Works with Node 18+.</div>
-      </div>
-      <div x-show="tab==='bash'" x-cloak class="bg-[#09090b] border border-[#3f3f46] rounded-xl overflow-hidden">
-        <div class="flex items-center justify-between px-5 py-3.5 terminal-font text-sm text-[#4ade80]">
-          <span>$ curl -fsSL https://raw.githubusercontent.com/sagar-grv/shipkit/main/setup.sh | bash</span>
-          <span x-data="{ c: false }"><button @click="navigator.clipboard.writeText('curl -fsSL https://raw.githubusercontent.com/sagar-grv/shipkit/main/setup.sh | bash').then(() => { c = true; setTimeout(() => c = false, 2000) })" class="text-[#71717a] hover:text-white transition-colors" type="button">
-            <svg x-show="!c" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-            <svg x-show="c" class="w-4 h-4 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
-          </button></span>
-        </div>
-        <div class="px-5 pb-4 text-xs text-[#71717a]">Linux/macOS. No Node.js? This works.</div>
-      </div>
-      <div x-show="tab==='powershell'" x-cloak class="bg-[#09090b] border border-[#3f3f46] rounded-xl overflow-hidden">
-        <div class="flex items-center justify-between px-5 py-3.5 terminal-font text-sm text-[#4ade80]">
-          <span>PS&gt; irm https://raw.githubusercontent.com/sagar-grv/shipkit/main/setup.ps1 | powershell</span>
-          <span x-data="{ c: false }"><button @click="navigator.clipboard.writeText('irm https://raw.githubusercontent.com/sagar-grv/shipkit/main/setup.ps1 | powershell').then(() => { c = true; setTimeout(() => c = false, 2000) })" class="text-[#71717a] hover:text-white transition-colors" type="button">
-            <svg x-show="!c" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-            <svg x-show="c" class="w-4 h-4 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
-          </button></span>
-        </div>
-        <div class="px-5 pb-4 text-xs text-[#71717a]">Windows PowerShell 5.1+ (no Node.js needed).</div>
-      </div>
-      <div x-show="tab==='global'" x-cloak class="bg-[#09090b] border border-[#3f3f46] rounded-xl overflow-hidden">
-        <div class="flex items-center justify-between px-5 py-3.5 terminal-font text-sm text-[#4ade80]">
-          <span>$ npm install -g shipkit-pipe</span>
-          <span x-data="{ c: false }"><button @click="navigator.clipboard.writeText('npm install -g shipkit-pipe').then(() => { c = true; setTimeout(() => c = false, 2000) })" class="text-[#71717a] hover:text-white transition-colors" type="button">
-            <svg x-show="!c" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-            <svg x-show="c" class="w-4 h-4 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
-          </button></span>
-        </div>
-        <div class="px-5 pb-4 text-xs text-[#71717a]">Global install. 19KB. Zero dependencies.</div>
-      </div>
+      <div class="tab-content active" id="tab-npx"><div class="tab-code"><div class="tab-code-header"><span><span style="color:var(--gold)">$</span> npx shipkit-pipe</span><button class="tab-copy-btn" data-cmd="npx shipkit-pipe"><svg class="copy-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><svg class="check-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none"><path d="M20 6L9 17l-5-5"/></svg></button></div><div class="tab-footer">No install needed. Works with Node 18+.</div></div></div>
+      <div class="tab-content" id="tab-bash"><div class="tab-code"><div class="tab-code-header"><span><span style="color:var(--gold)">$</span> curl -fsSL https://raw.githubusercontent.com/sagar-grv/shipkit/main/setup.sh | bash</span><button class="tab-copy-btn" data-cmd="curl -fsSL https://raw.githubusercontent.com/sagar-grv/shipkit/main/setup.sh | bash"><svg class="copy-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><svg class="check-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none"><path d="M20 6L9 17l-5-5"/></svg></button></div><div class="tab-footer">Linux/macOS. No Node.js? This works.</div></div></div>
+      <div class="tab-content" id="tab-powershell"><div class="tab-code"><div class="tab-code-header"><span><span style="color:var(--gold)">PS&gt;</span> irm https://raw.githubusercontent.com/sagar-grv/shipkit/main/setup.ps1 | powershell</span><button class="tab-copy-btn" data-cmd="irm https://raw.githubusercontent.com/sagar-grv/shipkit/main/setup.ps1 | powershell"><svg class="copy-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><svg class="check-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none"><path d="M20 6L9 17l-5-5"/></svg></button></div><div class="tab-footer">Windows PowerShell 5.1+ (no Node.js needed).</div></div></div>
+      <div class="tab-content" id="tab-global"><div class="tab-code"><div class="tab-code-header"><span><span style="color:var(--gold)">$</span> npm install -g shipkit-pipe</span><button class="tab-copy-btn" data-cmd="npm install -g shipkit-pipe"><svg class="copy-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><svg class="check-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none"><path d="M20 6L9 17l-5-5"/></svg></button></div><div class="tab-footer">Global install. 19KB. Zero dependencies.</div></div></div>
     </div>
-    <div class="text-center mt-8 text-xs text-[#71717a]"><span class="inline-flex items-center gap-1"><svg class="w-3.5 h-3.5 text-[#4ade80]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> No telemetry. No signup. Forever free.</span></div>
+    <div style="text-align:center;margin-top:24px;font-size:13px;color:var(--text3)"><span>✓ No telemetry. No signup. Forever free.</span></div>
   </div>
 </section>
 
-<section id="faq" class="py-20 sm:py-28">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-12 transition-all duration-700 opacity-0 translate-y-6" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-      <h2 class="text-3xl sm:text-4xl font-black mb-3">Frequently asked questions</h2>
-      <p class="text-[#a1a1aa] max-w-xl mx-auto">Everything you need to know about ShipKit.</p>
+<section id="faq" class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <h2>Frequently asked questions</h2>
+      <p>Everything you need to know about ShipKit.</p>
     </div>
-    <div class="max-w-3xl mx-auto space-y-3">
-      <div x-data="{ open: false }" class="bg-[#18181b] border border-[#3f3f46] rounded-xl overflow-hidden transition-all" :class="open ? 'border-[#22d3ee]/40' : ''">
-        <button @click="open = !open" class="w-full text-left px-5 py-4 flex items-center justify-between gap-4"><span class="font-medium text-sm">Does it work with GitLab or Bitbucket?</span><svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 text-[#71717a] transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button>
-        <div x-show="open" x-collapse class="px-5 pb-4 text-sm text-[#a1a1aa] leading-relaxed">Yes. ShipKit reads your <code class="text-xs bg-[#27272a] px-1.5 py-0.5 rounded">git remote origin URL</code> and auto-selects the right CI format: GitHub Actions, GitLab CI, or Bitbucket Pipelines.</div>
-      </div>
-      <div x-data="{ open: false }" class="bg-[#18181b] border border-[#3f3f46] rounded-xl overflow-hidden transition-all" :class="open ? 'border-[#22d3ee]/40' : ''">
-        <button @click="open = !open" class="w-full text-left px-5 py-4 flex items-center justify-between gap-4"><span class="font-medium text-sm">What if my project doesn't use Node.js?</span><svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 text-[#71717a] transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button>
-        <div x-show="open" x-collapse class="px-5 pb-4 text-sm text-[#a1a1aa] leading-relaxed">ShipKit detects Python (<code class="text-xs bg-[#27272a] px-1.5 py-0.5 rounded">pyproject.toml</code>), Go (<code>go.mod</code>), Rust (<code>Cargo.toml</code>), and Docker. No Node.js? Use the curl bash install.</div>
-      </div>
-      <div x-data="{ open: false }" class="bg-[#18181b] border border-[#3f3f46] rounded-xl overflow-hidden transition-all" :class="open ? 'border-[#22d3ee]/40' : ''">
-        <button @click="open = !open" class="w-full text-left px-5 py-4 flex items-center justify-between gap-4"><span class="font-medium text-sm">Can I preview before generating?</span><svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 text-[#71717a] transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button>
-        <div x-show="open" x-collapse class="px-5 pb-4 text-sm text-[#a1a1aa] leading-relaxed">Yes. Run <code class="text-xs bg-[#27272a] px-1.5 py-0.5 rounded">npx shipkit-pipe --dry-run</code> to see exactly what files would be generated without writing anything.</div>
-      </div>
-      <div x-data="{ open: false }" class="bg-[#18181b] border border-[#3f3f46] rounded-xl overflow-hidden transition-all" :class="open ? 'border-[#22d3ee]/40' : ''">
-        <button @click="open = !open" class="w-full text-left px-5 py-4 flex items-center justify-between gap-4"><span class="font-medium text-sm">Does it work in a monorepo?</span><svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 text-[#71717a] transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button>
-        <div x-show="open" x-collapse class="px-5 pb-4 text-sm text-[#a1a1aa] leading-relaxed">Yes. ShipKit scans <code class="text-xs bg-[#27272a] px-1.5 py-0.5 rounded">frontend/</code>, <code>backend/</code>, <code>web/</code>, <code>app/</code> for sub-projects when root has no package.json.</div>
-      </div>
-      <div x-data="{ open: false }" class="bg-[#18181b] border border-[#3f3f46] rounded-xl overflow-hidden transition-all" :class="open ? 'border-[#22d3ee]/40' : ''">
-        <button @click="open = !open" class="w-full text-left px-5 py-4 flex items-center justify-between gap-4"><span class="font-medium text-sm">Can I regenerate if files already exist?</span><svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 text-[#71717a] transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button>
-        <div x-show="open" x-collapse class="px-5 pb-4 text-sm text-[#a1a1aa] leading-relaxed">ShipKit skips existing files by default. Use <code class="text-xs bg-[#27272a] px-1.5 py-0.5 rounded">npx shipkit-pipe --force</code> to overwrite.</div>
-      </div>
-      <div x-data="{ open: false }" class="bg-[#18181b] border border-[#3f3f46] rounded-xl overflow-hidden transition-all" :class="open ? 'border-[#22d3ee]/40' : ''">
-        <button @click="open = !open" class="w-full text-left px-5 py-4 flex items-center justify-between gap-4"><span class="font-medium text-sm">Is ShipKit free? What's the catch?</span><svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 text-[#71717a] transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button>
-        <div x-show="open" x-collapse class="px-5 pb-4 text-sm text-[#a1a1aa] leading-relaxed">100% free. Apache 2.0 license. No telemetry, no signup, no SaaS, no API keys. There's no catch.</div>
-      </div>
+    <div class="accordion" id="faqAccordion2">
+      <div class="accordion-item reveal"><button class="accordion-btn">Does it work with GitLab or Bitbucket?<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><p>Yes. ShipKit reads your <code>git remote origin URL</code> and auto-selects the right CI format: GitHub Actions, GitLab CI, or Bitbucket Pipelines.</p></div></div>
+      <div class="accordion-item reveal"><button class="accordion-btn">What if my project doesn't use Node.js?<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><p>ShipKit detects Python (<code>pyproject.toml</code>), Go (<code>go.mod</code>), Rust (<code>Cargo.toml</code>), and Docker. No Node.js? Use the curl bash install.</p></div></div>
+      <div class="accordion-item reveal"><button class="accordion-btn">Can I preview before generating?<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><p>Yes. Run <code>npx shipkit-pipe --dry-run</code> to see exactly what files would be generated without writing anything.</p></div></div>
+      <div class="accordion-item reveal"><button class="accordion-btn">Does it work in a monorepo?<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><p>Yes. ShipKit scans <code>frontend/</code>, <code>backend/</code>, <code>web/</code>, <code>app/</code> for sub-projects when root has no package.json.</p></div></div>
+      <div class="accordion-item reveal"><button class="accordion-btn">Can I regenerate if files already exist?<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><p>ShipKit skips existing files by default. Use <code>npx shipkit-pipe --force</code> to overwrite.</p></div></div>
+      <div class="accordion-item reveal"><button class="accordion-btn">Is ShipKit free? What's the catch?<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><p>100% free. Apache 2.0 license. No telemetry, no signup, no SaaS, no API keys. There's no catch.</p></div></div>
     </div>
   </div>
 </section>
 
-<section class="py-28 relative overflow-hidden bg-grid">
-  <div class="absolute inset-0 bg-glow pointer-events-none"></div>
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 transition-all duration-700 opacity-0 translate-y-6" x-intersect:enter="$el.classList.add('opacity-100','translate-y-0')">
-    <h2 class="text-4xl sm:text-5xl font-black mb-4">Ship with confidence.</h2>
-    <p class="text-lg text-[#a1a1aa] max-w-lg mx-auto mb-8">Your project gets an automated team in 3 seconds. Free. Open source. Forever.</p>
-    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
-      <a href="https://github.com/sagar-grv/shipkit" target="_blank" class="inline-flex items-center gap-2.5 bg-gradient-to-r from-[#06b6d4] to-[#4ade80] text-black font-bold px-7 py-3.5 rounded-xl text-base hover:scale-105 transition-transform shadow-lg hover:shadow-[#22d3ee]/30 !no-underline">
-        <svg class="w-5 h-5" viewBox="0 0 16 16"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/></svg> Star on GitHub</a>
-      <div class="inline-flex items-center gap-3 bg-[#18181b] border border-[#3f3f46] rounded-xl px-5 py-3 terminal-font text-sm"><span class="text-[#71717a]">$</span><span class="text-[#4ade80]">npx shipkit-pipe</span></div>
+<section class="cta bg-grid section-border">
+  <div class="bg-glow"></div>
+  <div class="container" style="position:relative;z-index:2">
+    <h2>Ship with confidence.</h2>
+    <p>Your project gets an automated team in 3 seconds. Free. Open source. Forever.</p>
+    <div class="cta-actions">
+      <a href="https://github.com/sagar-grv/shipkit" target="_blank" class="cta-primary">
+        <svg width="20" height="20" viewBox="0 0 16 16"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/></svg> Star on GitHub</a>
+      <div class="cta-secondary"><span style="color:var(--text3)">$</span> npx shipkit-pipe</div>
     </div>
-    <p class="text-xs text-[#71717a]">19KB. Zero dependencies. Node 18+. Any OS.</p>
+    <p style="font-size:12px;color:var(--text3);margin-top:20px">19KB. Zero dependencies. Node 18+. Any OS.</p>
   </div>
 </section>
 
-<footer class="border-t border-[#3f3f46] py-10">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-2 text-sm"><span class="text-xl">⚓</span><span class="font-bold">ShipKit</span><span class="text-[#71717a] text-xs">v3.1.0</span></div>
-      <div class="flex items-center gap-6 text-sm">
-        <a href="https://github.com/sagar-grv/shipkit" class="text-[#a1a1aa] hover:text-white transition-colors">GitHub</a>
-        <a href="https://www.npmjs.com/package/shipkit-pipe" class="text-[#a1a1aa] hover:text-white transition-colors">npm</a>
-        <a href="https://github.com/sagar-grv/shipkit/issues" class="text-[#a1a1aa] hover:text-white transition-colors">Issues</a>
-        <a href="https://github.com/sagar-grv/shipkit/security/policy" class="text-[#a1a1aa] hover:text-white transition-colors">Security</a>
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand"><span>⚓</span><strong>ShipKit</strong><span style="color:var(--text3);font-size:12px">v3.1.0</span></div>
+      <div class="footer-links">
+        <a href="https://github.com/sagar-grv/shipkit">GitHub</a>
+        <a href="https://www.npmjs.com/package/shipkit-pipe">npm</a>
+        <a href="https://github.com/sagar-grv/shipkit/issues">Issues</a>
+        <a href="https://github.com/sagar-grv/shipkit/security/policy">Security</a>
       </div>
     </div>
-    <div class="mt-6 text-center text-xs text-[#71717a]">Built by <a href="https://github.com/sagar-grv" class="text-[#a1a1aa] hover:text-white">Sagar Giri</a> — Apache 2.0 License</div>
+    <div class="footer-copy">Built by <a href="https://github.com/sagar-grv" style="color:var(--text2)">Sagar Giri</a> — Apache 2.0 License</div>
   </div>
 </section>
 
 <script>
-(function(){var t=setTimeout(function(){if(!window.Alpine){document.querySelectorAll('[x-cloak]').forEach(function(e){e.removeAttribute('x-cloak')});document.querySelectorAll('.opacity-0').forEach(function(e){e.classList.remove('opacity-0','translate-y-6','translate-y-8','translate-y-4','-translate-y-4')})}clearTimeout(t)},3000)})();
-function terminalDemo() {
-  return {
-    lines: [{ type: 'dim', text: 'Type a command or click a suggestion below. Try: npx shipkit-pipe, npx shipkit-pipe check, help' }],
-    currentInput: '', history: [], historyIdx: -1,
-    suggestions: ['npx shipkit-pipe', 'npx shipkit-pipe --dry-run', 'npx shipkit-pipe check'],
-    executeCommand() {
-      const cmd = this.currentInput.trim();
-      if (!cmd) return;
-      this.lines.push({ type: 'prompt', text: cmd });
-      this.history.unshift(cmd); this.historyIdx = -1;
-      const lower = cmd.toLowerCase(); this.currentInput = '';
-      if (lower === 'help') {
-        this.addLines([{ type: 'info', text: 'Available commands:' },{ type: 'dim', text: '  npx shipkit-pipe              Auto-detect & generate' },{ type: 'dim', text: '  npx shipkit-pipe check        Verify everything works' },{ type: 'dim', text: '  npx shipkit-pipe --dry-run    Preview without writing' },{ type: 'dim', text: '  npx shipkit-pipe --force      Overwrite existing files' },{ type: 'dim', text: '  help                          Show this message' },{ type: 'dim', text: '  clear                         Clear terminal' }]);
-      } else if (lower === 'clear' || lower === 'cls') { this.lines = [];
-      } else if (lower === 'npx shipkit-pipe' || lower === 'shipkit-pipe') {
-        this.addLines([{ type: 'output', text: '  ⚓ ShipKit — my-project', cls: 'text-[#22d3ee]' },{ type: 'dim', text: '' },{ type: 'success', text: '  ✓ Next.js | pnpm | Node 20' },{ type: 'success', text: '  ✓ Scripts: lint, test, build' },{ type: 'success', text: '  ✓ Deploy: Vercel (my-project.vercel.app)' },{ type: 'dim', text: '' },{ type: 'success', text: '  ✓ Generated 6 files' },{ type: 'dim', text: '' },{ type: 'info', text: '  Files:' },{ type: 'dim', text: '    shipkit.json                 ← Project config' },{ type: 'dim', text: '    AGENTS.md                    ← AI agent instructions' },{ type: 'dim', text: '    .github/workflows/ci.yml     ← CI: lint > test > build' },{ type: 'dim', text: '    .github/workflows/health.yml ← Health check (every 6h)' },{ type: 'dim', text: '    .github/dependabot.yml       ← Auto-update deps' },{ type: 'dim', text: '    .github/workflows/codeql.yml ← Security scanning' },{ type: 'dim', text: '' },{ type: 'dim', text: '  Next: git add -A && git commit -m "add pipeline" && git push' }]);
-      } else if (lower.includes('dry-run') || lower.includes('--dry-run')) {
-        this.addLines([{ type: 'output', text: '  ⚓ ShipKit — dry run', cls: 'text-[#22d3ee]' },{ type: 'dim', text: '' },{ type: 'output', text: '  Detected:', cls: 'text-white' },{ type: 'dim', text: '    Project:   my-project' },{ type: 'dim', text: '    Framework: Next.js' },{ type: 'dim', text: '    Platform:  github (my-username/my-project)' },{ type: 'dim', text: '    PM:        pnpm | Node 20' },{ type: 'dim', text: '' },{ type: 'output', text: '  Would generate:', cls: 'text-white' },{ type: 'dim', text: '    .github/workflows/ci.yml     ← CI: lint > test > build' },{ type: 'dim', text: '    .github/dependabot.yml       ← Auto-update deps' },{ type: 'dim', text: '    .github/workflows/health.yml ← Health check (every 6h)' },{ type: 'dim', text: '    .github/workflows/codeql.yml ← Security scanning' },{ type: 'dim', text: '    shipkit.json                 ← Project config' },{ type: 'dim', text: '    AGENTS.md                    ← AI agent instructions' },{ type: 'dim', text: '' },{ type: 'dim', text: '  Run without --dry-run to generate.' }]);
-      } else if (lower.includes('check')) {
-        this.addLines([{ type: 'output', text: '  ⚓ ShipKit Check', cls: 'text-[#22d3ee]' },{ type: 'dim', text: '' },{ type: 'success', text: '  ✓ Project: my-awesome-app' },{ type: 'success', text: '  ✓ shipkit.json exists' },{ type: 'success', text: '  ✓ CI workflow valid (lint → test → build)' },{ type: 'success', text: '  ✓ Health check configured' },{ type: 'success', text: '  ✓ Site is up (200) — my-app.vercel.app' },{ type: 'success', text: '  ✓ No critical vulnerabilities' },{ type: 'success', text: '  ✓ AGENTS.md exists — AI agent ready' }]);
-      } else if (lower.includes('--force') || lower.includes('force')) {
-        this.addLines([{ type: 'output', text: '  ⚓ ShipKit — my-project', cls: 'text-[#22d3ee]' },{ type: 'dim', text: '' },{ type: 'success', text: '  ✓ Next.js | pnpm | Node 20' },{ type: 'output', text: '  ⚠ --force: Overwriting existing files', cls: 'text-[#facc15]' },{ type: 'dim', text: '' },{ type: 'success', text: '  ✓ Generated 6 files (0 skipped)' }]);
-      } else if (lower.startsWith('npx')) {
-        this.addLines([{ type: 'error', text: '  Unknown command. Try: npx shipkit-pipe, npx shipkit-pipe check' }]);
-      } else {
-        this.addLines([{ type: 'error', text: '  Unknown command. Type "help" for available commands.' }]);
+(function(){
+// === Scroll-based reveal (progressive enhancement: if JS fails, content stays visible) ===
+var reveals = document.querySelectorAll('.reveal');
+if ('IntersectionObserver' in window && reveals.length) {
+  reveals.forEach(function(el) { el.classList.add('reveal-animate'); });
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('revealed');
+        observer.unobserve(entry.target);
       }
-      this.scrollToBottom();
-    },
-    addLines(newLines) {
-      let i = 0; const addNext = () => { if (i < newLines.length) { this.lines.push(newLines[i]); i++; this.scrollToBottom(); setTimeout(addNext, 30); } }; addNext();
-    },
-    scrollToBottom() { this.$nextTick(() => { const el = this.$refs.output; if (el) el.scrollTop = el.scrollHeight; }); },
-    prevHistory() { if (!this.history.length) return; this.historyIdx = Math.min(this.historyIdx + 1, this.history.length - 1); this.currentInput = this.history[this.historyIdx]; },
-    nextHistory() { if (this.historyIdx <= 0) { this.historyIdx = -1; this.currentInput = ''; return; } this.historyIdx--; this.currentInput = this.history[this.historyIdx]; },
-    reset() { this.lines = [{ type: 'dim', text: 'Terminal reset. Type a command to begin.' }]; this.currentInput = ''; }
-  };
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  reveals.forEach(function(el) { observer.observe(el); });
 }
-function updateDemoStack(stack) {
-  const demo = document.querySelector('[x-data="terminalDemo()"]');
-  if (!demo) return;
-  let term;
-  try { term = Alpine.$data(demo); } catch { return; }
-  const outputs = {
-    next: [{ type: 'output', text: '  ⚓ ShipKit — my-next-app', cls: 'text-[#22d3ee]' },{ type: 'dim', text: '' },{ type: 'success', text: '  ✓ Next.js | pnpm | Node 20' },{ type: 'success', text: '  ✓ Scripts: lint, test, build' },{ type: 'success', text: '  ✓ Deploy: Vercel (my-next-app.vercel.app)' },{ type: 'dim', text: '  ✓ Generated CI: lint > test > build' }],
-    react: [{ type: 'output', text: '  ⚓ ShipKit — my-react-app', cls: 'text-[#22d3ee]' },{ type: 'dim', text: '' },{ type: 'success', text: '  ✓ React | npm | Node 20' },{ type: 'success', text: '  ✓ Scripts: test, build' },{ type: 'dim', text: '  ✓ Generated CI: test > build' }],
-    vue: [{ type: 'output', text: '  ⚓ ShipKit — my-vue-app', cls: 'text-[#22d3ee]' },{ type: 'dim', text: '' },{ type: 'success', text: '  ✓ Vue | yarn | Node 18' },{ type: 'success', text: '  ✓ Scripts: lint, build' },{ type: 'dim', text: '  ✓ Generated CI: lint > build' }],
-    python: [{ type: 'output', text: '  ⚓ ShipKit — my-python-api', cls: 'text-[#22d3ee]' },{ type: 'dim', text: '' },{ type: 'success', text: '  ✓ Python | pip | (pyproject.toml)' },{ type: 'dim', text: '  ✓ Generated: GitHub Actions CI (Python)' }],
-    go: [{ type: 'output', text: '  ⚓ ShipKit — my-go-service', cls: 'text-[#22d3ee]' },{ type: 'dim', text: '' },{ type: 'success', text: '  ✓ Go | (go.mod detected)' },{ type: 'dim', text: '  ✓ Generated: GitHub Actions CI (Go)' }],
-    monorepo: [{ type: 'output', text: '  ⚓ ShipKit — my-monorepo', cls: 'text-[#22d3ee]' },{ type: 'dim', text: '' },{ type: 'success', text: '  ✓ Monorepo detected' },{ type: 'dim', text: '    Sub-projects: frontend/, backend/' },{ type: 'success', text: '  ✓ Frontend: Next.js | pnpm' },{ type: 'success', text: '  ✓ Backend: Express | pnpm' }],
-    empty: [{ type: 'output', text: '  ⚓ ShipKit — my-new-project', cls: 'text-[#22d3ee]' },{ type: 'dim', text: '' },{ type: 'output', text: '  ✓ No project detected — generating baseline', cls: 'text-[#facc15]' },{ type: 'dim', text: '  ✓ Generated: baseline CI + AGENTS.md' }]
-  };
-  const out = outputs[stack] || outputs.next;
-  term.lines = [{ type: 'dim', text: `→ Auto-generated for ${stack}:` }];
-  let i = 0; const addNext = () => { if (i < out.length) { term.lines.push(out[i]); i++; term.scrollToBottom(); setTimeout(addNext, 40); } }; addNext();
-}
-function checkDemo() {
-  return {
-    lines: [], typing: true,
-    startTyping() {
-      const cmds = [{ type: 'prompt', text: 'npx shipkit-pipe check' },{ type: 'dim', text: '' },{ type: 'output', text: '  ⚓ ShipKit Check', color: '22d3ee' },{ type: 'dim', text: '' },{ type: 'output', text: '  ✓ Project: my-awesome-app', color: '4ade80' },{ type: 'output', text: '  ✓ shipkit.json exists', color: '4ade80' },{ type: 'output', text: '  ✓ CI workflow valid (lint → test → build)', color: '4ade80' },{ type: 'output', text: '  ✓ Health check configured', color: '4ade80' },{ type: 'output', text: '  ✓ Site is up (200) — my-app.vercel.app', color: '4ade80' },{ type: 'output', text: '  ✓ No critical vulnerabilities', color: '4ade80' },{ type: 'output', text: '  ✓ AGENTS.md exists — AI agent ready', color: '4ade80' },{ type: 'dim', text: '' },{ type: 'dim', text: '  All systems nominal. Push with confidence.' }];
-      let i = 0; const typeNext = () => { if (i < cmds.length) { this.lines.push(cmds[i]); i++; setTimeout(typeNext, 80); } else { this.typing = false; } }; setTimeout(typeNext, 400);
-    }
-  };
-}
-function startCount(from, to, duration, el) {
-  if (!el || el.dataset.counted) return; el.dataset.counted = 'true';
-  let startTime = null;
-  const step = (timestamp) => {
-    if (!startTime) startTime = timestamp;
-    const progress = Math.min((timestamp - startTime) / duration, 1);
-    const eased = 1 - Math.pow(1 - progress, 3);
-    el.textContent = Math.floor(from + (to - from) * eased);
+
+// === Nav scroll effect ===
+var nav = document.getElementById('nav');
+window.addEventListener('scroll', function() {
+  nav.classList.toggle('scrolled', window.scrollY > 20);
+});
+document.getElementById('navToggle').addEventListener('click', function() {
+  var menu = document.getElementById('mobileMenu');
+  var menuIcon = document.getElementById('menuIcon');
+  var closeIcon = document.getElementById('closeIcon');
+  menu.classList.toggle('open');
+  menuIcon.style.display = menu.classList.contains('open') ? 'none' : '';
+  closeIcon.style.display = menu.classList.contains('open') ? '' : 'none';
+});
+document.querySelectorAll('.mobile-link').forEach(function(el) {
+  el.addEventListener('click', function() {
+    document.getElementById('mobileMenu').classList.remove('open');
+    document.getElementById('menuIcon').style.display = '';
+    document.getElementById('closeIcon').style.display = 'none';
+  });
+});
+
+// === Hero copy button ===
+document.getElementById('heroCopyBtn').addEventListener('click', function() {
+  navigator.clipboard.writeText('npx shipkit-pipe').then(function() {
+    document.getElementById('heroCopyIcon').style.display = 'none';
+    document.getElementById('heroCheckIcon').style.display = '';
+    setTimeout(function() {
+      document.getElementById('heroCopyIcon').style.display = '';
+      document.getElementById('heroCheckIcon').style.display = 'none';
+    }, 2000);
+  });
+});
+
+// === Stat counters (native IntersectionObserver) ===
+function animateCounter(el, target, duration) {
+  var start = null;
+  function step(ts) {
+    if (!start) start = ts;
+    var progress = Math.min((ts - start) / duration, 1);
+    var eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.floor(eased * target);
     if (progress < 1) requestAnimationFrame(step);
-  };
+  }
   requestAnimationFrame(step);
 }
-fetch('https://registry.npmjs.org/shipkit-pipe/latest').then(r => r.json()).then(d => { document.querySelectorAll('[data-version]').forEach(el => { el.textContent = 'v' + d.version; }); }).catch(() => {});
+var statObserver = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) {
+      var el = entry.target;
+      if (el.dataset.counted) return;
+      el.dataset.counted = '1';
+      var vals = { stat1: 7, stat2: 4, stat3: 10, stat4: 3 };
+      animateCounter(el, vals[el.id] || 0, 2000);
+      statObserver.unobserve(el);
+    }
+  });
+});
+['stat1','stat2','stat3','stat4'].forEach(function(id) {
+  var el = document.getElementById(id);
+  if (el) statObserver.observe(el);
+});
+
+// === Terminal demo ===
+var termInput = document.getElementById('termInput');
+var termBody = document.getElementById('termBody');
+var termHistory = [];
+var termHistoryIdx = -1;
+
+function termAddLine(text, cls) {
+  var div = document.createElement('div');
+  div.className = 'terminal-line' + (cls ? ' ' + cls : '');
+  div.textContent = text;
+  termBody.insertBefore(div, termBody.lastElementChild);
+}
+
+function termExecute() {
+  var cmd = termInput.value.trim();
+  if (!cmd) return;
+  termInput.value = '';
+  termHistory.unshift(cmd);
+  termHistoryIdx = -1;
+  var promptDiv = document.createElement('div');
+  promptDiv.className = 'terminal-line';
+  promptDiv.innerHTML = '<span class="terminal-prompt">$</span> ' + cmd;
+  termBody.insertBefore(promptDiv, termBody.lastElementChild);
+  var lower = cmd.toLowerCase();
+  var lines = [];
+  if (lower === 'help') {
+    lines = ['Type a command. Examples:', '  npx shipkit-pipe          Auto-detect & generate', '  npx shipkit-pipe check    Verify everything works', '  npx shipkit-pipe --dry-run Preview without writing', '  help                      Show this message', '  clear                     Clear terminal'];
+    lines.forEach(function(l) { termAddLine(l, 'terminal-dim'); });
+  } else if (lower === 'clear' || lower === 'cls') {
+    termBody.innerHTML = '';
+    termBody.appendChild(document.querySelector('.terminal-input-line').parentNode);
+  } else if (lower === 'npx shipkit-pipe' || lower === 'shipkit-pipe') {
+    var output = ['', '  ⚓ ShipKit — my-project', '', '  ✓ Next.js | pnpm | Node 20', '  ✓ Scripts: lint, test, build', '  ✓ Deploy: Vercel', '', '  ✓ Generated 6 files', '', '  Files:', '    shipkit.json              ← Project config', '    AGENTS.md                 ← AI agent instructions', '    .github/workflows/ci.yml  ← CI: lint → test → build', '    .github/workflows/health.yml ← Health check', '    .github/dependabot.yml    ← Auto-update deps', '    .github/workflows/codeql.yml ← Security scanning'];
+    output.forEach(function(l) { termAddLine(l, l.startsWith('  ✓') ? 'terminal-success' : l.includes('→') ? 'terminal-info' : 'terminal-output'); });
+  } else if (lower.includes('dry-run') || lower.includes('--dry-run')) {
+    var dry = ['', '  ⚓ ShipKit — dry run', '', '  Detected:', '    Project:   my-project', '    Framework: Next.js', '    Platform:  github', '    PM:        pnpm | Node 20', '', '  Would generate:', '    .github/workflows/ci.yml     ← CI', '    .github/dependabot.yml       ← Deps', '    .github/workflows/health.yml ← Health', '    .github/workflows/codeql.yml ← Security', '    shipkit.json, AGENTS.md'];
+    dry.forEach(function(l) { termAddLine(l, 'terminal-output'); });
+  } else if (lower.includes('check')) {
+    var chk = ['', '  ⚓ ShipKit Check', '', '  ✓ Project: my-awesome-app', '  ✓ shipkit.json exists', '  ✓ CI workflow valid', '  ✓ Health check configured', '  ✓ Site is up — 200', '  ✓ No critical vulnerabilities', '  ✓ AGENTS.md exists — AI agent ready'];
+    chk.forEach(function(l) { termAddLine(l, l.startsWith('  ✓') ? 'terminal-success' : l.startsWith('  ⚓') ? 'terminal-info' : 'terminal-output'); });
+  } else if (lower.includes('--force')) {
+    ['', '  ⚓ ShipKit — my-project', '', '  ✓ Next.js | pnpm | Node 20', '  ⚠ --force: Overwriting existing files', '', '  ✓ Generated 6 files (0 skipped)'].forEach(function(l) { termAddLine(l, l.startsWith('  ⚠') ? 'terminal-success' : l.startsWith('  ⚓') ? 'terminal-info' : 'terminal-output'); });
+  } else {
+    termAddLine('  Unknown command. Try "help".', 'terminal-dim');
+  }
+  termBody.scrollTop = termBody.scrollHeight;
+}
+termInput.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') { termExecute(); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); if (termHistory.length) { termHistoryIdx = Math.min(termHistoryIdx + 1, termHistory.length - 1); termInput.value = termHistory[termHistoryIdx] || ''; } }
+  else if (e.key === 'ArrowDown') { e.preventDefault(); if (termHistoryIdx > 0) { termHistoryIdx--; termInput.value = termHistory[termHistoryIdx]; } else { termHistoryIdx = -1; termInput.value = ''; } }
+});
+document.getElementById('termSuggestions').addEventListener('click', function(e) {
+  var btn = e.target.closest('button');
+  if (btn) { termInput.value = btn.dataset.cmd; termExecute(); }
+});
+document.getElementById('resetTermBtn').addEventListener('click', function() {
+  termBody.innerHTML = '';
+  var inputLine = document.createElement('div');
+  inputLine.className = 'terminal-input-line';
+  inputLine.innerHTML = '<span class="terminal-prompt">$</span>';
+  var inp = document.createElement('input');
+  inp.type = 'text';
+  inp.id = 'termInput';
+  inp.className = 'terminal-input';
+  inp.placeholder = 'type a command...';
+  inp.autocomplete = 'off';
+  inp.spellcheck = false;
+  var cursor = document.createElement('span');
+  cursor.className = 'cursor';
+  inputLine.appendChild(inp);
+  inputLine.appendChild(cursor);
+  termBody.appendChild(inputLine);
+  var div = document.createElement('div');
+  div.className = 'terminal-line terminal-dim';
+  div.textContent = 'Terminal reset. Type a command to begin.';
+  termBody.insertBefore(div, inputLine);
+  document.getElementById('termInput').focus();
+  document.getElementById('termInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { termExecute(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); if (termHistory.length) { termHistoryIdx = Math.min(termHistoryIdx + 1, termHistory.length - 1); var inp2 = document.getElementById('termInput'); if (inp2) inp2.value = termHistory[termHistoryIdx] || ''; } }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); if (termHistoryIdx > 0) { termHistoryIdx--; var inp2 = document.getElementById('termInput'); if (inp2) inp2.value = termHistory[termHistoryIdx]; } else { termHistoryIdx = -1; var inp2 = document.getElementById('termInput'); if (inp2) inp2.value = ''; } }
+  });
+});
+document.getElementById('termContainer').addEventListener('click', function() {
+  var inp = document.getElementById('termInput');
+  if (inp) inp.focus();
+});
+
+// === Stack picker ===
+document.getElementById('stackBtns').addEventListener('click', function(e) {
+  var btn = e.target.closest('button');
+  if (!btn) return;
+  document.querySelectorAll('#stackBtns button').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  var stack = btn.dataset.stack;
+  var outputs = {
+    next: ['  ⚓ ShipKit — my-next-app', '', '  ✓ Next.js | pnpm | Node 20', '  ✓ Scripts: lint, test, build', '  ✓ Deploy: Vercel', '', '  ✓ Generated CI: lint → test → build'],
+    react: ['  ⚓ ShipKit — my-react-app', '', '  ✓ React | npm | Node 20', '  ✓ Scripts: test, build', '', '  ✓ Generated CI: test → build'],
+    vue: ['  ⚓ ShipKit — my-vue-app', '', '  ✓ Vue | yarn | Node 18', '  ✓ Scripts: lint, build', '', '  ✓ Generated CI: lint → build'],
+    python: ['  ⚓ ShipKit — my-python-api', '', '  ✓ Python | pip | (pyproject.toml)', '', '  ✓ Generated: GitHub Actions CI (Python)'],
+    go: ['  ⚓ ShipKit — my-go-service', '', '  ✓ Go | (go.mod detected)', '', '  ✓ Generated: GitHub Actions CI (Go)'],
+    monorepo: ['  ⚓ ShipKit — my-monorepo', '', '  ✓ Monorepo detected', '    Sub-projects: frontend/, backend/', '  ✓ Frontend: Next.js | pnpm', '  ✓ Backend: Express | pnpm'],
+    empty: ['  ⚓ ShipKit — my-new-project', '', '  ✓ No project detected — generating baseline', '', '  ✓ Generated: baseline CI + AGENTS.md']
+  };
+  var out = outputs[stack] || outputs.next;
+  termBody.querySelectorAll('.terminal-line').forEach(function(el) { el.remove(); });
+  var inputLine = termBody.querySelector('.terminal-input-line');
+  out.forEach(function(l) { termAddLine(l, l.startsWith('  ✓') ? 'terminal-success' : l.startsWith('  ⚓') ? 'terminal-info' : 'terminal-output'); });
+  if (inputLine) termBody.appendChild(inputLine);
+  termBody.scrollTop = termBody.scrollHeight;
+});
+
+// === Install tabs ===
+document.getElementById('tabBar').addEventListener('click', function(e) {
+  var btn = e.target.closest('button');
+  if (!btn) return;
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+});
+
+// === Tab copy buttons ===
+document.querySelectorAll('.tab-copy-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var cmd = this.dataset.cmd;
+    var copyIcon = this.querySelector('.copy-icon');
+    var checkIcon = this.querySelector('.check-icon');
+    navigator.clipboard.writeText(cmd).then(function() {
+      copyIcon.style.display = 'none';
+      checkIcon.style.display = '';
+      setTimeout(function() {
+        copyIcon.style.display = '';
+        checkIcon.style.display = 'none';
+      }, 2000);
+    });
+  });
+});
+
+// === Accordion ===
+function setupAccordion(containerId) {
+  var container = document.getElementById(containerId);
+  if (!container) return;
+  container.addEventListener('click', function(e) {
+    var btn = e.target.closest('.accordion-btn');
+    if (!btn) return;
+    var item = btn.closest('.accordion-item');
+    item.classList.toggle('open');
+  });
+}
+setupAccordion('faqAccordion');
+setupAccordion('faqAccordion2');
+
+// === Version fetch (graceful degradation: if CDN fails, version badge stays as-is) ===
+fetch('https://registry.npmjs.org/shipkit-pipe/latest').then(function(r) { return r.json(); }).then(function(d) {
+  document.querySelectorAll('[data-version]').forEach(function(el) { el.textContent = 'v' + d.version; });
+}).catch(function() {});
+})();
 </script>
 </body>
 </html>
