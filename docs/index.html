@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>ShipKit — Your Automated Dev Team</title>
-<meta name="description" content="One command sets up CI/CD, health monitoring, security scanning, and AI agent config. Auto-detects any project. Zero config.">
+<meta name="description" content="One command sets up CI/CD, monitoring, security, and AI agent config. Only generates what your project needs. Zero dependencies.">
 <meta property="og:title" content="ShipKit — Your Automated Dev Team">
-<meta property="og:description" content="One command. Smart CI/CD. Health monitoring. Security. Works in any directory, any stack, any AI agent.">
+<meta property="og:description" content="One command sets up CI/CD, monitoring, security, and AI agent config. Only generates what your project actually needs. Zero dependencies.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://sagar-grv.github.io/shipkit/">
 <meta property="og:image" content="https://sagar-grv.github.io/shipkit/og-image.svg">
@@ -275,11 +275,11 @@ Star
 <div class="hero-bg"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
 <div class="container hero-inner">
 <div class="pill" style="margin:0 auto 14px">
-<span class="pill-dot"></span>
-Auto-detects your stack
-</div>
-<h1>Your entire dev team<br><span class="gradient-text">in one CLI command</span></h1>
-<p>CI/CD, health monitoring, security scanning, and AI agent config — all set up by detecting your project. Works with any stack, any language, any directory.</p>
+  <span class="pill-dot"></span>
+ Auto-detect &amp; generate
+ </div>
+ <h1><span class="gradient-text">Your Automated Dev Team</span></h1>
+ <p>One command sets up CI/CD, monitoring, security, and AI agent config. Only generates what your project actually needs. Zero dependencies.</p>
 <div class="hero-row">
 <div class="hero-cmd" id="heroCmd">
 <span><span class="dollar">$</span> <span class="cmd">npx shipkit-pipe</span></span>
@@ -292,46 +292,46 @@ Auto-detects your stack
 See it in action
 </a>
 </div>
-<div class="hero-foot">No config files needed. Works in any directory.</div>
+<div class="hero-foot">Generates CI for GitHub Actions, GitLab CI, and Bitbucket Pipelines</div>
 <div class="dashboard reveal-animate">
 <div class="db-card">
 <div class="db-card-head">
-<span class="db-card-label">CI/CD Status</span>
-<span class="db-card-status active">● Active</span>
+<span class="db-card-label">CI/CD</span>
+<span class="db-card-status active">● Generated</span>
 </div>
-<div class="db-card-value blue" id="statCicd">0</div>
-<div class="db-card-sub">pipelines ready to run</div>
+<div class="db-card-value green">ci.yml</div>
+<div class="db-card-sub">Only steps you have (lint/test/build)</div>
 </div>
 <div class="db-card">
 <div class="db-card-head">
 <span class="db-card-label">Health</span>
-<span class="db-card-status active">● 99.9%</span>
+<span class="db-card-status active">● Generated</span>
 </div>
-<div class="db-card-value green" id="statHealth">0</div>
-<div class="db-card-sub">uptime last 30 days</div>
+<div class="db-card-value blue">health.yml</div>
+<div class="db-card-sub">Pings your site every 6 hours</div>
 </div>
 <div class="db-card">
 <div class="db-card-head">
-<span class="db-card-label">Security</span>
-<span class="db-card-status secure">● Secure</span>
+<span class="db-card-label">Agent</span>
+<span class="db-card-status secure">● Generated</span>
 </div>
-<div class="db-card-value purple" id="statSecure">0</div>
-<div class="db-card-sub">vulnerabilities found</div>
+<div class="db-card-value purple">AGENTS.md</div>
+<div class="db-card-sub">AI knows your project</div>
 </div>
 <div class="db-config">
 <div class="db-config-head">
 <span>
 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3m0 12l-4-4m4 4l4-4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17"/></svg>
-Detected config
+Detected
 </span>
 <span style="color:var(--green);font-size:10px">● auto</span>
 </div>
-<div class="db-config-body"><span class="key">"name"</span>: <span class="string">"shipkit"</span>
-<span class="key">"stack"</span>: <span class="string">"node"</span>
-<span class="key">"framework"</span>: <span class="string">"nextjs"</span>
-<span class="key">"ci"</span>: <span class="bool">true</span>
-<span class="key">"monitoring"</span>: <span class="bool">true</span>
-<span class="key">"security"</span>: <span class="bool">true</span></div>
+<div class="db-config-body"><span class="key">Project</span>:  shipkit-pipe
+<span class="key">Platform</span>: github (sagar-grv/shipkit)
+<span class="key">PM</span>:       npm
+<span class="key">Node</span>:     18
+<span class="key">Scripts</span>:  test
+<span class="key">Deploy</span>:   None detected</div>
 </div>
 </div>
 </div>
@@ -342,39 +342,39 @@ Detected config
 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
 Features
 </div>
-<h2 class="section-title reveal-animate">Everything you need to ship faster</h2>
-<p class="section-desc reveal-animate">One command provisions your entire infrastructure — CI/CD, monitoring, security, and agent config. Works with any stack.</p>
+<h2 class="section-title reveal-animate">What ShipKit does</h2>
+<p class="section-desc reveal-animate">Reads your project, detects your stack, and generates only what's missing. Zero dependencies. Works offline.</p>
 </div>
 <div class="container features-grid stagger">
 <div class="feature-card">
 <div class="feature-icon">🔍</div>
-<h3>Auto Stack Detection</h3>
-<p>Reads your project structure, package files, and dependencies to identify your exact stack. Zero configuration needed.</p>
+<h3>Auto-detect &amp; generate</h3>
+<p>Reads your project files — package.json, lock files, git remote — and identifies your exact stack. Zero config needed.</p>
 </div>
 <div class="feature-card">
 <div class="feature-icon">⚡</div>
-<h3>Instant CI/CD</h3>
-<p>Generates optimized GitHub Actions workflows from your stack. Lint, type-check, test, build, and deploy — automatically.</p>
+<h3>Smart CI/CD</h3>
+<p>Generates CI that ONLY includes steps you have (lint/test/build). Supports GitHub Actions, GitLab CI, and Bitbucket Pipelines.</p>
 </div>
 <div class="feature-card">
 <div class="feature-icon">📊</div>
-<h3>Health Monitoring</h3>
-<p>Configures uptime checks, error tracking, performance budgets, and alerts. Know before your users do.</p>
-</div>
-<div class="feature-card">
-<div class="feature-icon">🛡️</div>
-<h3>Security Scanning</h3>
-<p>Enables dependency auditing, secret detection, SAST, and container scanning. Catch vulnerabilities in CI, not production.</p>
+<h3>Health monitoring</h3>
+<p>Pings your site every 6 hours. Auto-creates a GitHub Issue if your site goes down, and closes it when it recovers.</p>
 </div>
 <div class="feature-card">
 <div class="feature-icon">🤖</div>
-<h3>AI Agent Config</h3>
-<p>Generates AGENTS.md tailored to your project. AI assistants understand your stack, structure, and conventions instantly.</p>
+<h3>AI agent config</h3>
+<p>Creates AGENTS.md so your AI agent knows your project — stack, rules, CI/CD, and session continuity instructions.</p>
 </div>
 <div class="feature-card">
-<div class="feature-icon">📦</div>
-<h3>Dependency Management</h3>
-<p>Auto-configures Dependabot for npm, pip, cargo, go modules, and more. Weekly updates with auto-merge for patches.</p>
+<div class="feature-icon">🛡️</div>
+<h3>Security + deps</h3>
+<p>Adds Dependabot for weekly updates, CodeQL security scanning, and npm audit. Catches vulnerabilities in CI.</p>
+</div>
+<div class="feature-card">
+<div class="feature-icon">🎯</div>
+<h3>Zero dependencies</h3>
+<p>One Node.js script. No npm packages to install. Runs offline. Just <code class="code">npx shipkit-pipe</code> and done.</p>
 </div>
 </div>
 </section>
@@ -385,7 +385,7 @@ Features
 Demo
 </div>
 <h2 class="section-title reveal-animate">See it in action</h2>
-<p class="section-desc reveal-animate">Run a single command and watch ShipKit analyze your project, generate configurations, and set up your entire pipeline.</p>
+<p class="section-desc reveal-animate">Run a single command. ShipKit reads your project, detects your stack, and generates everything you need — in seconds.</p>
 </div>
 <div class="container demo-grid">
 <div class="terminal reveal-animate">
@@ -401,25 +401,31 @@ Demo
 </div>
 <div class="demo-side">
 <div class="demo-code-snip reveal-animate">
-<span class="comment"># generated .github/workflows/ci.yml</span>
+<span class="comment"># Generated by ShipKit</span>
 <span class="key">name</span>: <span class="string">CI</span>
-<span class="key">on</span>: [push, pull_request]
+<span class="key">on</span>:
+  <span class="key">pull_request</span>:
+    <span class="key">branches</span>: [main]
+  <span class="key">push</span>:
+    <span class="key">branches</span>: [main]
 <span class="key">jobs</span>:
-  <span class="key">build</span>:
+  <span class="key">ci</span>:
     <span class="key">runs-on</span>: <span class="string">ubuntu-latest</span>
     <span class="key">steps</span>:
-      - <span class="key">uses</span>: <span class="string">actions/checkout@v4</span>
+      - <span class="key">uses</span>: <span class="string">actions/checkout@v5</span>
       - <span class="key">run</span>: <span class="string">npm ci</span>
       - <span class="key">run</span>: <span class="string">npm test</span>
 </div>
 <div class="demo-code-snip reveal-animate">
 <span class="comment"># generated AGENTS.md</span>
 <span class="key">## Stack</span>
-<span class="text">Next.js 15 · Supabase · Gemini API</span>
-<span class="key">## Conventions</span>
-<span class="text">App Router · Server Components</span>
-<span class="key">## Commands</span>
-<span class="text">npm run dev · npm test · npm run build</span>
+<span class="text">Framework — {{STACK_FRONTEND}}</span>
+<span class="text">Deploy — {{DEPLOY_PLATFORM}}</span>
+<span class="text">Node — {{NODE_VERSION}}</span>
+<span class="key">## Rules</span>
+<span class="text">1. Read LAST_SESSION.md at start</span>
+<span class="text">2. Update LAST_SESSION.md at end</span>
+<span class="text">3. Never commit secrets</span>
 </div>
 </div>
 </div>
@@ -430,29 +436,29 @@ Demo
 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
 How it works
 </div>
-<h2 class="section-title reveal-animate">Zero to deployed in 4 steps</h2>
-<p class="section-desc reveal-animate">No signup forms. No config wizards. Just run the command and watch it work.</p>
+<h2 class="section-title reveal-animate">Zero config in 4 steps</h2>
+<p class="section-desc reveal-animate">It reads your project, detects your stack, and generates only what's missing. That's it.</p>
 </div>
 <div class="container steps reveal-animate">
 <div class="step">
 <div class="step-num">1</div>
-<h3>Run one command</h3>
-<p><code class="code">npx shipkit-pipe</code> in your project directory. That's it.</p>
+<h3><code class="code">npx shipkit-pipe</code></h3>
+<p>Run it in your project directory. No install, no signup, no config files needed upfront.</p>
 </div>
 <div class="step">
 <div class="step-num">2</div>
-<h3>Auto-detection</h3>
-<p>ShipKit analyzes your project structure, dependencies, and config files to identify your stack.</p>
+<h3>Reads your project</h3>
+<p>Scans package.json, lock files, git remote, and npm registry to detect your stack, CI platform, and available scripts.</p>
 </div>
 <div class="step">
 <div class="step-num">3</div>
-<h3>Config generation</h3>
-<p>CI/CD workflows, monitoring, security scanning, and AI agent docs are generated for your exact stack.</p>
+<h3>Generates only what's missing</h3>
+<p>CI workflows, health checks, Dependabot, security scanning, AGENTS.md, LAST_SESSION.md — but only if they don't exist.</p>
 </div>
 <div class="step">
 <div class="step-num">4</div>
-<h3>Ship faster</h3>
-<p>Everything is in place — push code, get feedback, deploy with confidence. Your dev team in a CLI.</p>
+<h3>Ship with confidence</h3>
+<p>Push code. CI runs automatically. Health monitoring starts. Your AI agent knows your project. Everything in place.</p>
 </div>
 </div>
 </section>
@@ -462,18 +468,18 @@ How it works
 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></svg>
 Detection
 </div>
-<h2 class="section-title reveal-animate">Detects your stack automatically</h2>
-<p class="section-desc reveal-animate">Reads package.json, Cargo.toml, go.mod, and more. No manual configuration needed.</p>
+<h2 class="section-title reveal-animate">Detects your setup automatically</h2>
+<p class="section-desc reveal-animate">Reads your package files, git remote, and scripts — then generates CI that matches exactly what you have.</p>
 </div>
 <div class="container" style="overflow-x:auto">
 <table class="detect-table reveal-animate">
-<thead><tr><th>Stack</th><th>CI/CD</th><th>Lint</th><th>Test</th><th>Docker</th><th>Deploy</th></tr></thead>
+<thead><tr><th>CI Platform</th><th>Package Manager</th><th>Has Lint</th><th>Has Tests</th><th>Has Build</th><th>Deploy URL</th></tr></thead>
 <tbody>
-<tr><td><span class="tag ts">TypeScript</span> / <span class="tag js">React</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="detect-yes">auto</span></td></tr>
-<tr><td><span class="tag py">Python</span> / Django</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="detect-yes">auto</span></td></tr>
-<tr><td><span class="tag go">Go</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="detect-yes">auto</span></td></tr>
-<tr><td><span class="tag rs">Rust</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="detect-yes">auto</span></td></tr>
-<tr><td><span class="tag ts">Node.js</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="cross">—</span></td><td><span class="detect-yes">auto</span></td></tr>
+<tr><td><span class="tag ts">GitHub Actions</span></td><td><span class="tag js">npm</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="detect-yes">auto</span></td></tr>
+<tr><td><span class="tag ts">GitHub Actions</span></td><td><span class="tag py">pnpm</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="cross">—</span></td><td><span class="detect-yes">auto</span></td></tr>
+<tr><td><span class="tag ts">GitHub Actions</span></td><td><span class="tag go">yarn</span></td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="cross">—</span></td></tr>
+<tr><td><span class="tag py">GitLab CI</span></td><td><span class="tag rs">npm</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="detect-yes">auto</span></td></tr>
+<tr><td><span class="tag py">Bitbucket</span></td><td><span class="tag js">npm</span></td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="cross">—</span></td></tr>
 </tbody>
 </table>
 </div>
@@ -522,7 +528,7 @@ FAQ
 </div>
 <div class="faq-item reveal-animate">
 <button class="faq-q" onclick="toggleFaq(this)">What stacks are supported?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
-<div class="faq-a"><p>ShipKit supports Node.js, TypeScript, React, Next.js, Python, Django, Go, Rust, and more. If your stack isn't listed, you can extend detection via a simple plugin API.</p></div>
+<div class="faq-a"><p>Any Node.js >=18 project works. ShipKit auto-detects your CI platform (GitHub Actions, GitLab CI, Bitbucket), package manager (npm, pnpm, yarn, bun), and available scripts — no stack configuration needed.</p></div>
 </div>
 <div class="faq-item reveal-animate">
 <button class="faq-q" onclick="toggleFaq(this)">Can I customize the generated configs?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
@@ -542,7 +548,7 @@ FAQ
 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
 Copy command & start
 </button>
-<div class="cta-foot">npx shipkit-pipe • No signup • Works offline</div>
+<div class="cta-foot">npx shipkit-pipe • Zero dependencies • Works offline</div>
 </div>
 </section>
 <footer>
@@ -575,14 +581,8 @@ function closeMobile(){document.getElementById('mobileMenu').classList.remove('o
 var revealObserver=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){if(e.target.classList.contains('stagger')){e.target.classList.add('revealed')}else{e.target.classList.add('revealed')}
 revealObserver.unobserve(e.target)}})},{threshold:.08})
 document.querySelectorAll('.reveal-animate,.reveal-scale,.stagger').forEach(function(el){revealObserver.observe(el)})
-// --- Stat counters ---
-function animateCounter(el,target,duration){var start=0;var step=Math.max(1,Math.floor(target/60));var timer=setInterval(function(){start+=step;if(start>=target){start=target;clearInterval(timer)}
-el.textContent=start.toLocaleString()},duration/60)}
-var counterObserver=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){var map={statCicd:12,statHealth:99.9,statSecure:0};var id=e.target.id;if(map[id]){if(id==='statHealth'){animateCounter(e.target,100,1600)}else{animateCounter(e.target,map[id],1200)}}
-counterObserver.unobserve(e.target)}})},{threshold:.5})
-document.querySelectorAll('#statCicd,#statHealth,#statSecure').forEach(function(el){counterObserver.observe(el)})
 // --- Terminal typing ---
-var terminalLines=['','<span class="prompt">$</span> npx shipkit-pipe','<span class="out">Detecting project structure...</span>','<span class="out">→ Found: package.json, next.config.js, tsconfig.json</span>','<span class="out">→ Detected stack: <span class="success">Next.js 15 + TypeScript</span></span>','<span class="out">Generating configurations...</span>','<span class="out">→ <span class="success">✓</span> .github/workflows/ci.yml</span>','<span class="out">→ <span class="success">✓</span> .github/workflows/deploy.yml</span>','<span class="out">→ <span class="success">✓</span> AGENTS.md</span>','<span class="out">→ <span class="success">✓</span> .env.example</span>','<span class="out">→ <span class="success">✓</span> .github/dependabot.yml</span>','<span class="out">','<span class="success">ShipKit initialized successfully!</span>','<span class="out">Run <span class="highlight">git push</span> to trigger your first pipeline.</span>','<span class="prompt">$</span> <span class="highlight">▊</span>']
+var terminalLines=['','<span class="prompt">$</span> npx shipkit-pipe','<span class="out">⚓ ShipKit</span>','<span class="out">','<span class="out">  <span class="success">Detected:</span></span>','<span class="out">    Project:   my-project</span>','<span class="out">    Platform:  github (user/my-project)</span>','<span class="out">    PM:        npm</span>','<span class="out">    Node:      22</span>','<span class="out">    Scripts:   lint, test, build</span>','<span class="out">','<span class="out">  <span class="success">Generating:</span></span>','<span class="out">    .github/workflows/ci.yml</span>','<span class="out">    .github/dependabot.yml</span>','<span class="out">    .github/workflows/codeql.yml</span>','<span class="out">    .github/workflows/health.yml</span>','<span class="out">    shipkit.json</span>','<span class="out">    AGENTS.md</span>','<span class="out">    LAST_SESSION.md</span>','<span class="out">','<span class="success">  ✓ Done — 7 files generated</span>','<span class="prompt">$</span> <span class="highlight">▊</span>']
 var termIdx=0
 var termBody=document.getElementById('terminalBody')
 var termObserver=new IntersectionObserver(function(entries){if(entries[0].isIntersecting){termObserver.unobserve(termBody);startTyping()}},{threshold:.3})
