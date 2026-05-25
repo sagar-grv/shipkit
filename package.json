@@ -29,7 +29,7 @@
     "shipkit-pipe": "bin/shipkit-pipe.js"
   },
   "scripts": {
-    "test": "node bin/shipkit-pipe.js --help && node bin/shipkit-pipe.js --version"
+    "test": "node bin/shipkit-pipe.js --help && node bin/shipkit-pipe.js --version && node bin/shipkit-pipe.js --dry-run && node bin/shipkit-pipe.js check"
   },
   "files": [
     "bin/",

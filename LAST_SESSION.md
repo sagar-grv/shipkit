@@ -1,126 +1,60 @@
-# LAST_SESSION — ShipKit v2.0.1
+# LAST_SESSION — ShipKit v3.0.4
 
 **Date:** 2026-05-25
 **Branch:** `main` (clean — all committed & pushed)
-**Latest commit:** pending simplification rewrite
+**Latest commit:** v3.0.4 — CI/Setup fix, all 16 issues resolved
 **Remote:** https://github.com/sagar-grv/shipkit.git
 
 ---
 
 ## What Was Completed
 
-### 🎯 ShipKit Simplification — UX Redesign
+### 🎯 Complete Codebase Recovery — All 16 Issues Fixed
 
-**The old way was too complex:**
-```
-npx shipkit-pipe setup                # need to know subcommand
-npx shipkit-pipe setup --defaults     # need to know flags
-6 sections of prompts                 # too many questions
-Generates files even in empty dir     # confusing
-```
-
-**The new way:**
-```
-npx shipkit-pipe                     # Just works. One command. No prompts.
-npx shipkit-pipe -i                  # Only if you want to customize
-```
-
-Three key changes:
-
-#### 1. No `setup` subcommand
-`npx shipkit-pipe` now runs immediately — no subcommand, no flags needed. The `setup` subcommand is removed entirely. The `--defaults` / `-y` flags are also removed (it's the default behavior now).
-
-#### 2. No-project guard
-If there's no `package.json` in the current directory:
-```
-✗ No project found.
-Run this inside your project folder:
-
-  cd my-project
-  npx shipkit-pipe
-```
-No more generating placeholder files in empty directories.
-
-#### 3. `-i` / `--interactive` for optional customization
-The old interactive prompts are still available via `npx shipkit-pipe -i`. But 99% of users just need the auto-detect mode. Pared down from 6 sections to just the essentials: project info, AI agent, GitHub, deploy, database, monitoring.
-
-#### 4. Quieter output
-Instead of verbose section headers and file-by-file listing:
-```
-⚓ ShipKit — my-project
-
-✓ Generated 15 files
-Run with -i for interactive mode
-```
-
----
+1. **validate.yml** — removed 8 deleted template files from check, added 3 new ones, upgraded checkout@v5
+2. **setup.sh** — complete rewrite for v3: platform detection, dynamic scripts, single AGENTS.md, --dry-run
+3. **setup.ps1** — complete rewrite for v3: same improvements as setup.sh
+4. **README.md** — full rewrite, all v2 references removed
+5. **ROADMAP.md, BUGS.md, CHANGELOG.md, LAST_SESSION.md** — synced to current state
+6. **package.json** — test script improved
+7. **.gitattributes** — duplicate entry removed
+8. **docs/index.html** — terminal animation dynamic file count
 
 ### Files Changed
 
 ```
-bin/shipkit-pipe.js  (REWRITTEN — 315 lines, was 645)
-  - No setup subcommand, no prompts by default
-  - Check package.json first — error if missing
-  - -i/--interactive for the old prompt flow
-  - Quiet output by default
-
-setup.sh             (REWRITTEN — 170 lines, was 615)
-  - Same pattern: non-interactive by default
-  - --detect-only, --config, --force, --defaults removed
-  - Simpler: just bash setup.sh or bash setup.sh -i
-
-package.json         (UPDATED)
-  - validate:templates script removed
-  - check script added (syntax check)
-
-ROADMAP.md           (UPDATED)
-  - Simplification items marked done
-
-LAST_SESSION.md      (UPDATED)
-  - This file
+.github/workflows/validate.yml    (UPDATED — template check list, checkout@v5)
+setup.sh                           (REWRITTEN — v3 detection, platform, dry-run)
+setup.ps1                          (REWRITTEN — v3 detection, platform, dry-run)
+README.md                          (REWRITTEN — v3 docs)
+ROADMAP.md                         (UPDATED — v3 roadmap)
+BUGS.md                            (UPDATED — v3.0.4 resolved bugs)
+CHANGELOG.md                       (UPDATED — v3 entries added)
+LAST_SESSION.md                    (REWRITTEN — current state)
+package.json                       (UPDATED — test script)
+.gitattributes                     (FIXED — duplicate entry)
+docs/index.html                    (UPDATED — dynamic file count)
 ```
 
 ---
 
 ## Still To Do
 
-### 1. Republish to npm (v2.0.1)
-```bash
-npm version patch && npm publish
-```
-Verify: `npm view shipkit-pipe` shows latest version
-
-### 2. User tests on Ubuntu
-```bash
-git clone https://github.com/sagar-grv/shipkit.git /tmp/shipkit
-cd /tmp/shipkit
-bash setup.sh              # Should detect package.json and generate
-```
+- [ ] curl install method (`curl -fsSL https://shipkit.dev/install.sh | bash`)
+- [ ] --force flag for overwriting existing files
+- [ ] shipkit.json validation in check command
+- [ ] Python CLI (`pip install shipkit-pipe`)
 
 ---
 
-## Key Decisions Made
+## Key Decisions
 
 | Decision | Rationale |
 |----------|-----------|
-| **No `setup` subcommand** | One command is all you need. `npx shipkit-pipe` should just work. |
-| **No-project guard** | Placeholder files in empty dirs are confusing. Tell the user where to run it. |
-| **`-i` for interactive** | 99% of users don't need customization. Make the simple path the default. |
-| **Quiet output** | Show results, not process. `"✓ Generated 15 files"` is all they need. |
-| **Husky removed from auto-setup** | Don't call `npx husky init` automatically. Just drop the template file. |
-
----
-
-## Relevant Commands
-
-| Command | Description |
-|---------|-------------|
-| `node bin/shipkit-pipe.js` | Test JS CLI (auto mode) |
-| `node bin/shipkit-pipe.js -i` | Test JS CLI (interactive) |
-| `node bin/shipkit-pipe.js --help` | Show help |
-| `bash setup.sh` | Test bash version (auto mode) |
-| `bash setup.sh -i` | Test bash version (interactive) |
-| `git log --oneline -5` | Recent history |
+| **Single AGENTS.md vs multi-file** | Solo devs don't need 4 separate agent roles. One clear file is enough. |
+| **Platform-specific CI** | Read git remote URL → pick GitHub/GitLab/Bitbucket format automatically. |
+| **Dynamic scripts from package.json** | CI only generates steps you actually have. Never fails because of missing scripts. |
+| **--dry-run before write** | Users should preview what they're getting, especially in unfamiliar projects. |
 
 ---
 
@@ -128,7 +62,7 @@ bash setup.sh              # Should detect package.json and generate
 
 | Metric | Value |
 |--------|-------|
-| Deploy Frequency | 2 pushes (before simplification) |
-| Lead Time | ~1 hour (simplification from request to commit) |
+| Deploy Frequency | 1 push (v3.0.4) |
+| Lead Time | ~2 hours (analysis → fix all 16 issues) |
 | Change Failure Rate | 0% |
 | Time to Restore | N/A |

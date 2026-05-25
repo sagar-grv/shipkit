@@ -1,28 +1,21 @@
-# ShipKit Roadmap
+# ShipKit Roadmap — v3
 
-## [v2.0.1] — ✅ Shipped (2026-05-25)
-- [x] npm publish: `shipkit-pipe@2.0.0` live on npm
-- [x] Fix setup.ps1: here-string parser, -or syntax, encoding bugs
-- [x] Fix setup.sh: `has_git` variable without `$` prefix bug
-- [x] Fix setup.sh: CRLF heredoc corruption (cross-platform clones)
-- [x] .gitattributes: LF line ending enforcement for all code files
-- [x] GitHub Pages: landing page, og:image, .nojekyll (default URL)
-- [x] npm packaging: package.json, bin/, .npmignore
-- [x] CI/CD: playwright.yml, FUNDING.yml, ISSUE_TEMPLATE
-- [x] **Remove Python dependency**: `template/render.js` (Node.js) replaces fragile Python heredoc
-- [x] **Simplify UX**: `npx shipkit-pipe` — no subcommand, no prompts by default
-- [x] **No-project guard**: clear error when run in empty directory
-- [x] **`-i` / `--interactive`**: optional prompt mode instead of default
-- [x] **Custom domain dropped**: Use GitHub Pages default URL (no free domain)
+## [v3.0.4] — Current
+- [x] Fix CI: validate.yml checks current template files (not removed ones)
+- [x] Upgrade actions/checkout from @v4 to @v5 (Node.js 20 deprecation)
+- [x] Rewrite setup.sh for v3: platform detection, dynamic scripts, single AGENTS.md, --dry-run
+- [x] Rewrite setup.ps1 for v3: same improvements
+- [x] Update README.md to v3 (remove all v2 references)
+- [x] Update ROADMAP.md, BUGS.md, CHANGELOG.md, LAST_SESSION.md
+- [x] Fix package.json test script, .gitattributes duplicate, landing page
 
-## [v2.1.0] — Next
-- [ ] **Republish v2.0.1 to npm**: `npm version patch && npm publish`
-- [ ] **Verify Ubuntu**: `git pull && bash setup.sh`
-- [ ] **Post-launch analytics**: download counter badge in README
-- [ ] **Homebrew tap** (optional): `brew install shipkit`
+## [v3.1.0] — Next
+- [ ] **Curl install method**: `curl -fsSL https://shipkit.dev/install.sh | bash` for users without Node.js
+- [ ] **--force flag**: overwrite existing files
+- [ ] **shipkit.json validation**: `npx shipkit-pipe check` validates shipkit.json
+- [ ] **Python CLI**: `pip install shipkit-pipe`
 
-## [v2.2.0] — Future
-- [ ] Python CLI (`shipkit-pipe` as pip package)
+## [v3.2.0] — Future
+- [ ] VS Code extension (one-click ShipKit)
 - [ ] Docker image for CI-less environments
-- [ ] VS Code extension (GUI for setup)
 - [ ] Community template marketplace

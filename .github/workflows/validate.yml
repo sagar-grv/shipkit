@@ -17,26 +17,22 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       
       - name: Check template files
         run: |
           echo "Checking template files exist..."
           errors=0
           for f in \
-            template/agents/planner.md \
-            template/agents/co-developer.md \
-            template/agents/security-reviewer.md \
-            template/agents/monitor.md \
             template/docs/AGENTS.md \
-            template/docs/ROADMAP.md \
-            template/docs/BUGS.md \
             template/docs/LAST_SESSION.md \
             template/github/dependabot.yml \
             template/github/workflows/ci.yml \
             template/github/workflows/codeql.yml \
-            template/github/workflows/playwright.yml \
-            template/husky/pre-commit; do
+            template/github/workflows/health.yml \
+            template/gitlab/gitlab-ci.yml \
+            template/bitbucket/bitbucket-pipelines.yml \
+            template/render.js; do
             if [ -f "$f" ]; then
               echo "  ✓ $f"
             else
@@ -55,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       
       - name: Verify README exists
         run: |
