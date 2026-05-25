@@ -428,37 +428,11 @@ async function main() {
 
   // Check command
   if (args[0] === 'check') {
-    if (!fs.existsSync(path.join(cwd, 'package.json'))) {
-      console.log(`\n  ${C.red}✗ No project found.${C.reset} Run this inside your project folder.\n`);
-      process.exit(1);
-    }
     await check(cwd);
     process.exit(0);
   }
 
-  // Must have a project (package.json at root OR in subdirs, or other project files)
-  const hasRootPkg = fs.existsSync(path.join(cwd, 'package.json'));
-  const hasSubPkg = !hasRootPkg && ['frontend', 'backend', 'web', 'app', 'apps', 'packages', 'services', 'api', 'server', 'client'].some(
-    dir => fs.existsSync(path.join(cwd, dir, 'package.json'))
-  );
-  const hasOtherProject = !hasRootPkg && (
-    fs.existsSync(path.join(cwd, 'pyproject.toml')) ||
-    fs.existsSync(path.join(cwd, 'go.mod')) ||
-    fs.existsSync(path.join(cwd, 'Cargo.toml')) ||
-    fs.existsSync(path.join(cwd, 'pom.xml')) ||
-    fs.existsSync(path.join(cwd, 'Makefile')) ||
-    fs.existsSync(path.join(cwd, 'docker-compose.yml')) ||
-    fs.existsSync(path.join(cwd, 'docker-compose.yaml'))
-  );
-
-  if (!hasRootPkg && !hasSubPkg && !hasOtherProject) {
-    console.log(`\n  ${C.red}✗ No project found.${C.reset}`);
-    console.log(`  Run this inside your project folder:\n`);
-    console.log(`    ${C.cyan}cd my-project${C.reset}`);
-    console.log(`    ${C.cyan}npx shipkit-pipe${C.reset}\n`);
-    process.exit(1);
-  }
-
+  // Works in ANY directory — if the user ran it here, they want to set it up
   const d = detect(cwd);
   const isInteractive = args.includes('-i') || args.includes('--interactive');
 
@@ -486,7 +460,7 @@ async function main() {
   // Show what scripts were found
   const found = [d.hasLint && 'lint', d.hasTypecheck && 'typecheck', d.hasTest && 'test', d.hasBuild && 'build'].filter(Boolean);
   if (found.length) step(`Scripts: ${found.join(', ')}`);
-  else warn('No lint/test/build scripts found — CI will only install deps');
+  else dim('No scripts detected yet — CI will verify deps install cleanly');
 
   // Git
   if (d.ghOwner) step(`Git: ${d.ghOwner}/${d.ghRepo}`);
