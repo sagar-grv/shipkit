@@ -4,273 +4,396 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ShipKit — Your Automated Dev Team</title>
-<meta name="description" content="One command sets up CI/CD, health monitoring, security scanning, and AI agent config. Only generates what your project needs. Zero dependencies.">
+<meta name="description" content="One command sets up CI/CD, health monitoring, security scanning, and AI agent config. Smart detection. Zero config. Works everywhere.">
 <meta property="og:title" content="ShipKit — Your Automated Dev Team">
 <meta property="og:description" content="One command. Smart CI/CD. Health monitoring. Security. Works in any directory, any stack, any AI agent.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://sagar-grv.github.io/shipkit/">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="ShipKit — Your Automated Dev Team">
-<meta name="twitter:description" content="One command. Smart CI/CD. Health monitoring. Security scanning.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚓</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --bg:#09090b;
-  --bg2:#18181b;
-  --bg3:#27272a;
-  --border:#3f3f46;
-  --text:#fafafa;
-  --text2:#a1a1aa;
-  --text3:#71717a;
-  --accent:#22d3ee;
-  --accent2:#06b6d4;
-  --green:#4ade80;
-  --yellow:#facc15;
-  --radius:12px;
-  --max:1100px;
+  --bg:#09090b;--bg2:#18181b;--bg3:#27272a;--border:#3f3f46;
+  --text:#fafafa;--text2:#a1a1aa;--text3:#71717a;
+  --accent:#22d3ee;--accent2:#06b6d4;--green:#4ade80;--yellow:#facc15;--red:#f87171;
+  --radius:12px;--max:1100px;
 }
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 code,pre{font-family:'JetBrains Mono',monospace}
 a{color:var(--accent);text-decoration:none}
 a:hover{text-decoration:underline}
-
-/* Layout */
 .container{max-width:var(--max);margin:0 auto;padding:0 24px}
-section{padding:80px 0}
+section{padding:100px 0}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes typing{from{width:0}to{width:100%}}
+@keyframes pulse{0%,100%{opacity:0.4}50%{opacity:1}}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity 0.6s ease,transform 0.6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* Nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(9,9,11,0.8);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:12px 0}
+nav .container{display:flex;align-items:center;justify-content:space-between}
+nav .logo{font-weight:700;font-size:1.1rem;display:flex;align-items:center;gap:8px}
+nav .links{display:flex;align-items:center;gap:20px;font-size:0.9rem}
+nav .links a{color:var(--text2);transition:color 0.2s}
+nav .links a:hover{color:var(--text);text-decoration:none}
+.star-btn{display:inline-flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:0.85rem;color:var(--text);transition:border-color 0.2s,background 0.2s;text-decoration:none!important}
+.star-btn:hover{border-color:var(--yellow);background:rgba(250,204,21,0.05)}
+.star-btn svg{width:16px;height:16px;fill:var(--yellow)}
 
 /* Hero */
-.hero{padding:120px 0 80px;text-align:center}
-.hero h1{font-size:clamp(2.5rem,6vw,4rem);font-weight:700;letter-spacing:-0.03em;margin-bottom:16px}
+.hero{padding:160px 0 100px;text-align:center}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:100px;padding:6px 16px;font-size:0.8rem;color:var(--text2);margin-bottom:24px}
+.hero-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+.hero h1{font-size:clamp(2.8rem,7vw,4.5rem);font-weight:800;letter-spacing:-0.04em;margin-bottom:20px;line-height:1.1}
 .hero h1 span{background:linear-gradient(135deg,var(--accent),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero p{font-size:1.25rem;color:var(--text2);max-width:600px;margin:0 auto 40px}
-.hero-cmd{display:inline-flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px 28px;font-size:1.1rem;font-family:'JetBrains Mono',monospace;color:var(--green)}
-.hero-cmd .dollar{color:var(--text3)}
-.hero-tag{margin-top:20px;font-size:0.875rem;color:var(--text3)}
+.hero p{font-size:1.2rem;color:var(--text2);max-width:640px;margin:0 auto 40px;line-height:1.7}
+.hero-actions{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+.cmd-box{display:inline-flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 24px;font-family:'JetBrains Mono',monospace;font-size:1rem}
+.cmd-box .dollar{color:var(--text3)}
+.cmd-box .text{color:var(--green)}
+.cmd-box .copy{background:none;border:none;color:var(--text3);cursor:pointer;padding:4px;transition:color 0.2s}
+.cmd-box .copy:hover{color:var(--text)}
+.hero-sub{margin-top:20px;font-size:0.85rem;color:var(--text3)}
 
 /* Terminal */
-.terminal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;max-width:680px;margin:60px auto 0;text-align:left}
-.terminal-bar{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--bg3);border-bottom:1px solid var(--border)}
+.terminal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;max-width:700px;margin:60px auto 0;text-align:left;box-shadow:0 20px 60px rgba(0,0,0,0.4)}
+.terminal-bar{display:flex;align-items:center;gap:8px;padding:14px 18px;background:var(--bg3);border-bottom:1px solid var(--border)}
 .terminal-dot{width:12px;height:12px;border-radius:50%}
 .terminal-dot.r{background:#ef4444}.terminal-dot.y{background:#eab308}.terminal-dot.g{background:#22c55e}
-.terminal-body{padding:20px 24px;font-family:'JetBrains Mono',monospace;font-size:0.85rem;line-height:1.8;color:var(--text2)}
-.terminal-body .green{color:var(--green)}
-.terminal-body .cyan{color:var(--accent)}
-.terminal-body .dim{color:var(--text3)}
-.terminal-body .white{color:var(--text)}
+.terminal-title{margin-left:auto;margin-right:auto;font-size:0.75rem;color:var(--text3)}
+.terminal-body{padding:24px;font-family:'JetBrains Mono',monospace;font-size:0.82rem;line-height:2;color:var(--text2);min-height:280px}
+.terminal-body .g{color:var(--green)}.terminal-body .c{color:var(--accent)}.terminal-body .d{color:var(--text3)}.terminal-body .w{color:var(--text)}.terminal-body .y{color:var(--yellow)}
+.cursor{display:inline-block;width:8px;height:16px;background:var(--accent);animation:blink 1s infinite;vertical-align:middle}
+
+/* Use cases */
+.use-cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:40px}
+.use-case{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center;transition:border-color 0.3s,transform 0.3s}
+.use-case:hover{border-color:var(--accent);transform:translateY(-4px)}
+.use-case .icon{font-size:2rem;margin-bottom:8px}
+.use-case h4{font-size:0.9rem;font-weight:600;margin-bottom:4px}
+.use-case p{font-size:0.8rem;color:var(--text3)}
 
 /* Features */
-.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px}
-.feature{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:32px;transition:border-color 0.2s}
-.feature:hover{border-color:var(--accent)}
-.feature-icon{font-size:1.5rem;margin-bottom:12px}
-.feature h3{font-size:1.1rem;font-weight:600;margin-bottom:8px}
-.feature p{color:var(--text2);font-size:0.95rem}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px}
+.feature-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:32px;transition:border-color 0.3s}
+.feature-card:hover{border-color:var(--accent)}
+.feature-card .icon{font-size:1.5rem;margin-bottom:14px}
+.feature-card h3{font-size:1.1rem;font-weight:600;margin-bottom:10px}
+.feature-card p{color:var(--text2);font-size:0.95rem;line-height:1.6}
+.feature-card code{background:var(--bg3);padding:2px 8px;border-radius:4px;font-size:0.82rem}
 
-/* How it works */
-.steps{display:grid;gap:32px;max-width:700px}
-.step-item{display:grid;grid-template-columns:40px 1fr;gap:16px;align-items:start}
-.step-num{width:40px;height:40px;background:var(--bg3);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:0.9rem;color:var(--accent)}
-.step-content h4{font-weight:600;margin-bottom:4px}
-.step-content p{color:var(--text2);font-size:0.95rem}
+/* Why no prompts */
+.explainer{max-width:700px;margin:0 auto}
+.explainer-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:32px;margin-bottom:20px}
+.explainer-card h4{font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.explainer-card p{color:var(--text2);font-size:0.95rem}
 
-/* Comparison */
-.compare{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:800px}
-@media(max-width:640px){.compare{grid-template-columns:1fr}}
-.compare-col{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:28px}
-.compare-col h4{font-size:0.85rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--text3);margin-bottom:16px}
-.compare-col ul{list-style:none;font-size:0.95rem;color:var(--text2)}
-.compare-col ul li{padding:6px 0}
-.compare-col ul li::before{content:'✗ ';color:#ef4444}
-.compare-col.after ul li::before{content:'✓ ';color:var(--green)}
+/* Check command */
+.check-demo{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:24px;max-width:600px;margin:40px auto 0;font-family:'JetBrains Mono',monospace;font-size:0.82rem;line-height:2}
 
 /* CTA */
-.cta{text-align:center;padding:100px 0}
-.cta h2{font-size:2rem;font-weight:700;margin-bottom:12px}
-.cta p{color:var(--text2);margin-bottom:32px}
-.cta-btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent2);color:#000;font-weight:600;padding:14px 32px;border-radius:var(--radius);font-size:1rem;transition:transform 0.2s,box-shadow 0.2s}
-.cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(6,182,212,0.3);text-decoration:none}
+.cta{text-align:center;padding:120px 0}
+.cta h2{font-size:clamp(2rem,5vw,3rem);font-weight:800;margin-bottom:12px;letter-spacing:-0.02em}
+.cta p{color:var(--text2);margin-bottom:36px;font-size:1.1rem}
+.cta-btn{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--accent2),var(--green));color:#000;font-weight:700;padding:16px 36px;border-radius:var(--radius);font-size:1.05rem;transition:transform 0.2s,box-shadow 0.2s;text-decoration:none!important}
+.cta-btn:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(6,182,212,0.3)}
 
 /* Footer */
-footer{border-top:1px solid var(--border);padding:40px 0;text-align:center;color:var(--text3);font-size:0.875rem}
+footer{border-top:1px solid var(--border);padding:48px 0;text-align:center;color:var(--text3);font-size:0.875rem}
 footer a{color:var(--text2)}
+footer .links{display:flex;justify-content:center;gap:24px;margin-bottom:16px}
 
 /* Section headers */
-.section-title{font-size:1.75rem;font-weight:700;margin-bottom:8px}
-.section-sub{color:var(--text2);margin-bottom:40px;font-size:1.05rem}
+.section-header{text-align:center;margin-bottom:48px}
+.section-header h2{font-size:clamp(1.8rem,4vw,2.5rem);font-weight:800;letter-spacing:-0.02em;margin-bottom:12px}
+.section-header p{color:var(--text2);font-size:1.05rem;max-width:600px;margin:0 auto}
+
+@media(max-width:640px){
+  .hero-actions{flex-direction:column}
+  .features-grid{grid-template-columns:1fr}
+  nav .links a:not(.star-btn){display:none}
+}
 </style>
 </head>
 <body>
 
+<!-- Nav -->
+<nav>
+<div class="container">
+  <div class="logo">⚓ ShipKit</div>
+  <div class="links">
+    <a href="#features">Features</a>
+    <a href="#how">How it works</a>
+    <a href="#check">Verify</a>
+    <a href="https://github.com/sagar-grv/shipkit" class="star-btn" target="_blank">
+      <svg viewBox="0 0 16 16"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/></svg>
+      Star on GitHub
+    </a>
+  </div>
+</div>
+</nav>
+
 <!-- Hero -->
 <section class="hero">
 <div class="container">
-  <h1>Your <span>Automated Dev Team</span></h1>
-  <p>One command sets up CI/CD, health monitoring, security scanning, and AI agent config. Works in any directory. Zero dependencies.</p>
-  <div class="hero-cmd"><span class="dollar">$</span> npx shipkit-pipe</div>
-  <div class="hero-tag">No install needed. Runs instantly via npx. Works with any stack.</div>
+  <div class="hero-badge"><span class="dot"></span> v3 — Smart detection, zero config</div>
+  <h1>Your project deserves<br>an <span>automated team</span></h1>
+  <p>One command sets up CI/CD, health monitoring, security scanning, and AI agent config. Reads your project. Generates only what you need. No questions asked.</p>
+  
+  <div class="hero-actions">
+    <div class="cmd-box">
+      <span class="dollar">$</span>
+      <span class="text">npx shipkit-pipe</span>
+      <button class="copy" onclick="navigator.clipboard.writeText('npx shipkit-pipe')" title="Copy">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+      </button>
+    </div>
+  </div>
+  <p class="hero-sub">No install. No config. No questions. Just works.</p>
 
   <!-- Terminal demo -->
-  <div class="terminal">
+  <div class="terminal reveal">
     <div class="terminal-bar">
       <div class="terminal-dot r"></div>
       <div class="terminal-dot y"></div>
       <div class="terminal-dot g"></div>
+      <span class="terminal-title">shipkit-pipe</span>
     </div>
-    <div class="terminal-body">
-<span class="dim">$</span> <span class="white">npx shipkit-pipe</span>
+    <div class="terminal-body" id="terminal-output"></div>
+  </div>
+</div>
+</section>
 
-  <span class="cyan">⚓ ShipKit</span> — my-project
+<!-- Works everywhere -->
+<section id="works">
+<div class="container">
+  <div class="section-header reveal">
+    <h2>Works everywhere. No excuses.</h2>
+    <p>Empty folder, monorepo, full-stack app, API server — ShipKit detects what you have and generates accordingly.</p>
+  </div>
+  <div class="use-cases">
+    <div class="use-case reveal"><div class="icon">📁</div><h4>Empty project</h4><p>Starting fresh? Get baseline CI + security</p></div>
+    <div class="use-case reveal"><div class="icon">⚛️</div><h4>React / Next.js</h4><p>Detects framework, lint, test, build</p></div>
+    <div class="use-case reveal"><div class="icon">📦</div><h4>Monorepo</h4><p>Finds frontend/ backend/ subdirs</p></div>
+    <div class="use-case reveal"><div class="icon">🐍</div><h4>Python / Go / Rust</h4><p>Detects pyproject.toml, go.mod, Cargo.toml</p></div>
+    <div class="use-case reveal"><div class="icon">🐳</div><h4>Docker</h4><p>Detects docker-compose.yml</p></div>
+    <div class="use-case reveal"><div class="icon">🌐</div><h4>Any deploy</h4><p>Vercel, Netlify, Fly.io, Railway, Render</p></div>
+  </div>
+</div>
+</section>
 
-  <span class="green">✓</span> Next.js | pnpm | Node 20
-  <span class="green">✓</span> Scripts: lint, test, build
-  <span class="green">✓</span> Deploy: Vercel (my-project.vercel.app)
-
-  <span class="green">✓</span> Generated 7 files
-
-  <span class="cyan">Files:</span>
-    shipkit.json                 <span class="dim">← Project config</span>
-    AGENTS.md                    <span class="dim">← AI agent instructions</span>
-    .github/workflows/ci.yml     <span class="dim">← CI: lint > test > build</span>
-    .github/workflows/health.yml <span class="dim">← Health check (every 6h)</span>
-    .github/dependabot.yml       <span class="dim">← Auto-update deps</span>
-    .github/workflows/codeql.yml <span class="dim">← Security scanning</span>
+<!-- Why no prompts -->
+<section style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+<div class="container">
+  <div class="section-header reveal">
+    <h2>Why doesn't it ask anything?</h2>
+    <p>Because your project already tells ShipKit everything it needs to know.</p>
+  </div>
+  <div class="explainer">
+    <div class="explainer-card reveal">
+      <h4>📋 package.json scripts</h4>
+      <p>If you have a <code>lint</code> script, CI gets a lint step. No <code>test</code> script? No test step. Your CI never fails because of missing commands.</p>
+    </div>
+    <div class="explainer-card reveal">
+      <h4>📂 Lock files</h4>
+      <p><code>pnpm-lock.yaml</code> → uses pnpm. <code>yarn.lock</code> → uses yarn. <code>bun.lockb</code> → uses bun. No guessing.</p>
+    </div>
+    <div class="explainer-card reveal">
+      <h4>🔗 Git remote</h4>
+      <p>Reads your <code>origin</code> URL to get your GitHub owner/repo. No need to type it.</p>
+    </div>
+    <div class="explainer-card reveal">
+      <h4>🚀 Deploy config</h4>
+      <p>Found <code>vercel.json</code>? Health checks will ping your Vercel URL. Found <code>fly.toml</code>? It knows your Fly.io app name.</p>
+    </div>
+    <div class="explainer-card reveal">
+      <h4>💡 Want to customize?</h4>
+      <p>Run <code>npx shipkit-pipe -i</code> for interactive mode. But 95% of users never need it.</p>
     </div>
   </div>
 </div>
 </section>
 
-<!-- What it does -->
-<section>
+<!-- Features -->
+<section id="features">
 <div class="container">
-  <h2 class="section-title">What it actually does</h2>
-  <p class="section-sub">Not another boilerplate. An automated team that runs after you push.</p>
-  <div class="features">
-    <div class="feature">
-      <div class="feature-icon">⚡</div>
+  <div class="section-header reveal">
+    <h2>What your automated team does</h2>
+    <p>Six systems that run automatically after you push. You never check manually again.</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card reveal">
+      <div class="icon">⚡</div>
       <h3>Smart CI/CD</h3>
-      <p>Reads your package.json scripts. Only generates CI steps for what exists. No lint script? No lint step. Your CI never fails because of missing commands.</p>
+      <p>Generates GitHub Actions that match YOUR scripts. Only includes steps that exist. Lint script? Lint step. No lint script? No lint step. <strong>Your CI never fails because of bad config.</strong></p>
     </div>
-    <div class="feature">
-      <div class="feature-icon">🏥</div>
+    <div class="feature-card reveal">
+      <div class="icon">🏥</div>
       <h3>Health Monitoring</h3>
-      <p>Pings your site every 6 hours. If it's down, auto-creates a GitHub Issue. When it recovers, auto-closes the issue. You know before your users do.</p>
+      <p>Pings your production site every 6 hours. If it's down → auto-creates a GitHub Issue. When it recovers → auto-closes the issue. <strong>You know before your users.</strong></p>
     </div>
-    <div class="feature">
-      <div class="feature-icon">🔒</div>
+    <div class="feature-card reveal">
+      <div class="icon">🔒</div>
       <h3>Security Scanning</h3>
-      <p>CodeQL scans for vulnerabilities on every push. Dependabot keeps your dependencies updated. No manual checking needed.</p>
+      <p>CodeQL scans every push for vulnerabilities. Dependabot keeps deps updated with auto-PRs. <strong>No manual checking.</strong></p>
     </div>
-    <div class="feature">
-      <div class="feature-icon">🤖</div>
-      <h3>AI Agent Config</h3>
-      <p>Generates AGENTS.md so your AI coding agent (Claude, Cursor, Copilot, any) knows your stack, your rules, and your project state.</p>
+    <div class="feature-card reveal">
+      <div class="icon">🤖</div>
+      <h3>AI Agent Memory</h3>
+      <p>Generates <code>AGENTS.md</code> and <code>shipkit.json</code> so your AI agent (Claude, Cursor, Copilot) knows your stack, your rules, and what happened last session.</p>
     </div>
-    <div class="feature">
-      <div class="feature-icon">✅</div>
+    <div class="feature-card reveal">
+      <div class="icon">📦</div>
+      <h3>Auto-detect Everything</h3>
+      <p>Framework, package manager, Node version, deploy platform, git remote, available scripts — all detected from your existing files. <strong>Zero config.</strong></p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="icon">✅</div>
       <h3>Verify Command</h3>
-      <p><code>npx shipkit-pipe check</code> — pings your deploy URL, validates CI config, checks for vulnerabilities. One command tells you if everything works.</p>
-    </div>
-    <div class="feature">
-      <div class="feature-icon">📦</div>
-      <h3>Works Everywhere</h3>
-      <p>Monorepos, empty directories, Next.js, Express, Vue, Svelte, Go, Python — detects what you have and generates accordingly. Zero config.</p>
+      <p>Run <code>npx shipkit-pipe check</code> anytime. Pings your site, validates CI, checks vulnerabilities. <strong>One command tells you if everything works.</strong></p>
     </div>
   </div>
 </div>
 </section>
 
 <!-- How it works -->
-<section>
+<section id="how">
 <div class="container">
-  <h2 class="section-title">How it works</h2>
-  <p class="section-sub">Three seconds from install to working pipeline.</p>
-  <div class="steps">
-    <div class="step-item">
-      <div class="step-num">1</div>
-      <div class="step-content">
-        <h4>Run the command</h4>
-        <p><code>npx shipkit-pipe</code> in any project directory. No install, no config file, no setup wizard.</p>
-      </div>
+  <div class="section-header reveal">
+    <h2>Three seconds. Four steps.</h2>
+    <p>From install to working pipeline — no wizard, no prompts, no signup.</p>
+  </div>
+  <div class="explainer">
+    <div class="explainer-card reveal">
+      <h4>1️⃣ Run the command</h4>
+      <p><code>npx shipkit-pipe</code> — in any directory. No install needed. Runs via npx.</p>
     </div>
-    <div class="step-item">
-      <div class="step-num">2</div>
-      <div class="step-content">
-        <h4>Auto-detect</h4>
-        <p>Reads your package.json, lock files, git remote, deploy config. Figures out your stack, package manager, Node version, and available scripts.</p>
-      </div>
+    <div class="explainer-card reveal">
+      <h4>2️⃣ Auto-detect</h4>
+      <p>Reads package.json, lock files, git remote, deploy config, .nvmrc. Detects your framework, package manager, node version, and which scripts you have.</p>
     </div>
-    <div class="step-item">
-      <div class="step-num">3</div>
-      <div class="step-content">
-        <h4>Generate pipeline</h4>
-        <p>Creates GitHub Actions workflows, health checks, security scanning, and AI agent config — only what your project actually needs.</p>
-      </div>
+    <div class="explainer-card reveal">
+      <h4>3️⃣ Generate</h4>
+      <p>Creates 5-7 files: CI workflows, health checks, security scanning, Dependabot config, and AI agent instructions. Only generates what's relevant.</p>
     </div>
-    <div class="step-item">
-      <div class="step-num">4</div>
-      <div class="step-content">
-        <h4>Push and forget</h4>
-        <p><code>git push</code> — CI runs on every PR, health checks run every 6 hours, Dependabot keeps deps fresh, CodeQL scans for vulnerabilities.</p>
-      </div>
+    <div class="explainer-card reveal">
+      <h4>4️⃣ Push and forget</h4>
+      <p><code>git push</code> — GitHub Actions takes over. CI on every PR. Health checks every 6h. Dependabot keeps deps fresh. CodeQL finds vulnerabilities.</p>
     </div>
   </div>
 </div>
 </section>
 
-<!-- Before/After -->
-<section>
+<!-- Check -->
+<section id="check" style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
 <div class="container">
-  <h2 class="section-title">Before vs After</h2>
-  <p class="section-sub">What changes when you add ShipKit to your workflow.</p>
-  <div class="compare">
-    <div class="compare-col">
-      <h4>Without ShipKit</h4>
-      <ul>
-        <li>Manually check if site is up</li>
-        <li>Forget to run tests before pushing</li>
-        <li>Dependencies go months without updates</li>
-        <li>No security scanning until it's too late</li>
-        <li>AI agent forgets your project every session</li>
-        <li>CI config copied from Stack Overflow</li>
-      </ul>
-    </div>
-    <div class="compare-col after">
-      <h4>With ShipKit</h4>
-      <ul>
-        <li>Health check pings site every 6 hours</li>
-        <li>CI runs lint/test/build on every PR</li>
-        <li>Dependabot creates PRs for updates</li>
-        <li>CodeQL scans on every push</li>
-        <li>AGENTS.md gives your AI full context</li>
-        <li>CI generated from your actual scripts</li>
-      </ul>
-    </div>
+  <div class="section-header reveal">
+    <h2>Verify everything works</h2>
+    <p>One command tells you the state of your whole pipeline.</p>
+  </div>
+  <div class="check-demo reveal">
+<span class="d">$</span> <span class="w">npx shipkit-pipe check</span>
+
+  <span class="c">⚓ ShipKit Check</span>
+
+  <span class="g">✓</span> Project: my-awesome-app
+  <span class="g">✓</span> shipkit.json exists
+  <span class="g">✓</span> CI workflow valid (lint → test → build)
+  <span class="g">✓</span> Health check configured
+  <span class="g">✓</span> Site is up (200) — my-app.vercel.app
+  <span class="g">✓</span> No critical vulnerabilities
+  <span class="g">✓</span> AGENTS.md exists — AI agent ready
   </div>
 </div>
 </section>
 
 <!-- CTA -->
 <section class="cta">
-<div class="container">
-  <h2>Ready to ship?</h2>
-  <p>One command. Three seconds. Your project gets an automated team.</p>
-  <a href="https://github.com/sagar-grv/shipkit" class="cta-btn">View on GitHub →</a>
-  <div style="margin-top:24px">
-    <code style="color:var(--text2);font-size:0.95rem">npx shipkit-pipe</code>
+<div class="container reveal">
+  <h2>Ship with confidence.</h2>
+  <p>Your project gets an automated team in 3 seconds. Free. Open source. Forever.</p>
+  <a href="https://github.com/sagar-grv/shipkit" class="cta-btn">⭐ Star on GitHub</a>
+  <div style="margin-top:28px">
+    <div class="cmd-box" style="margin:0 auto">
+      <span class="dollar">$</span>
+      <span class="text">npx shipkit-pipe</span>
+    </div>
   </div>
+  <p style="margin-top:16px;font-size:0.85rem;color:var(--text3)">19KB. Zero deps. Node 18+. Any OS.</p>
 </div>
 </section>
 
 <footer>
 <div class="container">
-  <p>Built by <a href="https://github.com/sagar-grv">Sagar Giri</a> · <a href="https://github.com/sagar-grv/shipkit">GitHub</a> · <a href="https://www.npmjs.com/package/shipkit-pipe">npm</a></p>
+  <div class="links">
+    <a href="https://github.com/sagar-grv/shipkit">GitHub</a>
+    <a href="https://www.npmjs.com/package/shipkit-pipe">npm</a>
+    <a href="https://github.com/sagar-grv/shipkit/issues">Issues</a>
+  </div>
+  <p>Built by <a href="https://github.com/sagar-grv">Sagar Giri</a> — Apache 2.0 License</p>
 </div>
 </footer>
 
+<script>
+// ─── Scroll reveal ──────────────────────────────────────────────────────────
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ─── Terminal typing animation ──────────────────────────────────────────────
+const lines = [
+  { text: '$ npx shipkit-pipe', cls: 'w', delay: 800 },
+  { text: '', cls: '', delay: 400 },
+  { text: '  ⚓ ShipKit — my-project', cls: 'c', delay: 300 },
+  { text: '', cls: '', delay: 200 },
+  { text: '  ✓ Next.js | pnpm | Node 20', cls: 'g', delay: 100 },
+  { text: '  ✓ Scripts: lint, test, build', cls: 'g', delay: 100 },
+  { text: '  ✓ Deploy: Vercel (my-project.vercel.app)', cls: 'g', delay: 100 },
+  { text: '', cls: '', delay: 300 },
+  { text: '  ✓ Generated 7 files', cls: 'g', delay: 200 },
+  { text: '', cls: '', delay: 200 },
+  { text: '  Files:', cls: 'c', delay: 100 },
+  { text: '    shipkit.json                 ← Project config', cls: 'd', delay: 60 },
+  { text: '    AGENTS.md                    ← AI agent instructions', cls: 'd', delay: 60 },
+  { text: '    .github/workflows/ci.yml     ← CI: lint > test > build', cls: 'd', delay: 60 },
+  { text: '    .github/workflows/health.yml ← Health check (every 6h)', cls: 'd', delay: 60 },
+  { text: '    .github/dependabot.yml       ← Auto-update deps', cls: 'd', delay: 60 },
+  { text: '    .github/workflows/codeql.yml ← Security scanning', cls: 'd', delay: 60 },
+  { text: '', cls: '', delay: 300 },
+  { text: '  Next: git add -A && git commit -m "add pipeline" && git push', cls: 'd', delay: 0 },
+];
+
+const terminal = document.getElementById('terminal-output');
+let lineIdx = 0;
+
+function typeLine() {
+  if (lineIdx >= lines.length) { terminal.innerHTML += '<span class="cursor"></span>'; return; }
+  const line = lines[lineIdx++];
+  const el = document.createElement('div');
+  if (line.cls) el.className = line.cls;
+  el.textContent = line.text;
+  el.style.opacity = '0';
+  terminal.appendChild(el);
+  
+  setTimeout(() => { el.style.opacity = '1'; el.style.transition = 'opacity 0.15s'; }, 50);
+  setTimeout(typeLine, line.delay + 80);
+}
+
+// Start animation when terminal is visible
+const termObserver = new IntersectionObserver((entries) => {
+  if (entries[0].isIntersecting) { setTimeout(typeLine, 600); termObserver.disconnect(); }
+}, { threshold: 0.3 });
+termObserver.observe(document.querySelector('.terminal'));
+</script>
 </body>
 </html>
