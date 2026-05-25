@@ -11,211 +11,196 @@
 <meta property="og:url" content="https://sagar-grv.github.io/shipkit/">
 <meta property="og:image" content="https://sagar-grv.github.io/shipkit/og-image.svg">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#08080c">
+<meta name="theme-color" content="#07070a">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚓</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#08080c;--bg2:#0c0c14;--bg3:#12121e;--bg4:#1a1a2a;--border:#1e1e30;--border2:#2a2a40;--text:#eeedf2;--text2:#8b8a9a;--text3:#5b5a6a;--accent:#00d4ff;--accent2:#06b6d4;--accent-dim:rgba(0,212,255,0.08);--accent-glow:rgba(0,212,255,0.15);--gold:#fbbf24;--green:#22c55e;--font-head:'Sora',sans-serif;--font-body:'Outfit',sans-serif;--font-mono:'JetBrains Mono',monospace}
+:root{--bg:#07070a;--bg2:#0b0b12;--bg3:#10101c;--bg4:#18182a;--border:#1a1a2e;--border2:#26263e;--text:#eeeef2;--text2:#8a8a9a;--text3:#5a5a6a;--accent:#06f;--accent2:#00d4ff;--accent-dim:rgba(0,102,255,0.08);--accent-glow:rgba(0,102,255,0.12);--accent-card:rgba(0,102,255,0.04);--gold:#fbbf24;--green:#22c55e;--font-head:'Sora',sans-serif;--font-body:'Outfit',sans-serif;--font-mono:'JetBrains Mono',monospace}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{font-family:var(--font-body);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;line-height:1.6}
-code,.code{font-family:var(--font-mono)}
-h1,h2,h3,h4,h5,h6{font-family:var(--font-head);line-height:1.2}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;line-height:1.65}
+code,.code{font-family:var(--font-mono);font-size:.92em}
+h1,h2,h3,h4{font-family:var(--font-head);line-height:1.15;letter-spacing:-.02em}
 a{color:var(--accent);text-decoration:none}
-a:hover{opacity:.85}
-.container{max-width:1120px;margin:0 auto;padding:0 24px}
+.container{max-width:1100px;margin:0 auto;padding:0 24px}
 @media(min-width:768px){.container{padding:0 32px}}
-.section{padding:80px 0}
-@media(min-width:768px){.section{padding:100px 0}}
+.section{padding:60px 0}
+@media(min-width:768px){.section{padding:80px 0}}
 .section-dark{background:var(--bg2)}
-.section-border{border-top:1px solid var(--border)}
-/* background patterns */
-.bg-grid{background-image:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px);background-size:48px 48px}
-.bg-glow{position:absolute;inset:0;pointer-events:none;background:radial-gradient(800px circle at 50% 0%,rgba(0,212,255,0.05),transparent 70%)}
-.gradient-text{background:linear-gradient(135deg,var(--accent),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.gradient-text2{background:linear-gradient(135deg,var(--accent),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.label{display:inline-flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:100px;padding:6px 16px;font-size:13px;color:var(--text2)}
-.label-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse-dot 2s ease-in-out infinite}
-@keyframes pulse-dot{0%,100%{opacity:.4}50%{opacity:1}}
-@keyframes fade-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.bg-dots{background-image:radial-gradient(ellipse at 50% 0%,rgba(0,102,255,0.04) 0%,transparent 60%), radial-gradient(circle at 20% 80%,rgba(0,102,255,0.02) 0%,transparent 50%), radial-gradient(circle at 80% 20%,rgba(0,212,255,0.02) 0%,transparent 50%)}
+.gradient-text{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pill{display:inline-flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:100px;padding:5px 14px;font-size:12px;color:var(--text2)}
+.pill-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+@keyframes fade-up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fade-in{from{opacity:0}to{opacity:1}}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-@keyframes glow-pulse{0%,100%{box-shadow:0 0 0 0 var(--accent-dim)}50%{box-shadow:0 0 24px 4px var(--accent-glow)}}
-@keyframes gradient-shift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-.animate-float{animation:float 4s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0px)}50%{transform:translateY(-8px)}}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(0,102,255,0.08)}50%{box-shadow:0 0 28px 4px rgba(0,102,255,0.18)}}
+@keyframes scale-in{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+@keyframes slide-up{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes count-up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:1}
+.reveal-animate{opacity:0;transform:translateY(22px);transition:opacity .65s cubic-bezier(.16,1,.3,1),transform .65s cubic-bezier(.16,1,.3,1)}
+.reveal-animate.revealed{opacity:1;transform:translateY(0)}
 /* nav */
 nav{position:fixed;top:0;left:0;right:0;z-index:50;transition:all .3s}
-nav.scrolled{background:rgba(8,8,12,.85);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
-.nav-inner{display:flex;align-items:center;justify-content:space-between;height:56px}
-.nav-logo{display:flex;align-items:center;gap:8px;font-family:var(--font-head);font-weight:700;font-size:16px;color:var(--text)}
-.nav-logo span{font-size:20px}
-.nav-links{display:none;align-items:center;gap:24px}
-.nav-links a{font-size:14px;color:var(--text2);transition:color .2s}
+nav.scrolled{background:rgba(7,7,10,.88);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:54px}
+.nav-logo{display:flex;align-items:center;gap:7px;font-family:var(--font-head);font-weight:700;font-size:15px;color:var(--text)}
+.nav-logo span.anchor{font-size:18px}
+.nav-links{display:none;align-items:center;gap:20px}
+.nav-links a{font-size:13px;color:var(--text2);transition:color .2s}
 .nav-links a:hover{color:var(--text)}
-.nav-star{display:inline-flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-size:13px;color:var(--text);transition:border-color .2s}
+.nav-star{display:inline-flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:5px 12px;font-size:12px;color:var(--text);transition:border-color .2s}
 .nav-star:hover{border-color:var(--gold)}
-.nav-star svg{width:14px;height:14px;fill:var(--gold)}
-.nav-toggle{display:block;background:none;border:none;color:var(--text2);padding:8px;cursor:pointer}
-.nav-toggle svg{width:22px;height:22px}
-.mobile-menu{display:none;padding:12px 0 20px}
+.nav-star svg{width:13px;height:13px;fill:var(--gold)}
+.nav-toggle{display:block;background:none;border:none;color:var(--text2);padding:7px;cursor:pointer}
+.nav-toggle svg{width:20px;height:20px}
+.mobile-menu{display:none;padding:8px 0 16px}
 .mobile-menu.open{display:block}
-.mobile-menu a{display:block;padding:10px 12px;font-size:14px;color:var(--text2);border-radius:8px}
+.mobile-menu a{display:block;padding:8px 10px;font-size:13px;color:var(--text2);border-radius:6px}
 .mobile-menu a:hover{background:var(--bg3);color:var(--text)}
 @media(min-width:768px){.nav-links{display:flex}.nav-toggle{display:none}}
 /* hero */
 .hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden}
-.hero-content{position:relative;z-index:2;text-align:center;padding:100px 0 80px;animation:fade-up .8s ease}
-.hero h1{font-size:clamp(2rem,6vw,3.75rem);font-weight:800;letter-spacing:-.03em;margin-bottom:16px}
-.hero p{font-size:clamp(1rem,2vw,1.2rem);color:var(--text2);max-width:600px;margin:0 auto 36px;line-height:1.7}
-.hero-actions{display:flex;flex-direction:column;align-items:center;gap:16px;margin-bottom:20px}
-.hero-cmd{display:inline-flex;align-items:center;gap:12px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 20px;font-family:var(--font-mono);font-size:15px;animation:glow-pulse 3s ease-in-out infinite}
+.hero-inner{position:relative;z-index:2;text-align:center;padding:96px 0 40px;animation:slide-up .7s cubic-bezier(.16,1,.3,1)}
+.hero h1{font-size:clamp(2rem,6vw,3.5rem);font-weight:800;margin-bottom:14px}
+.hero h1 .gradient-text{display:inline-block}
+.hero p{font-size:clamp(.95rem,1.8vw,1.1rem);color:var(--text2);max-width:520px;margin:0 auto 32px;line-height:1.7}
+.hero-row{display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:16px}
+@media(min-width:640px){.hero-row{flex-direction:row;justify-content:center}}
+.hero-cmd{display:inline-flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-family:var(--font-mono);font-size:14px;animation:glow 3s ease-in-out infinite}
 .hero-cmd .dollar{color:var(--text3)}
 .hero-cmd .cmd{color:var(--green)}
-.hero-cmd button{background:none;border:none;color:var(--text3);cursor:pointer;padding:4px;transition:color .2s}
+.hero-cmd button{background:none;border:none;color:var(--text3);cursor:pointer;padding:3px;transition:color .2s;line-height:0}
 .hero-cmd button:hover{color:var(--text)}
-@media(min-width:640px){.hero-actions{flex-direction:row;justify-content:center}}
-.hero-try{display:inline-flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 22px;font-size:14px;color:var(--text);transition:border-color .3s}
+.hero-cmd button svg{width:15px;height:15px}
+.hero-try{display:inline-flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-size:13px;color:var(--text);transition:border-color .25s}
 .hero-try:hover{border-color:var(--accent)}
-.hero-footnote{font-size:13px;color:var(--text3)}
-/* stats */
-.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;padding:48px 0}
-@media(min-width:640px){.stats{grid-template-columns:repeat(4,1fr)}}
-.stat{text-align:center;animation:fade-up .6s ease forwards;opacity:0}
-.stat:nth-child(1){animation-delay:.1s}
-.stat:nth-child(2){animation-delay:.2s}
-.stat:nth-child(3){animation-delay:.3s}
-.stat:nth-child(4){animation-delay:.4s}
-.stat-val{font-size:clamp(1.8rem,4vw,2.5rem);font-weight:800;font-family:var(--font-head);background:linear-gradient(135deg,var(--accent),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.stat-val:nth-child(even){background:linear-gradient(135deg,var(--accent),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.stat-label{font-size:14px;color:var(--text3);margin-top:4px}
-/* section headers */
-.section-header{text-align:center;margin-bottom:56px;animation:fade-up .6s ease}
-.section-header h2{font-size:clamp(1.5rem,3.5vw,2.25rem);font-weight:800;margin-bottom:12px}
-.section-header p{color:var(--text2);max-width:520px;margin:0 auto}
-/* features grid */
-.features-grid{display:grid;gap:16px}
-@media(min-width:640px){.features-grid{grid-template-columns:repeat(2,1fr)}}
-@media(min-width:1024px){.features-grid{grid-template-columns:repeat(3,1fr)}}
-.feature-card{background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:28px;transition:all .3s;animation:fade-up .6s ease forwards;opacity:0}
-.feature-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 8px 32px var(--accent-dim)}
-.feature-card:nth-child(2){animation-delay:.1s}
-.feature-card:nth-child(3){animation-delay:.2s}
-.feature-card:nth-child(4){animation-delay:.3s}
-.feature-card:nth-child(5){animation-delay:.4s}
-.feature-card:nth-child(6){animation-delay:.5s}
-.feature-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:16px}
-.feature-card h3{font-size:17px;font-weight:700;margin-bottom:8px}
-.feature-card p{font-size:14px;color:var(--text2);line-height:1.7}
-.feature-card strong{color:var(--text)}
+.hero-foot{font-size:12px;color:var(--text3)}
+/* stats bar */
+.stats-row{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;padding:40px 0}
+@media(min-width:640px){.stats-row{grid-template-columns:repeat(4,1fr);gap:24px}}
+.stat{text-align:center;animation:count-up .5s ease forwards;opacity:0}
+.stat:nth-child(1){animation-delay:0s}
+.stat:nth-child(2){animation-delay:.1s}
+.stat:nth-child(3){animation-delay:.2s}
+.stat:nth-child(4){animation-delay:.3s}
+.stat-val{font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:800;font-family:var(--font-head);background:linear-gradient(135deg,var(--accent),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.stat-val.purple{background:linear-gradient(135deg,var(--accent),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-label{font-size:13px;color:var(--text3);margin-top:6px}
 /* demo terminal */
-.terminal{border:1px solid var(--border);border-radius:16px;overflow:hidden;background:#06060a;max-width:720px;margin:0 auto;animation:fade-up .6s ease}
-.terminal-header{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--bg3);border-bottom:1px solid var(--border)}
-.terminal-dot{width:10px;height:10px;border-radius:50%}
-.terminal-title{font-size:12px;color:var(--text3);margin:0 auto}
-.terminal-body{font-family:var(--font-mono);font-size:14px;line-height:1.8;padding:20px;color:var(--text2);min-height:280px;max-height:380px;overflow-y:auto}
-.terminal-body::-webkit-scrollbar{width:4px}
+.terminal-wrap{max-width:680px;margin:0 auto}
+.terminal{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#050508}
+.terminal-bar{display:flex;align-items:center;gap:7px;padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border)}
+.terminal-dot{width:9px;height:9px;border-radius:50%}
+.terminal-label{font-size:11px;color:var(--text3);margin:0 auto;letter-spacing:0}
+.terminal-body{font-family:var(--font-mono);font-size:13px;line-height:1.8;padding:16px;color:var(--text2);min-height:240px;max-height:340px;overflow-y:auto}
+.terminal-body::-webkit-scrollbar{width:3px}
 .terminal-body::-webkit-scrollbar-track{background:transparent}
 .terminal-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-.terminal-line{margin-bottom:2px}
+.terminal-line{margin-bottom:1px}
 .terminal-prompt{color:var(--green)}
-.terminal-output{color:var(--text2)}
-.terminal-info{color:var(--accent)}
 .terminal-success{color:var(--green)}
+.terminal-info{color:var(--accent2)}
 .terminal-dim{color:var(--text3)}
-.terminal-input-line{display:flex;align-items:center;gap:4px;margin-top:4px}
-.terminal-input-line .cursor{display:inline-block;width:2px;height:16px;background:var(--accent);animation:blink 1s step-end infinite}
-.terminal-input{background:none;border:none;color:var(--text);font-family:var(--font-mono);font-size:14px;outline:none;flex:1}
-.terminal-suggestions{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px 16px}
-.terminal-suggestions button{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-size:12px;color:var(--text2);cursor:pointer;transition:all .2s;font-family:var(--font-mono)}
-.terminal-suggestions button:hover{border-color:var(--accent);color:var(--text)}
-.terminal-suggestions .dollar{color:var(--text3)}
-.stack-picker{margin-top:24px;text-align:center;animation:fade-up .6s ease;animation-delay:.2s;opacity:0;animation-fill-mode:forwards}
-.stack-picker p{font-size:14px;color:var(--text3);margin-bottom:12px}
-.stack-btns{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
-.stack-btns button{padding:8px 18px;font-size:13px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;transition:all .2s;font-family:var(--font-body)}
-.stack-btns button:hover{border-color:var(--accent);color:var(--text)}
-.stack-btns button.active{border-color:var(--accent);color:var(--text);background:var(--accent-dim)}
-/* steps */
-.steps-grid{display:grid;gap:24px;position:relative}
-@media(min-width:768px){.steps-grid{grid-template-columns:repeat(4,1fr)}}
-.step{text-align:center;animation:fade-up .6s ease forwards;opacity:0}
-.step:nth-child(2){animation-delay:.1s}
-.step:nth-child(3){animation-delay:.2s}
-.step:nth-child(4){animation-delay:.3s}
-.step-num{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 16px;font-family:var(--font-head);font-weight:700}
-.step h4{font-size:16px;font-weight:700;margin-bottom:6px}
-.step p{font-size:14px;color:var(--text2);line-height:1.6}
-/* comparison */
-.compare-grid{display:grid;gap:16px;max-width:800px;margin:0 auto}
-@media(min-width:768px){.compare-grid{grid-template-columns:1fr 1fr}}
-.compare-card{border-radius:16px;padding:28px;animation:fade-up .6s ease forwards;opacity:0}
-.compare-card.before{background:var(--bg3);border:1px solid var(--border)}
-.compare-card.after{background:var(--bg3);border:1px solid var(--accent);animation-delay:.2s}
-.compare-card h4{font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.compare-card ul{list-style:none;display:flex;flex-direction:column;gap:10px}
-.compare-card li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--text2);line-height:1.5}
-.compare-card .icon{flex-shrink:0;margin-top:2px;font-size:14px}
-/* table */
-.detect-table{max-width:680px;margin:0 auto;border:1px solid var(--border);border-radius:16px;overflow:hidden;background:var(--bg3)}
-.detect-table table{width:100%;border-collapse:collapse;font-size:14px}
-.detect-table th{text-align:left;padding:14px 20px;font-family:var(--font-head);font-weight:600;background:var(--bg4);border-bottom:1px solid var(--border)}
-.detect-table td{padding:14px 20px;border-top:1px solid var(--border);color:var(--text2)}
-.detect-table td:first-child{font-weight:600;color:var(--text)}
-.detect-table tr:hover td{background:rgba(255,255,255,.02)}
-.detect-table .method{display:none;color:var(--text3);font-family:var(--font-mono);font-size:12px}
-@media(min-width:640px){.detect-table .method{display:table-cell}}
+.terminal-output{color:var(--text2)}
+.terminal-inp-wrap{display:flex;align-items:center;gap:4px;margin-top:4px}
+.terminal-inp-wrap .blink{display:inline-block;width:2px;height:14px;background:var(--accent);animation:blink 1s step-end infinite}
+.terminal-input{background:none;border:none;color:var(--text);font-family:var(--font-mono);font-size:13px;outline:none;flex:1}
+.terminal-chips{display:flex;flex-wrap:wrap;gap:6px;padding:10px 14px 14px}
+.terminal-chips button{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:5px 10px;font-size:11px;color:var(--text2);cursor:pointer;transition:all .2s;font-family:var(--font-mono)}
+.terminal-chips button:hover{border-color:var(--accent);color:var(--text)}
+.terminal-chips .dollar{color:var(--text3)}
+.stack-row{margin-top:20px;text-align:center}
+.stack-row p{font-size:13px;color:var(--text3);margin-bottom:10px}
+.stack-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
+.stack-chips button{padding:6px 16px;font-size:12px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;transition:all .2s;font-family:var(--font-body)}
+.stack-chips button:hover, .stack-chips button.active{border-color:var(--accent);color:var(--text);background:var(--accent-card)}
+/* section headers */
+.section-head{text-align:center;margin-bottom:40px}
+.section-head h2{font-size:clamp(1.3rem,3vw,2rem);font-weight:800;margin-bottom:8px}
+.section-head p{font-size:14px;color:var(--text2);max-width:480px;margin:0 auto}
+/* features + security merged */
+.f-row{display:grid;gap:12px}
+@media(min-width:640px){.f-row{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1024px){.f-row{grid-template-columns:repeat(3,1fr)}}
+.f-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:22px;transition:all .3s}
+.f-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 6px 24px var(--accent-dim)}
+.f-card .icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:12px}
+.f-card h3{font-size:15px;font-weight:700;margin-bottom:4px}
+.f-card p{font-size:13px;color:var(--text2);line-height:1.65}
+.f-card strong{color:var(--text)}
+.f-card code{font-size:12px;background:var(--bg4);padding:1px 5px;border-radius:3px}
+.f-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px;margin-top:10px;letter-spacing:.02em}
+/* how it works */
+.steps{display:grid;gap:20px}
+@media(min-width:768px){.steps{grid-template-columns:repeat(4,1fr)}}
+.step{text-align:center}
+.step-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:700;font-size:15px;margin:0 auto 12px}
+.step h4{font-size:14px;font-weight:700;margin-bottom:4px}
+.step p{font-size:13px;color:var(--text2);line-height:1.5}
+@media(min-width:768px){.steps-connector{position:relative}.steps-connector::after{content:'';position:absolute;top:20px;left:calc(12.5% + 30px);right:calc(12.5% + 30px);height:1px;background:linear-gradient(90deg,transparent,var(--accent-dim),transparent)}}
+/* detect table compact */
+.t-wrap{max-width:620px;margin:0 auto;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--bg3)}
+.t-wrap table{width:100%;border-collapse:collapse;font-size:13px}
+.t-wrap th{text-align:left;padding:10px 16px;font-family:var(--font-head);font-weight:600;background:var(--bg4);border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);letter-spacing:.03em;text-transform:uppercase}
+.t-wrap td{padding:9px 16px;border-top:1px solid var(--border);color:var(--text2)}
+.t-wrap td:first-child{color:var(--text);font-weight:500}
+.t-wrap tr:hover td{background:rgba(255,255,255,.015)}
+.t-wrap .mute{font-size:12px;color:var(--text3);display:none}
+@media(min-width:640px){.t-wrap .mute{display:table-cell}}
 /* install tabs */
-.install-tabs{max-width:600px;margin:0 auto}
-.tab-bar{display:flex;gap:4px;margin-bottom:20px;background:var(--bg3);border-radius:10px;padding:4px;border:1px solid var(--border)}
-.tab-btn{flex:1;padding:10px 16px;font-size:13px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--text3);cursor:pointer;transition:all .2s;font-family:var(--font-body);font-weight:500}
-.tab-btn.active{background:var(--bg4);color:var(--text);border-color:var(--border)}
-.tab-content{display:none}
-.tab-content.active{display:block}
-.tab-code{background:#06060a;border:1px solid var(--border);border-radius:12px;overflow:hidden}
-.tab-code-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;font-family:var(--font-mono);font-size:14px;color:var(--green)}
-.tab-code-header button{background:none;border:none;color:var(--text3);cursor:pointer;padding:4px;transition:color .2s}
-.tab-code-header button:hover{color:var(--text)}
-.tab-code-header button.copied{color:var(--green)}
-.tab-footer{padding:12px 16px;font-size:12px;color:var(--text3)}
-/* accordion (faq) */
-.accordion{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
-.accordion-item{border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .3s}
+.install-wrap{max-width:560px;margin:0 auto}
+.tab-bar{display:flex;gap:3px;margin-bottom:16px;background:var(--bg3);border-radius:8px;padding:3px;border:1px solid var(--border)}
+.tab-btn{flex:1;padding:7px 12px;font-size:12px;border-radius:6px;border:none;background:transparent;color:var(--text3);cursor:pointer;transition:all .2s;font-family:var(--font-body);font-weight:500}
+.tab-btn.active{background:var(--bg4);color:var(--text)}
+.tab-pane{display:none}
+.tab-pane.active{display:block}
+.tab-code{background:#050508;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.tab-code-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;font-family:var(--font-mono);font-size:13px;color:var(--green);gap:12px}
+.tab-code-head .cmd-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tab-code-head button{background:none;border:none;color:var(--text3);cursor:pointer;padding:3px;transition:color .2s;flex-shrink:0}
+.tab-code-head button:hover{color:var(--text)}
+.tab-code-head button svg{width:14px;height:14px;display:block}
+.tab-foot{font-size:11px;color:var(--text3);padding:8px 14px;border-top:1px solid var(--border)}
+/* accordion */
+.accordion{max-width:580px;margin:0 auto}
+.accordion-item{border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .3s;margin-bottom:6px}
 .accordion-item.open{border-color:var(--accent)}
-.accordion-btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;background:var(--bg3);border:none;color:var(--text);font-size:15px;font-weight:600;font-family:var(--font-body);cursor:pointer;text-align:left;transition:background .2s}
+.accordion-btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;background:var(--bg3);border:none;color:var(--text);font-size:13px;font-weight:600;font-family:var(--font-body);cursor:pointer;text-align:left}
 .accordion-btn:hover{background:var(--bg4)}
-.accordion-arrow{width:16px;height:16px;color:var(--text3);transition:transform .3s;flex-shrink:0}
+.accordion-arrow{width:14px;height:14px;color:var(--text3);transition:transform .3s;flex-shrink:0}
 .accordion-item.open .accordion-arrow{transform:rotate(180deg)}
-.accordion-body{padding:0 20px 0;max-height:0;overflow:hidden;transition:all .3s ease}
-.accordion-item.open .accordion-body{max-height:300px;padding:0 20px 20px}
-.accordion-body p{font-size:14px;color:var(--text2);line-height:1.7}
-.accordion-body code{font-family:var(--font-mono);font-size:12px;background:var(--bg4);padding:2px 6px;border-radius:4px}
+.accordion-body{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.accordion-item.open .accordion-body{max-height:200px}
+.accordion-body-inner{padding:0 16px 14px;font-size:13px;color:var(--text2);line-height:1.65}
+.accordion-body-inner code{font-size:12px;background:var(--bg4);padding:1px 5px;border-radius:3px}
 /* cta */
-.cta{text-align:center;padding:100px 0;position:relative;overflow:hidden}
-.cta h2{font-size:clamp(1.5rem,3.5vw,2.5rem);font-weight:800;margin-bottom:16px}
-.cta p{color:var(--text2);max-width:480px;margin:0 auto 32px;font-size:17px}
-.cta-actions{display:flex;flex-direction:column;align-items:center;gap:16px}
-@media(min-width:640px){.cta-actions{flex-direction:row;justify-content:center}}
-.cta-primary{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#08080c;font-weight:700;padding:14px 28px;border-radius:12px;font-size:16px;transition:transform .2s}
-.cta-primary:hover{transform:scale(1.05);opacity:1}
-.cta-secondary{display:inline-flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 20px;font-family:var(--font-mono);font-size:14px;color:var(--green)}
+.cta{text-align:center;padding:80px 0;position:relative;overflow:hidden}
+.cta h2{font-size:clamp(1.4rem,3vw,2rem);font-weight:800;margin-bottom:12px}
+.cta p{color:var(--text2);max-width:420px;margin:0 auto 28px;font-size:15px}
+.cta-row{display:flex;flex-direction:column;align-items:center;gap:12px}
+@media(min-width:640px){.cta-row{flex-direction:row;justify-content:center}}
+.cta-btn{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#07070a;font-weight:700;padding:12px 24px;border-radius:10px;font-size:14px;transition:transform .2s}
+.cta-btn:hover{transform:scale(1.04);opacity:1}
+.cta-btn svg{width:17px;height:17px}
+.cta-mon{display:inline-flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-family:var(--font-mono);font-size:13px;color:var(--green)}
+.cta-mon .dollar{color:var(--text3)}
 /* footer */
-footer{border-top:1px solid var(--border);padding:32px 0}
-.footer-inner{display:flex;flex-direction:column;align-items:center;gap:20px}
-@media(min-width:640px){.footer-inner{flex-direction:row;justify-content:space-between}}
-.footer-brand{display:flex;align-items:center;gap:8px;font-size:14px}
-.footer-brand span{font-size:20px}
-.footer-links{display:flex;gap:20px}
-.footer-links a{font-size:14px;color:var(--text3);transition:color .2s}
-.footer-links a:hover{color:var(--text2)}
-.footer-copy{text-align:center;font-size:12px;color:var(--text3);margin-top:16px}
-@media(min-width:640px){.footer-copy{text-align:right;margin-top:0}}
-/* scroll animation system */
-.reveal{opacity:1;transform:none}
-.reveal-animate{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
-.reveal-animate.revealed{opacity:1;transform:translateY(0)}
+footer{border-top:1px solid var(--border);padding:24px 0}
+.f-inner{display:flex;flex-direction:column;align-items:center;gap:16px}
+@media(min-width:640px){.f-inner{flex-direction:row;justify-content:space-between}}
+.f-brand{display:flex;align-items:center;gap:6px;font-size:13px}
+.f-brand span.anchor{font-size:17px}
+.f-links{display:flex;gap:16px}
+.f-links a{font-size:13px;color:var(--text3);transition:color .2s}
+.f-links a:hover{color:var(--text2)}
+.f-copy{text-align:center;font-size:11px;color:var(--text3);margin-top:14px}
+@media(min-width:640px){.f-copy{text-align:right;margin-top:0}}
 </style>
 </head>
 <body>
@@ -223,7 +208,7 @@ footer{border-top:1px solid var(--border);padding:32px 0}
 <nav id="nav">
   <div class="container">
     <div class="nav-inner">
-      <a href="#" class="nav-logo"><span>⚓</span>ShipKit</a>
+      <a href="#" class="nav-logo"><span class="anchor">⚓</span>ShipKit</a>
       <div class="nav-links">
         <a href="#features">Features</a>
         <a href="#demo">Demo</a>
@@ -239,76 +224,77 @@ footer{border-top:1px solid var(--border);padding:32px 0}
       </button>
     </div>
     <div class="mobile-menu" id="mobileMenu">
-      <a href="#features" class="mobile-link">Features</a>
-      <a href="#demo" class="mobile-link">Demo</a>
-      <a href="#how" class="mobile-link">How it works</a>
-      <a href="#install" class="mobile-link">Install</a>
-      <a href="#faq" class="mobile-link">FAQ</a>
-      <a href="https://github.com/sagar-grv/shipkit" target="_blank" class="mobile-link">GitHub →</a>
+      <a href="#features">Features</a>
+      <a href="#demo">Demo</a>
+      <a href="#how">How it works</a>
+      <a href="#install">Install</a>
+      <a href="#faq">FAQ</a>
+      <a href="https://github.com/sagar-grv/shipkit">GitHub →</a>
     </div>
   </div>
 </nav>
 
-<section class="hero bg-grid">
-  <div class="bg-glow"></div>
-  <div class="container hero-content">
-    <div class="label" style="margin:0 auto 24px"><span class="label-dot"></span>v3 — Smart detection, zero config</div>
+<section class="hero">
+  <div class="hero-inner container">
+    <div class="pill" style="margin:0 auto 22px"><span class="pill-dot"></span>v3 — Smart detection, zero config</div>
     <h1>Your project deserves<br><span class="gradient-text">an automated team</span></h1>
-    <p>One command sets up CI/CD, health monitoring, security scanning, and AI agent config. Reads your project. Generates only what you need. No questions asked.</p>
-    <div class="hero-actions">
+    <p>One command sets up CI/CD, health monitoring, security, and AI agent config. Reads your project. Generates only what you need.</p>
+    <div class="hero-row">
       <div class="hero-cmd" id="heroCmd">
         <span class="dollar">$</span>
         <span class="cmd">npx shipkit-pipe</span>
-        <button id="heroCopyBtn" aria-label="Copy command">
-          <svg id="heroCopyIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-          <svg id="heroCheckIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none"><path d="M20 6L9 17l-5-5"/></svg>
+        <button id="heroCopyBtn" aria-label="Copy">
+          <svg id="heroCopyIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          <svg id="heroCheckIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none"><path d="M20 6L9 17l-5-5"/></svg>
         </button>
       </div>
-      <a href="#demo" class="hero-try">Try it live <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      <a href="#demo" class="hero-try">Try it live <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
     </div>
-    <p class="hero-footnote">No install. No config. No questions. Just works.</p>
+    <p class="hero-foot">No install. No config. No questions. Just works.</p>
   </div>
 </section>
 
-<section class="section-dark section-border">
+<section class="section-dark" style="border-top:1px solid var(--border)">
   <div class="container">
-    <div class="stats">
+    <div class="stats-row">
       <div class="stat"><div class="stat-val" id="stat1">0</div><div class="stat-label">Files generated</div></div>
-      <div class="stat"><div class="stat-val" id="stat2">0</div><div class="stat-label">Platforms supported</div></div>
+      <div class="stat"><div class="stat-val purple" id="stat2">0</div><div class="stat-label">Platforms supported</div></div>
       <div class="stat"><div class="stat-val" id="stat3">0</div><div class="stat-label">Frameworks detected</div></div>
-      <div class="stat"><div class="stat-val" id="stat4">0</div><div class="stat-label">CI platforms</div></div>
+      <div class="stat"><div class="stat-val purple" id="stat4">0</div><div class="stat-label">CI platforms</div></div>
     </div>
   </div>
 </section>
 
-<section id="demo" class="section">
+<section id="demo" class="section bg-dots">
   <div class="container">
-    <div class="section-header reveal">
+    <div class="section-head reveal">
       <h2>Try it live</h2>
-      <p>Type commands into the terminal below and see what ShipKit generates for your stack.</p>
+      <p>Commands in the terminal. Results in seconds. Skip to any stack below.</p>
     </div>
-    <div class="terminal reveal" id="termContainer">
-      <div class="terminal-header">
-        <span class="terminal-dot" style="background:#ef4444"></span>
-        <span class="terminal-dot" style="background:#eab308"></span>
-        <span class="terminal-dot" style="background:#22c55e"></span>
-        <span class="terminal-title">shipkit-pipe — interactive demo</span>
-        <button id="resetTermBtn" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;margin-left:auto">⟳ Reset</button>
-      </div>
-      <div class="terminal-body" id="termBody">
-        <div class="terminal-line terminal-dim">Type a command or click a suggestion. Try: npx shipkit-pipe, check, help</div>
-        <div class="terminal-input-line"><span class="terminal-prompt">$</span><input type="text" id="termInput" class="terminal-input" placeholder="type a command..." autocomplete="off" spellcheck="false"><span class="cursor"></span></div>
-      </div>
-      <div class="terminal-suggestions" id="termSuggestions">
-        <button data-cmd="npx shipkit-pipe"><span class="dollar">$</span> npx shipkit-pipe</button>
-        <button data-cmd="npx shipkit-pipe --dry-run"><span class="dollar">$</span> npx shipkit-pipe --dry-run</button>
-        <button data-cmd="npx shipkit-pipe check"><span class="dollar">$</span> npx shipkit-pipe check</button>
-        <button data-cmd="help"><span class="dollar">$</span> help</button>
+    <div class="terminal-wrap reveal">
+      <div class="terminal" id="termContainer">
+        <div class="terminal-bar">
+          <span class="terminal-dot" style="background:#ef4444"></span>
+          <span class="terminal-dot" style="background:#eab308"></span>
+          <span class="terminal-dot" style="background:#22c55e"></span>
+          <span class="terminal-label">shipkit-pipe — interactive demo</span>
+          <button id="resetTermBtn" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;margin-left:auto">⟳ Reset</button>
+        </div>
+        <div class="terminal-body" id="termBody">
+          <div class="terminal-line terminal-dim">Type a command or click a snippet. Try: npx shipkit-pipe, check, help</div>
+          <div class="terminal-inp-wrap"><span class="terminal-prompt">$</span><input type="text" id="termInput" class="terminal-input" placeholder="type a command..." autocomplete="off" spellcheck="false"><span class="blink"></span></div>
+        </div>
+        <div class="terminal-chips" id="termChips">
+          <button data-cmd="npx shipkit-pipe"><span class="dollar">$</span> shipkit-pipe</button>
+          <button data-cmd="npx shipkit-pipe --dry-run"><span class="dollar">$</span> --dry-run</button>
+          <button data-cmd="npx shipkit-pipe check"><span class="dollar">$</span> check</button>
+          <button data-cmd="help"><span class="dollar">$</span> help</button>
+        </div>
       </div>
     </div>
-    <div class="stack-picker reveal">
+    <div class="stack-row reveal">
       <p>Or pick a stack to auto-generate:</p>
-      <div class="stack-btns" id="stackBtns">
+      <div class="stack-chips" id="stackChips">
         <button data-stack="next" class="active">Next.js</button>
         <button data-stack="react">React</button>
         <button data-stack="vue">Vue</button>
@@ -321,431 +307,255 @@ footer{border-top:1px solid var(--border);padding:32px 0}
   </div>
 </section>
 
-<section id="features" class="section section-dark section-border">
+<section id="features" class="section section-dark" style="border-top:1px solid var(--border)">
   <div class="container">
-    <div class="section-header reveal">
-      <h2>What your automated team does</h2>
-      <p>Six systems that run automatically after you push. You never check manually again.</p>
+    <div class="section-head reveal">
+      <h2>Your automated team</h2>
+      <p>Six pipelines that run automatically after you push. No manual checking.</p>
     </div>
-    <div class="features-grid">
-      <div class="feature-card" style="transition-delay:0s"><div class="feature-icon" style="background:rgba(0,212,255,.1)">⚡</div><h3>Smart CI/CD</h3><p>Generates CI that matches <strong>your</strong> scripts. Only includes steps that exist. Lint script? Lint step. Your CI never fails because of bad config.</p></div>
-      <div class="feature-card" style="transition-delay:.1s"><div class="feature-icon" style="background:rgba(34,197,94,.1)">🏥</div><h3>Health Monitoring</h3><p>Pings your production site every 6 hours. Down? Auto-creates a GitHub Issue. Recovers? Auto-closes it. You know before your users.</p></div>
-      <div class="feature-card" style="transition-delay:.2s"><div class="feature-icon" style="background:rgba(167,139,250,.1)">🔒</div><h3>Security Scanning</h3><p>CodeQL scans every push for vulnerabilities. Dependabot keeps deps updated. No manual checking.</p></div>
-      <div class="feature-card" style="transition-delay:.3s"><div class="feature-icon" style="background:rgba(251,191,36,.1)">🤖</div><h3>AI Agent Memory</h3><p>Generates <code>AGENTS.md</code> so your AI agent knows your stack, rules, and last session. No more starting from scratch.</p></div>
-      <div class="feature-card" style="transition-delay:.4s"><div class="feature-icon" style="background:rgba(0,212,255,.1)">📦</div><h3>Auto-detect Everything</h3><p>Framework, package manager, Node version, deploy platform, git remote — all detected from existing files. <strong>Zero config.</strong></p></div>
-      <div class="feature-card" style="transition-delay:.5s"><div class="feature-icon" style="background:rgba(34,197,94,.1)">✅</div><h3>Verify Command</h3><p>Run <code>npx shipkit-pipe check</code> anytime. Pings your site, validates CI, checks vulnerabilities. One command tells you everything works.</p></div>
+    <div class="f-row">
+      <div class="f-card reveal"><div class="icon" style="background:rgba(0,102,255,.1)">⚡</div><h3>Smart CI/CD</h3><p>Generates CI that matches <strong>your</strong> scripts. Only includes steps you have. Never fails from bad config.</p></div>
+      <div class="f-card reveal"><div class="icon" style="background:rgba(34,197,94,.1)">🏥</div><h3>Health Monitoring</h3><p>Pings every 6h. Down? Auto-creates a GitHub Issue. Recovers? Auto-closes it. You know before users.</p></div>
+      <div class="f-card reveal"><div class="icon" style="background:rgba(167,139,250,.1)">🔒</div><h3>Security Scanning</h3><p>CodeQL scans every push. Dependabot keeps deps updated. <span class="f-badge" style="background:rgba(167,139,250,.1);color:#a78bfa">Every push</span></p></div>
+      <div class="f-card reveal"><div class="icon" style="background:rgba(251,191,36,.1)">🤖</div><h3>AI Agent Memory</h3><p>Generates <code>AGENTS.md</code> so your AI agent knows your stack, rules, and last session.</p></div>
+      <div class="f-card reveal"><div class="icon" style="background:rgba(0,102,255,.1)">📦</div><h3>Auto-detect</h3><p>Framework, package manager, Node version, deploy platform — all detected. <strong>Zero config.</strong></p></div>
+      <div class="f-card reveal"><div class="icon" style="background:rgba(34,197,94,.1)">✅</div><h3>Verify Command</h3><p><code>npx shipkit-pipe check</code> — validates CI, pings your site, checks vulnerabilities. One command.</p></div>
     </div>
   </div>
 </section>
 
 <section class="section">
   <div class="container">
-    <div class="section-header reveal">
-      <h2>Works everywhere. No excuses.</h2>
-      <p>Empty folder, monorepo, full-stack app, API server — ShipKit detects what you have.</p>
+    <div class="section-head reveal">
+      <h2>How it detects</h2>
+      <p>It reads your files. Not your mind.</p>
     </div>
-    <div class="detect-table reveal">
+    <div class="t-wrap reveal">
       <table>
-        <thead><tr><th>What it detects</th><th>Reads from</th><th class="method">Method</th></tr></thead>
+        <thead><tr><th>What</th><th>Source</th><th class="mute">Method</th></tr></thead>
         <tbody>
-          <tr><td>Framework</td><td>package.json deps</td><td class="method">next, react, vue → match</td></tr>
-          <tr><td>Scripts</td><td>package.json scripts</td><td class="method">Only includes steps you have</td></tr>
-          <tr><td>Package manager</td><td>Lock files</td><td class="method">pnpm-lock / yarn.lock / bun.lockb</td></tr>
-          <tr><td>Node version</td><td>.nvmrc / .node-version</td><td class="method">Reads exact version string</td></tr>
-          <tr><td>Git platform</td><td>git remote origin URL</td><td class="method">GitHub / GitLab / Bitbucket</td></tr>
-          <tr><td>Deploy URL</td><td>vercel.json / fly.toml</td><td class="method">Parses config files</td></tr>
-          <tr><td>Monorepo</td><td>Subdirectories</td><td class="method">Scans frontend/ backend/ web/</td></tr>
-          <tr><td>Non-Node projects</td><td>pyproject.toml / go.mod</td><td class="method">Python, Go, Rust, Docker</td></tr>
+          <tr><td>Framework</td><td>package.json deps</td><td class="mute">next, react, vue → match</td></tr>
+          <tr><td>Scripts</td><td>package.json</td><td class="mute">Only steps you have</td></tr>
+          <tr><td>Package manager</td><td>Lock files</td><td class="mute">pnpm, yarn, bun</td></tr>
+          <tr><td>Git platform</td><td>git remote URL</td><td class="mute">GitHub / GitLab / Bitbucket</td></tr>
+          <tr><td>Deploy URL</td><td>vercel.json / fly.toml</td><td class="mute">Parses config</td></tr>
+          <tr><td>Monorepo</td><td>Subdirectories</td><td class="mute">frontend/ backend/ app/</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 </section>
 
-<section id="how" class="section section-dark section-border">
+<section id="how" class="section section-dark" style="border-top:1px solid var(--border)">
   <div class="container">
-    <div class="section-header reveal">
+    <div class="section-head reveal">
       <h2>Three seconds. Four steps.</h2>
-      <p>From install to working pipeline — no wizard, no prompts, no signup.</p>
+      <p>From install to working pipeline — no wizard, no prompts.</p>
     </div>
-    <div class="steps-grid">
-      <div class="step"><div class="step-num" style="background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.3)">1</div><h4>Run the command</h4><p><code class="code" style="background:var(--bg4);padding:2px 8px;border-radius:4px;font-size:13px">npx shipkit-pipe</code></p></div>
-      <div class="step"><div class="step-num" style="background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3)">2</div><h4>Auto-detect</h4><p>Reads package.json, lock files, git remote, deploy config</p></div>
-      <div class="step"><div class="step-num" style="background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.3)">3</div><h4>Generate</h4><p>CI, health checks, security scanning, AI agent files</p></div>
-      <div class="step"><div class="step-num" style="background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3)">4</div><h4>Push and forget</h4><p>CI on every PR. Health check every 6h. Deps auto-update.</p></div>
-    </div>
-  </div>
-</section>
-
-<section class="section">
-  <div class="container">
-    <div class="section-header reveal">
-      <h2>Before ShipKit vs After</h2>
-      <p>The difference is one command.</p>
-    </div>
-    <div class="compare-grid">
-      <div class="compare-card before reveal">
-        <h4><span class="icon" style="color:#ef4444">✗</span> Before ShipKit</h4>
-        <ul>
-          <li><span class="icon" style="color:#ef4444">✗</span> Manually configure CI/CD for every project</li>
-          <li><span class="icon" style="color:#ef4444">✗</span> CI fails because config doesn't match your scripts</li>
-          <li><span class="icon" style="color:#ef4444">✗</span> No health monitoring — users tell you it's down</li>
-          <li><span class="icon" style="color:#ef4444">✗</span> Manual CodeQL + Dependabot setup</li>
-          <li><span class="icon" style="color:#ef4444">✗</span> Write separate prompts for AI agent every session</li>
-          <li><span class="icon" style="color:#ef4444">✗</span> GitLab/Bitbucket? Write CI from scratch</li>
-        </ul>
-      </div>
-      <div class="compare-card after reveal">
-        <h4><span class="icon" style="color:#22c55e">✓</span> After <span class="gradient-text">npx shipkit-pipe</span></h4>
-        <ul>
-          <li><span class="icon" style="color:#22c55e">✓</span> CI auto-generated from your scripts</li>
-          <li><span class="icon" style="color:#22c55e">✓</span> Smart CI — only steps that exist, never fails</li>
-          <li><span class="icon" style="color:#22c55e">✓</span> Health check pings every 6h, auto-creates issues</li>
-          <li><span class="icon" style="color:#22c55e">✓</span> Security + deps generated automatically</li>
-          <li><span class="icon" style="color:#22c55e">✓</span> AGENTS.md — agent knows your stack</li>
-          <li><span class="icon" style="color:#22c55e">✓</span> Auto-detects platform, generates right format</li>
-        </ul>
-      </div>
+    <div class="steps steps-connector">
+      <div class="step reveal"><div class="step-icon" style="background:rgba(0,102,255,.12);border:1px solid rgba(0,102,255,.25)">1</div><h4>Run the command</h4><p><code class="code" style="background:var(--bg4);padding:1px 6px;border-radius:3px;font-size:12px">npx shipkit-pipe</code></p></div>
+      <div class="step reveal"><div class="step-icon" style="background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25)">2</div><h4>Auto-detect</h4><p>Reads package.json, lock files, git remote</p></div>
+      <div class="step reveal"><div class="step-icon" style="background:rgba(0,102,255,.12);border:1px solid rgba(0,102,255,.25)">3</div><h4>Generate</h4><p>CI, health checks, security, AI agent files</p></div>
+      <div class="step reveal"><div class="step-icon" style="background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25)">4</div><h4>Push & forget</h4><p>CI on every PR. Health every 6h. Deps auto-update.</p></div>
     </div>
   </div>
 </section>
 
-<section class="section section-dark section-border">
+<section id="install" class="section section-dark" style="border-top:1px solid var(--border)">
   <div class="container">
-    <div class="section-header reveal">
-      <h2>Why doesn't it ask anything?</h2>
-      <p>Because your project already tells ShipKit everything it needs to know.</p>
-    </div>
-    <div class="accordion" id="faqAccordion">
-      <div class="accordion-item reveal"><button class="accordion-btn">📋 package.json scripts<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><p>If you have a <code>lint</code> script, CI gets a lint step. No <code>test</code> script? No test step. Your CI never fails because of missing commands.</p></div></div>
-      <div class="accordion-item reveal"><button class="accordion-btn">📂 Lock files<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><p><code>pnpm-lock.yaml</code> → pnpm. <code>yarn.lock</code> → yarn. <code>bun.lockb</code> → bun. No guessing.</p></div></div>
-      <div class="accordion-item reveal"><button class="accordion-btn">🔗 Git remote<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><p>Reads <code>origin</code> URL to get your GitHub owner/repo. Supports GitHub, GitLab, and Bitbucket.</p></div></div>
-      <div class="accordion-item reveal"><button class="accordion-btn">🚀 Deploy config<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><p>Found <code>vercel.json</code>? Health checks ping your Vercel URL. Found <code>fly.toml</code>? It knows your Fly.io app name.</p></div></div>
-      <div class="accordion-item reveal"><button class="accordion-btn">💡 Want to customize?<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><p>Run <code>npx shipkit-pipe -i</code> for interactive mode. But 95% of users never need it.</p></div></div>
-    </div>
-  </div>
-</section>
-
-<section id="security" class="section">
-  <div class="container">
-    <div class="section-header reveal">
-      <h2>Security gates. Automatic.</h2>
-      <p>Four layers of protection that run without you lifting a finger.</p>
-    </div>
-    <div style="max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:12px">
-      <div class="reveal" style="display:flex;align-items:center;gap:16px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px 20px"><div style="width:32px;height:32px;border-radius:8px;background:rgba(0,212,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">⚡</div><div><h4 style="font-size:14px;font-weight:700;margin-bottom:2px">CI Pipeline</h4><p style="font-size:13px;color:var(--text2)">Lint → typecheck → test → build on every push/PR.</p></div><span style="margin-left:auto;flex-shrink:0;font-size:11px;background:rgba(0,212,255,.1);color:var(--accent);padding:4px 10px;border-radius:100px;font-weight:600">Push / PR</span></div>
-      <div class="reveal" style="display:flex;align-items:center;gap:16px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px 20px"><div style="width:32px;height:32px;border-radius:8px;background:rgba(167,139,250,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">🔒</div><div><h4 style="font-size:14px;font-weight:700;margin-bottom:2px">CodeQL Security</h4><p style="font-size:13px;color:var(--text2)">100+ vulnerability classes — injection, XSS, crypto, path traversal.</p></div><span style="margin-left:auto;flex-shrink:0;font-size:11px;background:rgba(167,139,250,.1);color:#a78bfa;padding:4px 10px;border-radius:100px;font-weight:600">Every push</span></div>
-      <div class="reveal" style="display:flex;align-items:center;gap:16px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px 20px"><div style="width:32px;height:32px;border-radius:8px;background:rgba(251,191,36,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">📦</div><div><h4 style="font-size:14px;font-weight:700;margin-bottom:2px">Dependabot</h4><p style="font-size:13px;color:var(--text2)">Weekly dependency updates. Groups minor/patch. Auto-PRs.</p></div><span style="margin-left:auto;flex-shrink:0;font-size:11px;background:rgba(251,191,36,.1);color:var(--gold);padding:4px 10px;border-radius:100px;font-weight:600">Weekly</span></div>
-      <div class="reveal" style="display:flex;align-items:center;gap:16px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px 20px"><div style="width:32px;height:32px;border-radius:8px;background:rgba(34,197,94,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">🏥</div><div><h4 style="font-size:14px;font-weight:700;margin-bottom:2px">Health Check</h4><p style="font-size:13px;color:var(--text2)">Pings every 6h. Down? Auto-creates issue. Recovered? Auto-closes.</p></div><span style="margin-left:auto;flex-shrink:0;font-size:11px;background:rgba(34,197,94,.1);color:var(--green);padding:4px 10px;border-radius:100px;font-weight:600">Every 6h</span></div>
-    </div>
-  </div>
-</section>
-
-<section id="install" class="section section-dark section-border">
-  <div class="container">
-    <div class="section-header reveal">
+    <div class="section-head reveal">
       <h2>Install in one line</h2>
-      <p>No signup. No wizard. No survey. Choose your method.</p>
+      <p>No signup. No wizard. Choose your method.</p>
     </div>
-    <div class="install-tabs reveal">
+    <div class="install-wrap reveal">
       <div class="tab-bar" id="tabBar">
         <button class="tab-btn active" data-tab="npx">npx</button>
-        <button class="tab-btn" data-tab="bash">curl bash</button>
+        <button class="tab-btn" data-tab="bash">curl</button>
         <button class="tab-btn" data-tab="powershell">PowerShell</button>
-        <button class="tab-btn" data-tab="global">npm i -g</button>
+        <button class="tab-btn" data-tab="global">npm -g</button>
       </div>
-      <div class="tab-content active" id="tab-npx"><div class="tab-code"><div class="tab-code-header"><span><span style="color:var(--gold)">$</span> npx shipkit-pipe</span><button class="tab-copy-btn" data-cmd="npx shipkit-pipe"><svg class="copy-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><svg class="check-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none"><path d="M20 6L9 17l-5-5"/></svg></button></div><div class="tab-footer">No install needed. Works with Node 18+.</div></div></div>
-      <div class="tab-content" id="tab-bash"><div class="tab-code"><div class="tab-code-header"><span><span style="color:var(--gold)">$</span> curl -fsSL https://raw.githubusercontent.com/sagar-grv/shipkit/main/setup.sh | bash</span><button class="tab-copy-btn" data-cmd="curl -fsSL https://raw.githubusercontent.com/sagar-grv/shipkit/main/setup.sh | bash"><svg class="copy-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><svg class="check-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none"><path d="M20 6L9 17l-5-5"/></svg></button></div><div class="tab-footer">Linux/macOS. No Node.js? This works.</div></div></div>
-      <div class="tab-content" id="tab-powershell"><div class="tab-code"><div class="tab-code-header"><span><span style="color:var(--gold)">PS&gt;</span> irm https://raw.githubusercontent.com/sagar-grv/shipkit/main/setup.ps1 | powershell</span><button class="tab-copy-btn" data-cmd="irm https://raw.githubusercontent.com/sagar-grv/shipkit/main/setup.ps1 | powershell"><svg class="copy-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><svg class="check-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none"><path d="M20 6L9 17l-5-5"/></svg></button></div><div class="tab-footer">Windows PowerShell 5.1+ (no Node.js needed).</div></div></div>
-      <div class="tab-content" id="tab-global"><div class="tab-code"><div class="tab-code-header"><span><span style="color:var(--gold)">$</span> npm install -g shipkit-pipe</span><button class="tab-copy-btn" data-cmd="npm install -g shipkit-pipe"><svg class="copy-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><svg class="check-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none"><path d="M20 6L9 17l-5-5"/></svg></button></div><div class="tab-footer">Global install. 19KB. Zero dependencies.</div></div></div>
+      <div class="tab-pane active" id="tab-npx"><div class="tab-code"><div class="tab-code-head"><span class="cmd-text"><span style="color:var(--gold)">$</span> npx shipkit-pipe</span><button class="tab-copy" data-cmd="npx shipkit-pipe"><svg class="copy-icon" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><svg class="check-icon" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none"><path d="M20 6L9 17l-5-5"/></svg></button></div><div class="tab-foot">No install needed. Node 18+.</div></div></div>
+      <div class="tab-pane" id="tab-bash"><div class="tab-code"><div class="tab-code-head"><span class="cmd-text"><span style="color:var(--gold)">$</span> curl -fsSL https://git.io/shipkit | bash</span><button class="tab-copy" data-cmd="curl -fsSL https://raw.githubusercontent.com/sagar-grv/shipkit/main/setup.sh | bash"><svg class="copy-icon" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><svg class="check-icon" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none"><path d="M20 6L9 17l-5-5"/></svg></button></div><div class="tab-foot">Linux/macOS. No Node? This works.</div></div></div>
+      <div class="tab-pane" id="tab-powershell"><div class="tab-code"><div class="tab-code-head"><span class="cmd-text"><span style="color:var(--gold)">PS&gt;</span> irm https://git.io/shipkit-ps1 | powershell</span><button class="tab-copy" data-cmd="irm https://raw.githubusercontent.com/sagar-grv/shipkit/main/setup.ps1 | powershell"><svg class="copy-icon" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><svg class="check-icon" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none"><path d="M20 6L9 17l-5-5"/></svg></button></div><div class="tab-foot">Windows PowerShell 5.1+.</div></div></div>
+      <div class="tab-pane" id="tab-global"><div class="tab-code"><div class="tab-code-head"><span class="cmd-text"><span style="color:var(--gold)">$</span> npm install -g shipkit-pipe</span><button class="tab-copy" data-cmd="npm install -g shipkit-pipe"><svg class="copy-icon" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><svg class="check-icon" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none"><path d="M20 6L9 17l-5-5"/></svg></button></div><div class="tab-foot">19KB. Zero dependencies.</div></div></div>
     </div>
-    <div style="text-align:center;margin-top:24px;font-size:13px;color:var(--text3)"><span>✓ No telemetry. No signup. Forever free.</span></div>
+    <div style="text-align:center;margin-top:20px;font-size:12px;color:var(--text3)">✓ No telemetry · No signup · Forever free</div>
   </div>
 </section>
 
 <section id="faq" class="section">
   <div class="container">
-    <div class="section-header reveal">
-      <h2>Frequently asked questions</h2>
-      <p>Everything you need to know about ShipKit.</p>
+    <div class="section-head reveal">
+      <h2>Frequently asked</h2>
+      <p>Everything you need to know.</p>
     </div>
-    <div class="accordion" id="faqAccordion2">
-      <div class="accordion-item reveal"><button class="accordion-btn">Does it work with GitLab or Bitbucket?<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><p>Yes. ShipKit reads your <code>git remote origin URL</code> and auto-selects the right CI format: GitHub Actions, GitLab CI, or Bitbucket Pipelines.</p></div></div>
-      <div class="accordion-item reveal"><button class="accordion-btn">What if my project doesn't use Node.js?<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><p>ShipKit detects Python (<code>pyproject.toml</code>), Go (<code>go.mod</code>), Rust (<code>Cargo.toml</code>), and Docker. No Node.js? Use the curl bash install.</p></div></div>
-      <div class="accordion-item reveal"><button class="accordion-btn">Can I preview before generating?<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><p>Yes. Run <code>npx shipkit-pipe --dry-run</code> to see exactly what files would be generated without writing anything.</p></div></div>
-      <div class="accordion-item reveal"><button class="accordion-btn">Does it work in a monorepo?<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><p>Yes. ShipKit scans <code>frontend/</code>, <code>backend/</code>, <code>web/</code>, <code>app/</code> for sub-projects when root has no package.json.</p></div></div>
-      <div class="accordion-item reveal"><button class="accordion-btn">Can I regenerate if files already exist?<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><p>ShipKit skips existing files by default. Use <code>npx shipkit-pipe --force</code> to overwrite.</p></div></div>
-      <div class="accordion-item reveal"><button class="accordion-btn">Is ShipKit free? What's the catch?<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><p>100% free. Apache 2.0 license. No telemetry, no signup, no SaaS, no API keys. There's no catch.</p></div></div>
+    <div class="accordion reveal">
+      <div class="accordion-item"><button class="accordion-btn">GitLab or Bitbucket?<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><div class="accordion-body-inner">Yes. ShipKit reads your <code>git remote origin URL</code> and auto-selects the right CI format: GitHub Actions, GitLab CI, or Bitbucket Pipelines.</div></div></div>
+      <div class="accordion-item"><button class="accordion-btn">What if my project has no Node.js?<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><div class="accordion-body-inner">ShipKit detects Python (<code>pyproject.toml</code>), Go (<code>go.mod</code>), Rust (<code>Cargo.toml</code>), and Docker. No Node? Use the curl bash install.</div></div></div>
+      <div class="accordion-item"><button class="accordion-btn">Can I preview before generating?<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><div class="accordion-body-inner">Run <code>npx shipkit-pipe --dry-run</code> to see exactly what files would be generated, without writing anything.</div></div></div>
+      <div class="accordion-item"><button class="accordion-btn">My files already exist?<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><div class="accordion-body-inner">ShipKit skips existing files by default. Use <code>npx shipkit-pipe --force</code> to overwrite.</div></div></div>
+      <div class="accordion-item"><button class="accordion-btn">Is it actually free?<svg class="accordion-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="accordion-body"><div class="accordion-body-inner">100% free. Apache 2.0. No telemetry, no signup, no SaaS, no API keys. There's no catch.</div></div></div>
     </div>
   </div>
 </section>
 
-<section class="cta bg-grid section-border">
-  <div class="bg-glow"></div>
-  <div class="container" style="position:relative;z-index:2">
+<section class="cta" style="border-top:1px solid var(--border)">
+  <div class="container">
     <h2>Ship with confidence.</h2>
     <p>Your project gets an automated team in 3 seconds. Free. Open source. Forever.</p>
-    <div class="cta-actions">
-      <a href="https://github.com/sagar-grv/shipkit" target="_blank" class="cta-primary">
-        <svg width="20" height="20" viewBox="0 0 16 16"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/></svg> Star on GitHub</a>
-      <div class="cta-secondary"><span style="color:var(--text3)">$</span> npx shipkit-pipe</div>
+    <div class="cta-row">
+      <a href="https://github.com/sagar-grv/shipkit" target="_blank" class="cta-btn">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/></svg> Star on GitHub</a>
+      <div class="cta-mon"><span class="dollar">$</span> npx shipkit-pipe</div>
     </div>
-    <p style="font-size:12px;color:var(--text3);margin-top:20px">19KB. Zero dependencies. Node 18+. Any OS.</p>
+    <p style="font-size:11px;color:var(--text3);margin-top:18px">19KB · Zero dependencies · Node 18+ · Any OS</p>
   </div>
 </section>
 
 <footer>
   <div class="container">
-    <div class="footer-inner">
-      <div class="footer-brand"><span>⚓</span><strong>ShipKit</strong><span style="color:var(--text3);font-size:12px">v3.1.0</span></div>
-      <div class="footer-links">
+    <div class="f-inner">
+      <div class="f-brand"><span class="anchor">⚓</span><strong>ShipKit</strong><span style="color:var(--text3);font-size:11px">v3.1.0</span></div>
+      <div class="f-links">
         <a href="https://github.com/sagar-grv/shipkit">GitHub</a>
         <a href="https://www.npmjs.com/package/shipkit-pipe">npm</a>
         <a href="https://github.com/sagar-grv/shipkit/issues">Issues</a>
         <a href="https://github.com/sagar-grv/shipkit/security/policy">Security</a>
       </div>
     </div>
-    <div class="footer-copy">Built by <a href="https://github.com/sagar-grv" style="color:var(--text2)">Sagar Giri</a> — Apache 2.0 License</div>
+    <div class="f-copy">Built by <a href="https://github.com/sagar-grv" style="color:var(--text2)">Sagar Giri</a> — Apache 2.0</div>
   </div>
 </section>
 
 <script>
 (function(){
-// === Scroll-based reveal (progressive enhancement: if JS fails, content stays visible) ===
+// === Scroll reveal (progressive enhancement) ===
 var reveals = document.querySelectorAll('.reveal');
 if ('IntersectionObserver' in window && reveals.length) {
-  reveals.forEach(function(el) { el.classList.add('reveal-animate'); });
-  var observer = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('revealed');
-        observer.unobserve(entry.target);
-      }
+  reveals.forEach(function(e){e.classList.add('reveal-animate')});
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (e.isIntersecting){e.target.classList.add('revealed');obs.unobserve(e.target)}
     });
-  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-  reveals.forEach(function(el) { observer.observe(el); });
+  },{threshold:.08});
+  reveals.forEach(function(e){obs.observe(e)});
 }
 
-// === Nav scroll effect ===
+// === Nav ===
 var nav = document.getElementById('nav');
-window.addEventListener('scroll', function() {
-  nav.classList.toggle('scrolled', window.scrollY > 20);
+window.addEventListener('scroll',function(){nav.classList.toggle('scrolled',window.scrollY>20)});
+document.getElementById('navToggle').addEventListener('click',function(){
+  var m=document.getElementById('mobileMenu'),mi=document.getElementById('menuIcon'),ci=document.getElementById('closeIcon');
+  m.classList.toggle('open');mi.style.display=m.classList.contains('open')?'none':'';ci.style.display=m.classList.contains('open')?'':'none';
 });
-document.getElementById('navToggle').addEventListener('click', function() {
-  var menu = document.getElementById('mobileMenu');
-  var menuIcon = document.getElementById('menuIcon');
-  var closeIcon = document.getElementById('closeIcon');
-  menu.classList.toggle('open');
-  menuIcon.style.display = menu.classList.contains('open') ? 'none' : '';
-  closeIcon.style.display = menu.classList.contains('open') ? '' : 'none';
-});
-document.querySelectorAll('.mobile-link').forEach(function(el) {
-  el.addEventListener('click', function() {
+document.querySelectorAll('#mobileMenu a').forEach(function(a){
+  a.addEventListener('click',function(){
     document.getElementById('mobileMenu').classList.remove('open');
-    document.getElementById('menuIcon').style.display = '';
-    document.getElementById('closeIcon').style.display = 'none';
+    document.getElementById('menuIcon').style.display='';document.getElementById('closeIcon').style.display='none';
   });
 });
 
-// === Hero copy button ===
-document.getElementById('heroCopyBtn').addEventListener('click', function() {
-  navigator.clipboard.writeText('npx shipkit-pipe').then(function() {
-    document.getElementById('heroCopyIcon').style.display = 'none';
-    document.getElementById('heroCheckIcon').style.display = '';
-    setTimeout(function() {
-      document.getElementById('heroCopyIcon').style.display = '';
-      document.getElementById('heroCheckIcon').style.display = 'none';
-    }, 2000);
-  });
+// === Hero copy ===
+document.getElementById('heroCopyBtn').addEventListener('click',function(){
+  navigator.clipboard.writeText('npx shipkit-pipe');
+  var ci=document.getElementById('heroCopyIcon'),ch=document.getElementById('heroCheckIcon');
+  ci.style.display='none';ch.style.display='';setTimeout(function(){ci.style.display='';ch.style.display='none'},2000);
 });
 
-// === Stat counters (native IntersectionObserver) ===
-function animateCounter(el, target, duration) {
-  var start = null;
-  function step(ts) {
-    if (!start) start = ts;
-    var progress = Math.min((ts - start) / duration, 1);
-    var eased = 1 - Math.pow(1 - progress, 3);
-    el.textContent = Math.floor(eased * target);
-    if (progress < 1) requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-}
-var statObserver = new IntersectionObserver(function(entries) {
-  entries.forEach(function(entry) {
-    if (entry.isIntersecting) {
-      var el = entry.target;
-      if (el.dataset.counted) return;
-      el.dataset.counted = '1';
-      var vals = { stat1: 7, stat2: 4, stat3: 10, stat4: 3 };
-      animateCounter(el, vals[el.id] || 0, 2000);
-      statObserver.unobserve(el);
+// === Stat counters ===
+function animCounter(el,t){var s=null;function step(ts){if(!s)s=ts;var p=Math.min((ts-s)/2000,1),v=Math.floor(t*(1-Math.pow(1-p,3)));el.textContent=v;if(p<1)requestAnimationFrame(step)}requestAnimationFrame(step)}
+var so=new IntersectionObserver(function(entries){
+  entries.forEach(function(e){
+    if(e.isIntersecting){
+      var el=e.target;if(el.dataset.done)return;el.dataset.done='1';
+      var v={stat1:7,stat2:4,stat3:10,stat4:3};
+      animCounter(el,v[el.id]||0);so.unobserve(el);
     }
   });
 });
-['stat1','stat2','stat3','stat4'].forEach(function(id) {
-  var el = document.getElementById(id);
-  if (el) statObserver.observe(el);
-});
+['stat1','stat2','stat3','stat4'].forEach(function(id){var el=document.getElementById(id);if(el)so.observe(el)});
 
-// === Terminal demo ===
-var termInput = document.getElementById('termInput');
-var termBody = document.getElementById('termBody');
-var termHistory = [];
-var termHistoryIdx = -1;
-
-function termAddLine(text, cls) {
-  var div = document.createElement('div');
-  div.className = 'terminal-line' + (cls ? ' ' + cls : '');
-  div.textContent = text;
-  termBody.insertBefore(div, termBody.lastElementChild);
+// === Terminal ===
+var ti=document.getElementById('termInput'),tb=document.getElementById('termBody'),hist=[],hIdx=-1;
+function tadd(t,c){var d=document.createElement('div');d.className='terminal-line'+(c?' '+c:'');d.textContent=t;tb.insertBefore(d,tb.lastElementChild);}
+function trexec(){
+  var cmd=ti.value.trim();if(!cmd)return;ti.value='';hist.unshift(cmd);hIdx=-1;
+  var p=document.createElement('div');p.className='terminal-line';p.innerHTML='<span class="terminal-prompt">$</span> '+cmd;tb.insertBefore(p,tb.lastElementChild);
+  var l=cmd.toLowerCase(),lines=[];
+  if(l==='help'){['Examples:','  shipkit-pipe          Auto-detect & generate','  shipkit-pipe check    Verify everything','  shipkit-pipe --dry-run Preview','  help                  This message','  clear                 Clear'].forEach(function(l){tadd(l,'terminal-dim')})}
+  else if(l==='clear'||l==='cls'){tb.innerHTML='';tb.appendChild(tb.lastElementChild)}
+  else if(l==='npx shipkit-pipe'||l==='shipkit-pipe'){['','  ⚓ ShipKit — my-project','','  ✓ Next.js | pnpm | Node 20','  ✓ Scripts: lint, test, build','  ✓ Generated 6 files','','  Files:','    shipkit.json, AGENTS.md','    .github/workflows/ci.yml','    .github/workflows/health.yml','    .github/dependabot.yml','    .github/workflows/codeql.yml'].forEach(function(l){tadd(l,l.startsWith('  ✓')?'terminal-success':l.startsWith('  ⚓')?'terminal-info':'terminal-output')})}
+  else if(l.includes('dry-run')){['','  ⚓ ShipKit — dry run','','  Detected: Next.js | pnpm | Node 20','    Platform: github','','  Would generate: 6 files','    CI, health, security, deps','    AGENTS.md, shipkit.json'].forEach(function(l){tadd(l,l.startsWith('  ⚓')?'terminal-info':'terminal-output')})}
+  else if(l.includes('check')){['','  ⚓ ShipKit Check','','  ✓ Project: my-awesome-app','  ✓ CI workflow valid','  ✓ Health check configured','  ✓ Site is up — 200','  ✓ No critical vulnerabilities','  ✓ AI agent ready'].forEach(function(l){tadd(l,l.startsWith('  ✓')?'terminal-success':l.startsWith('  ⚓')?'terminal-info':'terminal-output')})}
+  else if(l.includes('--force')){['','  ⚓ ShipKit — my-project','','  ✓ Next.js | pnpm | Node 20','  ⚠ Overwriting existing files','  ✓ Generated 6 files (0 skipped)'].forEach(function(l){tadd(l,l.startsWith('  ⚠')?'terminal-success':l.startsWith('  ⚓')?'terminal-info':'terminal-output')})}
+  else{tadd('  Unknown. Try "help".','terminal-dim')}
+  tb.scrollTop=tb.scrollHeight;
 }
-
-function termExecute() {
-  var cmd = termInput.value.trim();
-  if (!cmd) return;
-  termInput.value = '';
-  termHistory.unshift(cmd);
-  termHistoryIdx = -1;
-  var promptDiv = document.createElement('div');
-  promptDiv.className = 'terminal-line';
-  promptDiv.innerHTML = '<span class="terminal-prompt">$</span> ' + cmd;
-  termBody.insertBefore(promptDiv, termBody.lastElementChild);
-  var lower = cmd.toLowerCase();
-  var lines = [];
-  if (lower === 'help') {
-    lines = ['Type a command. Examples:', '  npx shipkit-pipe          Auto-detect & generate', '  npx shipkit-pipe check    Verify everything works', '  npx shipkit-pipe --dry-run Preview without writing', '  help                      Show this message', '  clear                     Clear terminal'];
-    lines.forEach(function(l) { termAddLine(l, 'terminal-dim'); });
-  } else if (lower === 'clear' || lower === 'cls') {
-    termBody.innerHTML = '';
-    termBody.appendChild(document.querySelector('.terminal-input-line').parentNode);
-  } else if (lower === 'npx shipkit-pipe' || lower === 'shipkit-pipe') {
-    var output = ['', '  ⚓ ShipKit — my-project', '', '  ✓ Next.js | pnpm | Node 20', '  ✓ Scripts: lint, test, build', '  ✓ Deploy: Vercel', '', '  ✓ Generated 6 files', '', '  Files:', '    shipkit.json              ← Project config', '    AGENTS.md                 ← AI agent instructions', '    .github/workflows/ci.yml  ← CI: lint → test → build', '    .github/workflows/health.yml ← Health check', '    .github/dependabot.yml    ← Auto-update deps', '    .github/workflows/codeql.yml ← Security scanning'];
-    output.forEach(function(l) { termAddLine(l, l.startsWith('  ✓') ? 'terminal-success' : l.includes('→') ? 'terminal-info' : 'terminal-output'); });
-  } else if (lower.includes('dry-run') || lower.includes('--dry-run')) {
-    var dry = ['', '  ⚓ ShipKit — dry run', '', '  Detected:', '    Project:   my-project', '    Framework: Next.js', '    Platform:  github', '    PM:        pnpm | Node 20', '', '  Would generate:', '    .github/workflows/ci.yml     ← CI', '    .github/dependabot.yml       ← Deps', '    .github/workflows/health.yml ← Health', '    .github/workflows/codeql.yml ← Security', '    shipkit.json, AGENTS.md'];
-    dry.forEach(function(l) { termAddLine(l, 'terminal-output'); });
-  } else if (lower.includes('check')) {
-    var chk = ['', '  ⚓ ShipKit Check', '', '  ✓ Project: my-awesome-app', '  ✓ shipkit.json exists', '  ✓ CI workflow valid', '  ✓ Health check configured', '  ✓ Site is up — 200', '  ✓ No critical vulnerabilities', '  ✓ AGENTS.md exists — AI agent ready'];
-    chk.forEach(function(l) { termAddLine(l, l.startsWith('  ✓') ? 'terminal-success' : l.startsWith('  ⚓') ? 'terminal-info' : 'terminal-output'); });
-  } else if (lower.includes('--force')) {
-    ['', '  ⚓ ShipKit — my-project', '', '  ✓ Next.js | pnpm | Node 20', '  ⚠ --force: Overwriting existing files', '', '  ✓ Generated 6 files (0 skipped)'].forEach(function(l) { termAddLine(l, l.startsWith('  ⚠') ? 'terminal-success' : l.startsWith('  ⚓') ? 'terminal-info' : 'terminal-output'); });
-  } else {
-    termAddLine('  Unknown command. Try "help".', 'terminal-dim');
-  }
-  termBody.scrollTop = termBody.scrollHeight;
-}
-termInput.addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') { termExecute(); }
-  else if (e.key === 'ArrowUp') { e.preventDefault(); if (termHistory.length) { termHistoryIdx = Math.min(termHistoryIdx + 1, termHistory.length - 1); termInput.value = termHistory[termHistoryIdx] || ''; } }
-  else if (e.key === 'ArrowDown') { e.preventDefault(); if (termHistoryIdx > 0) { termHistoryIdx--; termInput.value = termHistory[termHistoryIdx]; } else { termHistoryIdx = -1; termInput.value = ''; } }
+ti.addEventListener('keydown',function(e){
+  if(e.key==='Enter')trexec();
+  else if(e.key==='ArrowUp'){e.preventDefault();if(hist.length){hIdx=Math.min(hIdx+1,hist.length-1);ti.value=hist[hIdx]||''}}
+  else if(e.key==='ArrowDown'){e.preventDefault();if(hIdx>0){hIdx--;ti.value=hist[hIdx]}else{hIdx=-1;ti.value=''}}
 });
-document.getElementById('termSuggestions').addEventListener('click', function(e) {
-  var btn = e.target.closest('button');
-  if (btn) { termInput.value = btn.dataset.cmd; termExecute(); }
+document.getElementById('termChips').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(b){ti.value=b.dataset.cmd;trexec();}
 });
-document.getElementById('resetTermBtn').addEventListener('click', function() {
-  termBody.innerHTML = '';
-  var inputLine = document.createElement('div');
-  inputLine.className = 'terminal-input-line';
-  inputLine.innerHTML = '<span class="terminal-prompt">$</span>';
-  var inp = document.createElement('input');
-  inp.type = 'text';
-  inp.id = 'termInput';
-  inp.className = 'terminal-input';
-  inp.placeholder = 'type a command...';
-  inp.autocomplete = 'off';
-  inp.spellcheck = false;
-  var cursor = document.createElement('span');
-  cursor.className = 'cursor';
-  inputLine.appendChild(inp);
-  inputLine.appendChild(cursor);
-  termBody.appendChild(inputLine);
-  var div = document.createElement('div');
-  div.className = 'terminal-line terminal-dim';
-  div.textContent = 'Terminal reset. Type a command to begin.';
-  termBody.insertBefore(div, inputLine);
+document.getElementById('resetTermBtn').addEventListener('click',function(){
+  tb.innerHTML='';var w=document.createElement('div');w.className='terminal-inp-wrap';
+  w.innerHTML='<span class="terminal-prompt">$</span>';
+  var i=document.createElement('input');i.type='text';i.id='termInput';i.className='terminal-input';i.placeholder='type a command...';i.autocomplete='off';i.spellcheck=false;
+  var c=document.createElement('span');c.className='blink';w.appendChild(i);w.appendChild(c);tb.appendChild(w);
+  var d=document.createElement('div');d.className='terminal-line terminal-dim';d.textContent='Terminal reset.';tb.insertBefore(d,w);
   document.getElementById('termInput').focus();
-  document.getElementById('termInput').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') { termExecute(); }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); if (termHistory.length) { termHistoryIdx = Math.min(termHistoryIdx + 1, termHistory.length - 1); var inp2 = document.getElementById('termInput'); if (inp2) inp2.value = termHistory[termHistoryIdx] || ''; } }
-    else if (e.key === 'ArrowDown') { e.preventDefault(); if (termHistoryIdx > 0) { termHistoryIdx--; var inp2 = document.getElementById('termInput'); if (inp2) inp2.value = termHistory[termHistoryIdx]; } else { termHistoryIdx = -1; var inp2 = document.getElementById('termInput'); if (inp2) inp2.value = ''; } }
+  document.getElementById('termInput').addEventListener('keydown',ti._listener||function(e){
+    if(e.key==='Enter')trexec();
+    else if(e.key==='ArrowUp'){e.preventDefault();if(hist.length){hIdx=Math.min(hIdx+1,hist.length-1);document.getElementById('termInput').value=hist[hIdx]||''}}
+    else if(e.key==='ArrowDown'){e.preventDefault();if(hIdx>0){hIdx--;document.getElementById('termInput').value=hist[hIdx]}else{hIdx=-1;document.getElementById('termInput').value=''}}
   });
 });
-document.getElementById('termContainer').addEventListener('click', function() {
-  var inp = document.getElementById('termInput');
-  if (inp) inp.focus();
-});
+document.getElementById('termContainer').addEventListener('click',function(){var i=document.getElementById('termInput');if(i)i.focus()});
 
 // === Stack picker ===
-document.getElementById('stackBtns').addEventListener('click', function(e) {
-  var btn = e.target.closest('button');
-  if (!btn) return;
-  document.querySelectorAll('#stackBtns button').forEach(function(b) { b.classList.remove('active'); });
-  btn.classList.add('active');
-  var stack = btn.dataset.stack;
-  var outputs = {
-    next: ['  ⚓ ShipKit — my-next-app', '', '  ✓ Next.js | pnpm | Node 20', '  ✓ Scripts: lint, test, build', '  ✓ Deploy: Vercel', '', '  ✓ Generated CI: lint → test → build'],
-    react: ['  ⚓ ShipKit — my-react-app', '', '  ✓ React | npm | Node 20', '  ✓ Scripts: test, build', '', '  ✓ Generated CI: test → build'],
-    vue: ['  ⚓ ShipKit — my-vue-app', '', '  ✓ Vue | yarn | Node 18', '  ✓ Scripts: lint, build', '', '  ✓ Generated CI: lint → build'],
-    python: ['  ⚓ ShipKit — my-python-api', '', '  ✓ Python | pip | (pyproject.toml)', '', '  ✓ Generated: GitHub Actions CI (Python)'],
-    go: ['  ⚓ ShipKit — my-go-service', '', '  ✓ Go | (go.mod detected)', '', '  ✓ Generated: GitHub Actions CI (Go)'],
-    monorepo: ['  ⚓ ShipKit — my-monorepo', '', '  ✓ Monorepo detected', '    Sub-projects: frontend/, backend/', '  ✓ Frontend: Next.js | pnpm', '  ✓ Backend: Express | pnpm'],
-    empty: ['  ⚓ ShipKit — my-new-project', '', '  ✓ No project detected — generating baseline', '', '  ✓ Generated: baseline CI + AGENTS.md']
-  };
-  var out = outputs[stack] || outputs.next;
-  termBody.querySelectorAll('.terminal-line').forEach(function(el) { el.remove(); });
-  var inputLine = termBody.querySelector('.terminal-input-line');
-  out.forEach(function(l) { termAddLine(l, l.startsWith('  ✓') ? 'terminal-success' : l.startsWith('  ⚓') ? 'terminal-info' : 'terminal-output'); });
-  if (inputLine) termBody.appendChild(inputLine);
-  termBody.scrollTop = termBody.scrollHeight;
+document.getElementById('stackChips').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;
+  document.querySelectorAll('#stackChips button').forEach(function(b){b.classList.remove('active')});
+  b.classList.add('active');
+  var s=b.dataset.stack,o={next:['  ⚓ ShipKit — my-next-app','','  ✓ Next.js | pnpm | Node 20','  ✓ Scripts: lint, test, build','  ✓ Generated CI: lint → test → build'],react:['  ⚓ ShipKit — my-react-app','','  ✓ React | npm | Node 20','  ✓ Scripts: test, build','  ✓ Generated CI: test → build'],vue:['  ⚓ ShipKit — my-vue-app','','  ✓ Vue | yarn | Node 18','  ✓ Scripts: lint, build','  ✓ Generated CI: lint → build'],python:['  ⚓ ShipKit — my-python-api','','  ✓ Python | pip','  ✓ Generated: GitHub Actions CI'],go:['  ⚓ ShipKit — my-go-service','','  ✓ Go | go.mod detected','  ✓ Generated: GitHub Actions CI'],monorepo:['  ⚓ ShipKit — my-monorepo','','  ✓ Monorepo detected','    frontend/ + backend/','  ✓ Full CI for both packages'],empty:['  ⚓ ShipKit — my-new-project','','  ✓ No project detected','  ✓ Generated: baseline CI + AGENTS.md']};
+  var out=o[s]||o.next;
+  tb.querySelectorAll('.terminal-line').forEach(function(e){e.remove()});
+  var il=tb.querySelector('.terminal-inp-wrap');
+  out.forEach(function(l){tadd(l,l.startsWith('  ✓')?'terminal-success':l.startsWith('  ⚓')?'terminal-info':'terminal-output')});
+  if(il)tb.appendChild(il);tb.scrollTop=tb.scrollHeight;
 });
 
 // === Install tabs ===
-document.getElementById('tabBar').addEventListener('click', function(e) {
-  var btn = e.target.closest('button');
-  if (!btn) return;
-  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
-  document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
-  btn.classList.add('active');
-  document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+document.getElementById('tabBar').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
+  document.querySelectorAll('.tab-pane').forEach(function(c){c.classList.remove('active')});
+  b.classList.add('active');document.getElementById('tab-'+b.dataset.tab).classList.add('active');
 });
 
-// === Tab copy buttons ===
-document.querySelectorAll('.tab-copy-btn').forEach(function(btn) {
-  btn.addEventListener('click', function() {
-    var cmd = this.dataset.cmd;
-    var copyIcon = this.querySelector('.copy-icon');
-    var checkIcon = this.querySelector('.check-icon');
-    navigator.clipboard.writeText(cmd).then(function() {
-      copyIcon.style.display = 'none';
-      checkIcon.style.display = '';
-      setTimeout(function() {
-        copyIcon.style.display = '';
-        checkIcon.style.display = 'none';
-      }, 2000);
-    });
+// === Tab copy ===
+document.querySelectorAll('.tab-copy').forEach(function(b){
+  b.addEventListener('click',function(){
+    navigator.clipboard.writeText(this.dataset.cmd);
+    var ci=this.querySelector('.copy-icon'),ch=this.querySelector('.check-icon');
+    ci.style.display='none';ch.style.display='';setTimeout(function(){ci.style.display='';ch.style.display='none'},2000);
   });
 });
 
 // === Accordion ===
-function setupAccordion(containerId) {
-  var container = document.getElementById(containerId);
-  if (!container) return;
-  container.addEventListener('click', function(e) {
-    var btn = e.target.closest('.accordion-btn');
-    if (!btn) return;
-    var item = btn.closest('.accordion-item');
-    item.classList.toggle('open');
+document.querySelectorAll('.accordion').forEach(function(container){
+  container.addEventListener('click',function(e){
+    var b=e.target.closest('.accordion-btn');if(!b)return;
+    b.closest('.accordion-item').classList.toggle('open');
   });
-}
-setupAccordion('faqAccordion');
-setupAccordion('faqAccordion2');
+});
 
-// === Version fetch (graceful degradation: if CDN fails, version badge stays as-is) ===
-fetch('https://registry.npmjs.org/shipkit-pipe/latest').then(function(r) { return r.json(); }).then(function(d) {
-  document.querySelectorAll('[data-version]').forEach(function(el) { el.textContent = 'v' + d.version; });
-}).catch(function() {});
+// === Version fetch (graceful) ===
+fetch('https://registry.npmjs.org/shipkit-pipe/latest').then(function(r){return r.json()}).then(function(d){
+  document.querySelectorAll('[data-version]').forEach(function(e){e.textContent='v'+d.version});
+}).catch(function(){});
 })();
 </script>
 </body>
