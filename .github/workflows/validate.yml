@@ -1,4 +1,4 @@
-﻿# ShipKit — Validate templates and docs
+# ShipKit — Validate templates and docs
 name: Validate
 
 on:
@@ -76,7 +76,7 @@ jobs:
       - uses: actions/checkout@v5
       
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "22"
 
