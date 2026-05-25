@@ -68,16 +68,34 @@ function detect(cwd) {
     ghRepo: '',
     deployUrl: '',
     deployPlatform: '',
+    isMonorepo: false,
+    subProjects: [],
   };
 
-  // package.json
-  const pkgPath = path.join(cwd, 'package.json');
+  // Find package.json — root first, then subdirs
+  let pkgPath = path.join(cwd, 'package.json');
+  let pkgDir = cwd;
+
+  if (!fs.existsSync(pkgPath)) {
+    // Monorepo: look in common subdirectories
+    const subdirs = ['frontend', 'backend', 'web', 'app', 'apps', 'packages', 'services', 'api', 'server', 'client'];
+    const found = subdirs.filter(dir => fs.existsSync(path.join(cwd, dir, 'package.json')));
+    if (found.length > 0) {
+      d.isMonorepo = true;
+      d.subProjects = found;
+      // Use the first frontend-like subproject for detection
+      const primary = found.find(f => ['frontend', 'web', 'app', 'client'].includes(f)) || found[0];
+      pkgPath = path.join(cwd, primary, 'package.json');
+      pkgDir = path.join(cwd, primary);
+    }
+  }
+
   if (!fs.existsSync(pkgPath)) return d;
 
   let pkg;
   try { pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8')); } catch { return d; }
 
-  if (pkg.name) d.name = pkg.name;
+  if (pkg.name) d.name = d.isMonorepo ? path.basename(cwd) : pkg.name;
   if (pkg.description) d.desc = pkg.description;
   if (pkg.homepage) d.deployUrl = pkg.homepage;
 
@@ -93,11 +111,15 @@ function detect(cwd) {
   else if (deps.express) d.frontend = 'Express';
   else if (deps.fastify) d.frontend = 'Fastify';
   else if (deps.hono) d.frontend = 'Hono';
+  else if (deps.django || fs.existsSync(path.join(cwd, 'manage.py'))) d.frontend = 'Django';
+  else if (fs.existsSync(path.join(cwd, 'go.mod'))) d.frontend = 'Go';
 
-  // Package manager
+  // Package manager (check root level for monorepo)
   if (fs.existsSync(path.join(cwd, 'pnpm-lock.yaml'))) { d.pm = 'pnpm'; d.installCmd = 'pnpm install --frozen-lockfile'; }
   else if (fs.existsSync(path.join(cwd, 'yarn.lock'))) { d.pm = 'yarn'; d.installCmd = 'yarn --frozen-lockfile'; }
   else if (fs.existsSync(path.join(cwd, 'bun.lockb'))) { d.pm = 'bun'; d.installCmd = 'bun install --frozen-lockfile'; }
+  else if (fs.existsSync(path.join(pkgDir, 'pnpm-lock.yaml'))) { d.pm = 'pnpm'; d.installCmd = 'pnpm install --frozen-lockfile'; }
+  else if (fs.existsSync(path.join(pkgDir, 'yarn.lock'))) { d.pm = 'yarn'; d.installCmd = 'yarn --frozen-lockfile'; }
   else { d.pm = 'npm'; d.installCmd = 'npm ci'; }
 
   // Scripts — ONLY include CI steps for scripts that ACTUALLY EXIST
@@ -109,7 +131,6 @@ function detect(cwd) {
     d.hasTypecheck = true;
     d.typecheckCmd = scripts.typecheck ? `${d.pm} run typecheck` : `${d.pm} run type-check`;
   } else if (deps.typescript) {
-    // Has typescript but no typecheck script — use tsc directly
     d.hasTypecheck = true;
     d.typecheckCmd = 'npx tsc --noEmit';
   }
@@ -137,10 +158,7 @@ function detect(cwd) {
   // Deploy platform detection
   if (fs.existsSync(path.join(cwd, 'vercel.json')) || fs.existsSync(path.join(cwd, '.vercel'))) {
     d.deployPlatform = 'Vercel';
-    if (!d.deployUrl) d.deployUrl = `https://${d.name}.vercel.app`;
-    // Try to get exact URL from .vercel/project.json
-    const vp = path.join(cwd, '.vercel', 'project.json');
-    if (fs.existsSync(vp)) { try { const v = JSON.parse(fs.readFileSync(vp, 'utf-8')); if (v.projectId) d.deployUrl = `https://${d.ghRepo || d.name}.vercel.app`; } catch {} }
+    if (!d.deployUrl) d.deployUrl = `https://${d.ghRepo || d.name}.vercel.app`;
   } else if (fs.existsSync(path.join(cwd, 'netlify.toml'))) {
     d.deployPlatform = 'Netlify';
     if (!d.deployUrl) d.deployUrl = `https://${d.name}.netlify.app`;
@@ -151,6 +169,8 @@ function detect(cwd) {
     d.deployPlatform = 'Render';
   } else if (fs.existsSync(path.join(cwd, 'railway.json')) || fs.existsSync(path.join(cwd, 'railway.toml'))) {
     d.deployPlatform = 'Railway';
+  } else if (fs.existsSync(path.join(cwd, 'docker-compose.yml')) || fs.existsSync(path.join(cwd, 'docker-compose.yaml'))) {
+    d.deployPlatform = 'Docker';
   }
 
   return d;
@@ -262,8 +282,10 @@ async function check(cwd) {
 
   // 1. Project
   const pkgPath = path.join(cwd, 'package.json');
-  if (!fs.existsSync(pkgPath)) { fail('No package.json found'); process.exit(1); }
-  const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+  let pkg = {};
+  if (fs.existsSync(pkgPath)) {
+    pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+  }
   step(`Project: ${pkg.name || path.basename(cwd)}`);
 
   // 2. shipkit.json
@@ -414,8 +436,22 @@ async function main() {
     process.exit(0);
   }
 
-  // Must have package.json
-  if (!fs.existsSync(path.join(cwd, 'package.json'))) {
+  // Must have a project (package.json at root OR in subdirs, or other project files)
+  const hasRootPkg = fs.existsSync(path.join(cwd, 'package.json'));
+  const hasSubPkg = !hasRootPkg && ['frontend', 'backend', 'web', 'app', 'apps', 'packages', 'services', 'api', 'server', 'client'].some(
+    dir => fs.existsSync(path.join(cwd, dir, 'package.json'))
+  );
+  const hasOtherProject = !hasRootPkg && (
+    fs.existsSync(path.join(cwd, 'pyproject.toml')) ||
+    fs.existsSync(path.join(cwd, 'go.mod')) ||
+    fs.existsSync(path.join(cwd, 'Cargo.toml')) ||
+    fs.existsSync(path.join(cwd, 'pom.xml')) ||
+    fs.existsSync(path.join(cwd, 'Makefile')) ||
+    fs.existsSync(path.join(cwd, 'docker-compose.yml')) ||
+    fs.existsSync(path.join(cwd, 'docker-compose.yaml'))
+  );
+
+  if (!hasRootPkg && !hasSubPkg && !hasOtherProject) {
     console.log(`\n  ${C.red}✗ No project found.${C.reset}`);
     console.log(`  Run this inside your project folder:\n`);
     console.log(`    ${C.cyan}cd my-project${C.reset}`);
@@ -443,6 +479,9 @@ async function main() {
   // Build detection summary
   const parts = [d.frontend || 'Node.js', d.pm, `Node ${d.nodeVer}`].join(' | ');
   s.stop(parts);
+
+  // Monorepo info
+  if (d.isMonorepo) step(`Monorepo: ${d.subProjects.join(', ')}`);
 
   // Show what scripts were found
   const found = [d.hasLint && 'lint', d.hasTypecheck && 'typecheck', d.hasTest && 'test', d.hasBuild && 'build'].filter(Boolean);
