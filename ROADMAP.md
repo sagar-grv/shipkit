@@ -10,13 +10,14 @@
 - [x] npm packaging: package.json, bin/, .npmignore
 - [x] CI/CD: playwright.yml, FUNDING.yml, ISSUE_TEMPLATE
 - [x] **Remove Python dependency**: `template/render.js` (Node.js) replaces fragile Python heredoc
-- [x] **`--defaults` / `-y` flag**: Non-interactive mode for both JS CLI and setup.sh
+- [x] **Simplify UX**: `npx shipkit-pipe` — no subcommand, no prompts by default
+- [x] **No-project guard**: clear error when run in empty directory
+- [x] **`-i` / `--interactive`**: optional prompt mode instead of default
 - [x] **Custom domain dropped**: Use GitHub Pages default URL (no free domain)
 
 ## [v2.1.0] — Next
-- [ ] **Verify on Ubuntu**: `git pull` latest, test `bash setup.sh --defaults`
 - [ ] **Republish v2.0.1 to npm**: `npm version patch && npm publish`
-- [ ] **Verify `npx shipkit-pipe setup --defaults`** on WSL 2 / native Linux
+- [ ] **Verify Ubuntu**: `git pull && bash setup.sh`
 - [ ] **Post-launch analytics**: download counter badge in README
 - [ ] **Homebrew tap** (optional): `brew install shipkit`
 

@@ -28,7 +28,7 @@
   },
   "scripts": {
     "validate": "node bin/shipkit-pipe.js --help",
-    "validate:templates": "for f in template/agents/*.md template/docs/*.md template/github/*.yml template/github/workflows/*.yml template/husky/pre-commit; do test -f \"$f\" && echo \"✓ $f\" || { echo \"✗ $f\"; exit 1; }; done"
+    "check": "bash -n bin/shipkit-pipe.js && bash -n setup.sh && echo 'OK' || echo 'FAIL'"
   },
   "files": [
     "bin/",

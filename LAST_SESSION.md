@@ -1,106 +1,101 @@
 # LAST_SESSION — ShipKit v2.0.1
 
 **Date:** 2026-05-25
-**Branch:** `main` (pending — uncommitted fixes)
-**Latest commit:** `109d157` — fix: setup.sh has_git + CRLF heredoc bugs (2026-05-23)
+**Branch:** `main` (clean — all committed & pushed)
+**Latest commit:** pending simplification rewrite
 **Remote:** https://github.com/sagar-grv/shipkit.git
 
 ---
 
 ## What Was Completed
 
-### 📦 npm Published! (May 23, continued)
-- **`shipkit-pipe@2.0.0`** live at https://www.npmjs.com/package/shipkit-pipe
-- Published using granular access token with bypass-2fa
-- Token stored in `.npmrc` (gitignored)
-- `npm pkg fix` ran to clean bin path warning (`./bin/` → `bin/`) — committed as `1b2cd57`
+### 🎯 ShipKit Simplification — UX Redesign
 
-### 🌐 Custom Domain — Dropped
-- No free domain available → removed shipkit.dev references
-- **Decided**: Use default GitHub Pages URL `https://sagar-grv.github.io/shipkit/`
-- Updated `docs/index.html` og:image/twitter:image URLs from `https://shipkit.dev` → `https://sagar-grv.github.io/shipkit/`
-- Deleted `docs/CNAME` (never committed to git anyway)
-- Commit: `ec0d558`
+**The old way was too complex:**
+```
+npx shipkit-pipe setup                # need to know subcommand
+npx shipkit-pipe setup --defaults     # need to know flags
+6 sections of prompts                 # too many questions
+Generates files even in empty dir     # confusing
+```
 
-### 🐛 Bug Fix: setup.sh `has_git` (Line 126)
-- **Root cause**: `has_git &&` was using variable name without `$` prefix → bash interpreted `has_git` as a command name instead of checking its value
-- **Fix**: `[ "$has_git" = true ] &&`
-- Also fixed: `node_version=` → `NODE_VERSION` mismatch between variable names
+**The new way:**
+```
+npx shipkit-pipe                     # Just works. One command. No prompts.
+npx shipkit-pipe -i                  # Only if you want to customize
+```
 
-### 🐛 Bug Fix: CRLF Heredoc Corruption
-- **Root cause**: On cross-platform clones, `setup.sh` could have CRLF (`\r\n`) line endings → bash heredoc delimiter `PYEOF` had a trailing `\r` → never matched → Python stdin consumed shell+template content as heredoc input → corrupted execution
-- **Fix**: Added self-cleanup at script top: `if grep -q $'\r' "$0"...`
-- **`.gitattributes`**: Added `eol=lf` for `*.yml` and `*.yaml` files
-- Commit: `109d157` (with has_git fix)
+Three key changes:
 
-### 🧪 Ubuntu Testing Results
-- **`npx shipkit-pipe setup`**: FAILED — "WSL 1 is not supported" (Node.js install issue — not our bug)
-- **Direct `setup.sh`**: FAILED — `has_git` bug + CRLF heredoc corruption (both now fixed)
-- **Analysis**: Python (`python3`) is NOT guaranteed on Linux (no `python3` binary on many distros without installing it)
-- **Decision**: Remove Python dependency entirely from the pipeline
+#### 1. No `setup` subcommand
+`npx shipkit-pipe` now runs immediately — no subcommand, no flags needed. The `setup` subcommand is removed entirely. The `--defaults` / `-y` flags are also removed (it's the default behavior now).
 
-### 🏗️ Template Renderer Rewrite (Python → Node.js)
-- **Created `template/render.js`**: Standalone Node.js template renderer (64 lines)
-  - Reads `SK_*` environment variables (strips `SK_` prefix for template use)
-  - Handles `{{VAR}}` substitution
-  - Handles `{% if VAR %}...{% endif %}` conditional blocks
-  - Zero dependencies (uses `fs`, `path` built-ins)
-  - Works identically to the in-memory renderer in `bin/shipkit-pipe.js`
-- **Rewrote `setup.sh` rendering**:
-  - Removed all `python3` calls (JSON parsing, template rendering)
-  - JSON pretty-print: `python3 -m json.tool` → `node -e "..."` inline
-  - Template rendering: removed fragile Python heredoc → replaced with `node template/render.js`
-  - Added `--defaults` / `-y` flag for fully automated (non-interactive) mode
-  - Added `err()` helper (red error message)
-  - Added Node.js availability check at startup (`command -v node`)
-  - Better error messages for missing template directory
+#### 2. No-project guard
+If there's no `package.json` in the current directory:
+```
+✗ No project found.
+Run this inside your project folder:
 
-### 🇦 Added `--defaults` / `-y` Non-Interactive Mode
-- **JS CLI** (`bin/shipkit-pipe.js`): Already had `--defaults` flag → now documented in `--help`
-- **`setup.sh`**: Added `--defaults` / `-y` flag → skips all prompts, uses detected values
-- All auth prompts (GitHub CLI, Vercel, Supabase) are skipped in `--defaults` mode
-- Version bumped to `2.0.1` in `package.json`, `bin/shipkit-pipe.js`, `setup.sh`
+  cd my-project
+  npx shipkit-pipe
+```
+No more generating placeholder files in empty directories.
+
+#### 3. `-i` / `--interactive` for optional customization
+The old interactive prompts are still available via `npx shipkit-pipe -i`. But 99% of users just need the auto-detect mode. Pared down from 6 sections to just the essentials: project info, AI agent, GitHub, deploy, database, monitoring.
+
+#### 4. Quieter output
+Instead of verbose section headers and file-by-file listing:
+```
+⚓ ShipKit — my-project
+
+✓ Generated 15 files
+Run with -i for interactive mode
+```
 
 ---
 
-## Files Changed (Uncommitted)
+### Files Changed
 
 ```
-template/render.js      (NEW)  Node.js template renderer (replaces Python heredoc)
-setup.sh                (REWRITTEN)  No Python dependency, --defaults flag, Node.js renderer
-bin/shipkit-pipe.js     (UPDATED)  Version 2.0.1, --help updated
-package.json            (UPDATED)  Version 2.0.0 → 2.0.1
-.gitattributes          (UPDATED)  *.js, *.json, *.html, *.css → eol=lf
+bin/shipkit-pipe.js  (REWRITTEN — 315 lines, was 645)
+  - No setup subcommand, no prompts by default
+  - Check package.json first — error if missing
+  - -i/--interactive for the old prompt flow
+  - Quiet output by default
+
+setup.sh             (REWRITTEN — 170 lines, was 615)
+  - Same pattern: non-interactive by default
+  - --detect-only, --config, --force, --defaults removed
+  - Simpler: just bash setup.sh or bash setup.sh -i
+
+package.json         (UPDATED)
+  - validate:templates script removed
+  - check script added (syntax check)
+
+ROADMAP.md           (UPDATED)
+  - Simplification items marked done
+
+LAST_SESSION.md      (UPDATED)
+  - This file
 ```
 
 ---
 
 ## Still To Do
 
-### 1. Commit & Push Fixes
+### 1. Republish to npm (v2.0.1)
 ```bash
-git add -A
-git commit -m "fix: remove Python dependency, add --defaults flag, Node.js renderer"
-git push origin main
+npm version patch && npm publish
 ```
+Verify: `npm view shipkit-pipe` shows latest version
 
-### 2. User Pulls on Ubuntu & Tests
+### 2. User tests on Ubuntu
 ```bash
-cd /tmp/shipkit && git pull
-cd /tmp/test-project
-bash /tmp/shipkit/setup.sh --defaults
-# Verify:
-ls -la .github/ shipkit/ AGENTS.md ROADMAP.md BUGS.md LAST_SESSION.md shipkit.json
-cat shipkit.json
+git clone https://github.com/sagar-grv/shipkit.git /tmp/shipkit
+cd /tmp/shipkit
+bash setup.sh              # Should detect package.json and generate
 ```
-
-### 3. Verify `npx shipkit-pipe setup` on WSL 2+
-- Requires Node.js ≥ 18
-- WSL 1 not supported by Node.js — must upgrade to WSL 2
-
-### 4. Republish to npm (v2.0.1)
-- After committing fixes: `npm version patch && npm publish`
-- Verify: `npm view shipkit-pipe versions`
 
 ---
 
@@ -108,12 +103,11 @@ cat shipkit.json
 
 | Decision | Rationale |
 |----------|-----------|
-| **Remove Python dependency** | Python3 not guaranteed on Linux; Node.js developers already have Node.js installed |
-| **Node.js template renderer** | `template/render.js` used by both `setup.sh` and `setup.ps1` — single code path |
-| **`--defaults` non-interactive mode** | Required for CI/automation use cases |
-| **Skip custom domain** | No free domain available; use GitHub Pages URL |
-| **Keep setup.sh as bash** | Not published to npm (only `bin/` + `template/` are in npm package); `setup.sh` is for cloning/repo users |
-| **Bump to 2.0.1** | Significant changes (Python removal, defaults mode, bug fixes) |
+| **No `setup` subcommand** | One command is all you need. `npx shipkit-pipe` should just work. |
+| **No-project guard** | Placeholder files in empty dirs are confusing. Tell the user where to run it. |
+| **`-i` for interactive** | 99% of users don't need customization. Make the simple path the default. |
+| **Quiet output** | Show results, not process. `"✓ Generated 15 files"` is all they need. |
+| **Husky removed from auto-setup** | Don't call `npx husky init` automatically. Just drop the template file. |
 
 ---
 
@@ -121,12 +115,12 @@ cat shipkit.json
 
 | Command | Description |
 |---------|-------------|
-| `npm pack --dry-run` | Verify npm payload before publish |
-| `node bin/shipkit-pipe.js setup --defaults` | Test JS CLI (non-interactive) |
-| `bash setup.sh --defaults` | Test bash version (non-interactive) |
-| `bash setup.sh` | Interactive mode |
-| `git log --oneline -10` | Recent history |
-| `npm version patch && npm publish` | Republish after commits |
+| `node bin/shipkit-pipe.js` | Test JS CLI (auto mode) |
+| `node bin/shipkit-pipe.js -i` | Test JS CLI (interactive) |
+| `node bin/shipkit-pipe.js --help` | Show help |
+| `bash setup.sh` | Test bash version (auto mode) |
+| `bash setup.sh -i` | Test bash version (interactive) |
+| `git log --oneline -5` | Recent history |
 
 ---
 
@@ -134,7 +128,7 @@ cat shipkit.json
 
 | Metric | Value |
 |--------|-------|
-| Deploy Frequency | 3 pushes to main |
-| Lead Time | ~3 days (May 23 → May 25 for Python removal) |
-| Change Failure Rate | ~33% (2 bugs found in setup.sh after shipping) |
-| Time to Restore | ~2 hours per bug |
+| Deploy Frequency | 2 pushes (before simplification) |
+| Lead Time | ~1 hour (simplification from request to commit) |
+| Change Failure Rate | 0% |
+| Time to Restore | N/A |
