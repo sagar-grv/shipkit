@@ -64,6 +64,7 @@ function detect(cwd) {
     hasTypecheck: false, typecheckCmd: '',
     hasGit: false,
     gitRemote: '',
+    gitPlatform: 'github', // github | gitlab | bitbucket
     ghOwner: '',
     ghRepo: '',
     deployUrl: '',
@@ -152,7 +153,17 @@ function detect(cwd) {
     if (d.gitRemote) {
       const m = d.gitRemote.match(/[:/]([^/]+)\/([^/.]+?)(?:\.git)?$/);
       if (m) { d.ghOwner = m[1]; d.ghRepo = m[2]; }
+      // Detect git platform
+      if (d.gitRemote.includes('gitlab')) d.gitPlatform = 'gitlab';
+      else if (d.gitRemote.includes('bitbucket')) d.gitPlatform = 'bitbucket';
+      else d.gitPlatform = 'github';
     }
+  }
+  // Also check for existing CI configs to detect platform
+  if (!d.gitPlatform) {
+    if (fs.existsSync(path.join(cwd, '.gitlab-ci.yml'))) d.gitPlatform = 'gitlab';
+    else if (fs.existsSync(path.join(cwd, 'bitbucket-pipelines.yml'))) d.gitPlatform = 'bitbucket';
+    else d.gitPlatform = 'github';
   }
 
   // Deploy platform detection
@@ -231,19 +242,27 @@ function generate(cwd, d) {
 
   if (!tmplDir) { fail('Template directory not found. Reinstall: npm i -g shipkit-pipe'); process.exit(1); }
 
-  // Files to generate — ONLY what's needed
-  const files = [
-    ['github/workflows/ci.yml', '.github/workflows/ci.yml'],
-    ['github/dependabot.yml', '.github/dependabot.yml'],
-    ['github/workflows/codeql.yml', '.github/workflows/codeql.yml'],
-    ['docs/AGENTS.md', 'AGENTS.md'],
-    ['docs/LAST_SESSION.md', 'LAST_SESSION.md'],
-  ];
+  // Files to generate — platform-specific CI
+  const files = [];
 
-  // Only add health check if we have a deploy URL
-  if (d.deployUrl) {
-    files.push(['github/workflows/health.yml', '.github/workflows/health.yml']);
+  if (d.gitPlatform === 'gitlab') {
+    files.push(['gitlab/gitlab-ci.yml', '.gitlab-ci.yml']);
+  } else if (d.gitPlatform === 'bitbucket') {
+    files.push(['bitbucket/bitbucket-pipelines.yml', 'bitbucket-pipelines.yml']);
+  } else {
+    // GitHub (default)
+    files.push(['github/workflows/ci.yml', '.github/workflows/ci.yml']);
+    files.push(['github/dependabot.yml', '.github/dependabot.yml']);
+    files.push(['github/workflows/codeql.yml', '.github/workflows/codeql.yml']);
+    // Only add health check if we have a deploy URL
+    if (d.deployUrl) {
+      files.push(['github/workflows/health.yml', '.github/workflows/health.yml']);
+    }
   }
+
+  // Common files (all platforms)
+  files.push(['docs/AGENTS.md', 'AGENTS.md']);
+  files.push(['docs/LAST_SESSION.md', 'LAST_SESSION.md']);
 
   let gen = 0, skip = 0;
 
@@ -409,19 +428,23 @@ async function main() {
   Only generates what your project actually needs. Zero dependencies.${C.reset}
 
   ${C.bold}Usage:${C.reset}
-    ${C.green}npx shipkit-pipe${C.reset}         Auto-detect & generate
-    ${C.green}npx shipkit-pipe check${C.reset}   Verify everything works
-    ${C.green}npx shipkit-pipe -i${C.reset}      Interactive (ask questions)
-    ${C.green}npx shipkit-pipe --help${C.reset}   This message
+    ${C.green}npx shipkit-pipe${C.reset}            Auto-detect & generate
+    ${C.green}npx shipkit-pipe check${C.reset}      Verify everything works
+    ${C.green}npx shipkit-pipe --dry-run${C.reset}  Preview without writing files
+    ${C.green}npx shipkit-pipe -i${C.reset}         Interactive (ask questions)
+    ${C.green}npx shipkit-pipe --help${C.reset}      This message
 
   ${C.bold}What it does:${C.reset}
-    • Reads your package.json scripts
+    • Reads your project files (package.json, lock files, git remote)
     • Generates CI that ONLY includes steps you have (lint/test/build)
+    • Supports GitHub Actions, GitLab CI, and Bitbucket Pipelines
     • Sets up health monitoring (pings your site every 6h)
     • Creates AGENTS.md so your AI agent knows your project
-    • Adds Dependabot + CodeQL for security
+    • Adds dependency updates + security scanning
 
-  ${C.bold}Works with:${C.reset} Any framework, any AI agent, any deploy platform.
+  ${C.bold}Works with:${C.reset} Any framework, any CI platform, any AI agent, any deploy target.
+
+  ${C.bold}No Node.js?${C.reset} Download from: https://github.com/sagar-grv/shipkit/releases
 `);
     process.exit(0);
   }
@@ -435,6 +458,38 @@ async function main() {
   // Works in ANY directory — if the user ran it here, they want to set it up
   const d = detect(cwd);
   const isInteractive = args.includes('-i') || args.includes('--interactive');
+  const isDryRun = args.includes('--dry-run') || args.includes('--preview');
+
+  // Dry run mode — show what would be generated
+  if (isDryRun) {
+    console.log(`\n  ${C.bold}${C.cyan}⚓ ShipKit${C.reset} — dry run (no files will be written)\n`);
+    console.log(`  ${C.bold}Detected:${C.reset}`);
+    console.log(`    Project:   ${d.name}`);
+    console.log(`    Framework: ${d.frontend || 'Not detected'}`);
+    console.log(`    Platform:  ${d.gitPlatform} ${d.ghOwner ? `(${d.ghOwner}/${d.ghRepo})` : ''}`);
+    console.log(`    PM:        ${d.pm}`);
+    console.log(`    Node:      ${d.nodeVer}`);
+    console.log(`    Deploy:    ${d.deployPlatform || 'None'} ${d.deployUrl ? `(${d.deployUrl})` : ''}`);
+    const found = [d.hasLint && 'lint', d.hasTypecheck && 'typecheck', d.hasTest && 'test', d.hasBuild && 'build'].filter(Boolean);
+    console.log(`    Scripts:   ${found.length ? found.join(', ') : 'None detected'}`);
+    if (d.isMonorepo) console.log(`    Monorepo:  ${d.subProjects.join(', ')}`);
+    console.log(`\n  ${C.bold}Would generate:${C.reset}`);
+    if (d.gitPlatform === 'gitlab') {
+      console.log(`    .gitlab-ci.yml              ← CI: ${found.join(' > ') || 'install'}`);
+    } else if (d.gitPlatform === 'bitbucket') {
+      console.log(`    bitbucket-pipelines.yml     ← CI: ${found.join(' > ') || 'install'}`);
+    } else {
+      console.log(`    .github/workflows/ci.yml    ← CI: ${found.join(' > ') || 'install'}`);
+      console.log(`    .github/dependabot.yml      ← Auto-update deps`);
+      console.log(`    .github/workflows/codeql.yml← Security scanning`);
+      if (d.deployUrl) console.log(`    .github/workflows/health.yml← Health check (every 6h)`);
+    }
+    console.log(`    shipkit.json                ← Project config`);
+    console.log(`    AGENTS.md                   ← AI agent instructions`);
+    console.log(`    LAST_SESSION.md             ← Session continuity`);
+    console.log(`\n  ${C.dim}Run without --dry-run to generate these files.${C.reset}\n`);
+    process.exit(0);
+  }
 
   // Interactive mode
   if (isInteractive) {
@@ -463,7 +518,9 @@ async function main() {
   else dim('No scripts detected yet — CI will verify deps install cleanly');
 
   // Git
-  if (d.ghOwner) step(`Git: ${d.ghOwner}/${d.ghRepo}`);
+  if (d.ghOwner) step(`Git: ${d.ghOwner}/${d.ghRepo} (${d.gitPlatform})`);
+  else if (d.hasGit) step(`Git: ${d.gitPlatform}`);
+  else dim('No git repo — run "git init" to enable CI');
 
   // Deploy
   if (d.deployUrl) step(`Deploy: ${d.deployPlatform} (${d.deployUrl})`);
@@ -481,10 +538,17 @@ async function main() {
   showFile('shipkit.json', 'Project config');
   showFile('AGENTS.md', 'AI agent instructions');
   showFile('LAST_SESSION.md', 'Session continuity');
-  showFile('.github/workflows/ci.yml', `CI: ${found.join(' > ') || 'install'}`);
-  showFile('.github/workflows/health.yml', 'Health check (every 6h)');
-  showFile('.github/dependabot.yml', 'Auto-update deps');
-  showFile('.github/workflows/codeql.yml', 'Security scanning');
+  // Platform-specific CI
+  if (d.gitPlatform === 'gitlab') {
+    showFile('.gitlab-ci.yml', `CI: ${found.join(' > ') || 'install'}`);
+  } else if (d.gitPlatform === 'bitbucket') {
+    showFile('bitbucket-pipelines.yml', `CI: ${found.join(' > ') || 'install'}`);
+  } else {
+    showFile('.github/workflows/ci.yml', `CI: ${found.join(' > ') || 'install'}`);
+    showFile('.github/workflows/health.yml', 'Health check (every 6h)');
+    showFile('.github/dependabot.yml', 'Auto-update deps');
+    showFile('.github/workflows/codeql.yml', 'Security scanning');
+  }
 
   console.log(`\n  ${C.bold}Next:${C.reset} ${C.dim}git add -A && git commit -m "add pipeline" && git push${C.reset}`);
   console.log(`  ${C.bold}Verify:${C.reset} ${C.dim}npx shipkit-pipe check${C.reset}\n`);
