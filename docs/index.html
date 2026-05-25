@@ -3,675 +3,274 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ShipKit — Your AI Agent, CI/CD & Security in One Command</title>
-<meta name="description" content="ShipKit replaces a 6-person engineering team with AI agents + automated pipelines. One command sets up CI/CD, security scanning, pre-commit hooks, and AI agent protocols for any project.">
-<meta property="og:title" content="ShipKit — Your AI Agent, CI/CD & Security in One Command">
-<meta property="og:description" content="Replace a 6-person engineering team with AI agents + automated pipelines. One command. Any stack. Any agent.">
+<title>ShipKit — Your Automated Dev Team</title>
+<meta name="description" content="One command sets up CI/CD, health monitoring, security scanning, and AI agent config. Only generates what your project needs. Zero dependencies.">
+<meta property="og:title" content="ShipKit — Your Automated Dev Team">
+<meta property="og:description" content="One command. Smart CI/CD. Health monitoring. Security. Works in any directory, any stack, any AI agent.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://sagar-grv.github.io/shipkit/">
-<meta property="og:image" content="https://sagar-grv.github.io/shipkit/og-image.svg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="ShipKit — MVP to Production Pipeline">
-<meta name="twitter:description" content="One command. AI agent + CI/CD + security. Ship like a team of six.">
-<meta name="twitter:image" content="https://sagar-grv.github.io/shipkit/og-image.svg">
+<meta name="twitter:title" content="ShipKit — Your Automated Dev Team">
+<meta name="twitter:description" content="One command. Smart CI/CD. Health monitoring. Security scanning.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚓</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* ─── Reset & Variables ───────────────────────────── */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --black:#080c14;
-  --navy:#0d1321;
-  --navy-light:#1a2332;
-  --slate:#2a3444;
-  --steel:#4a5568;
-  --muted:#8892a4;
-  --pearl:#c8d0dc;
-  --white:#e8edf5;
-  --gold:#d97706;
-  --gold-light:#f59e0b;
-  --gold-glow:rgba(217,119,6,0.15);
-  --teal:#5eead4;
-  --teal-dim:#2dd4bf;
-  --teal-glow:rgba(94,234,212,0.08);
-  --red:#ef4444;
-  --radius-sm:8px;
-  --radius-md:14px;
-  --radius-lg:20px;
+  --bg:#09090b;
+  --bg2:#18181b;
+  --bg3:#27272a;
+  --border:#3f3f46;
+  --text:#fafafa;
+  --text2:#a1a1aa;
+  --text3:#71717a;
+  --accent:#22d3ee;
+  --accent2:#06b6d4;
+  --green:#4ade80;
+  --yellow:#facc15;
+  --radius:12px;
+  --max:1100px;
 }
 html{scroll-behavior:smooth}
-body{
-  background:var(--black);
-  color:var(--pearl);
-  font-family:'DM Sans',-apple-system,sans-serif;
-  font-weight:400;
-  line-height:1.65;
-  -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
-}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+code,pre{font-family:'JetBrains Mono',monospace}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
 
-/* ─── Background Texture ──────────────────────────── */
-body::before{
-  content:'';
-  position:fixed;
-  inset:0;
-  z-index:-1;
-  background-image:
-    radial-gradient(circle at 25% 25%, var(--gold-glow) 0%, transparent 50%),
-    radial-gradient(circle at 75% 75%, var(--teal-glow) 0%, transparent 50%),
-    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.015) 39px, rgba(255,255,255,0.015) 40px),
-    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.015) 39px, rgba(255,255,255,0.015) 40px);
-  pointer-events:none;
-}
+/* Layout */
+.container{max-width:var(--max);margin:0 auto;padding:0 24px}
+section{padding:80px 0}
 
-/* ─── Type ─────────────────────────────────────────── */
-h1,h2,h3{font-family:'DM Serif Display',Georgia,serif;font-weight:400;line-height:1.15;color:var(--white);letter-spacing:-0.02em}
-h1{font-size:clamp(42px,7vw,80px)}
-h2{font-size:clamp(30px,4vw,48px);margin-bottom:12px}
-h3{font-size:22px;margin-bottom:8px}
-p{color:var(--muted);max-width:540px}
-a{color:var(--gold-light);text-decoration:none;transition:color .2s}
-a:hover{color:var(--teal)}
+/* Hero */
+.hero{padding:120px 0 80px;text-align:center}
+.hero h1{font-size:clamp(2.5rem,6vw,4rem);font-weight:700;letter-spacing:-0.03em;margin-bottom:16px}
+.hero h1 span{background:linear-gradient(135deg,var(--accent),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{font-size:1.25rem;color:var(--text2);max-width:600px;margin:0 auto 40px}
+.hero-cmd{display:inline-flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px 28px;font-size:1.1rem;font-family:'JetBrains Mono',monospace;color:var(--green)}
+.hero-cmd .dollar{color:var(--text3)}
+.hero-tag{margin-top:20px;font-size:0.875rem;color:var(--text3)}
 
-/* ─── Nav ─────────────────────────────────────────── */
-nav{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  background:rgba(8,12,20,0.88);
-  backdrop-filter:blur(16px) saturate(1.2);
-  -webkit-backdrop-filter:blur(16px) saturate(1.2);
-  border-bottom:1px solid rgba(255,255,255,0.04);
-  height:64px;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 clamp(20px,4vw,48px);
-}
-nav .logo{
-  display:flex;align-items:center;gap:10px;
-  font-size:20px;font-weight:600;color:var(--white);
-  letter-spacing:-0.3px;
-}
-nav .logo span{font-size:24px;line-height:1}
-.nav-links{display:flex;align-items:center;gap:8px}
-.nav-links a{
-  padding:8px 16px;border-radius:var(--radius-sm);
-  font-size:14px;font-weight:500;color:var(--muted);
-  transition:all .2s;
-}
-.nav-links a:hover{color:var(--white);background:rgba(255,255,255,0.04)}
-.nav-links .gh-btn{
-  display:flex;align-items:center;gap:6px;
-  padding:7px 14px;margin-left:8px;
-  border:1px solid var(--slate);border-radius:var(--radius-sm);
-  font-size:13px;font-weight:500;color:var(--pearl);
-  transition:all .2s;
-}
-.nav-links .gh-btn:hover{border-color:var(--gold);color:var(--gold-light);background:var(--gold-glow)}
+/* Terminal */
+.terminal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;max-width:680px;margin:60px auto 0;text-align:left}
+.terminal-bar{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--bg3);border-bottom:1px solid var(--border)}
+.terminal-dot{width:12px;height:12px;border-radius:50%}
+.terminal-dot.r{background:#ef4444}.terminal-dot.y{background:#eab308}.terminal-dot.g{background:#22c55e}
+.terminal-body{padding:20px 24px;font-family:'JetBrains Mono',monospace;font-size:0.85rem;line-height:1.8;color:var(--text2)}
+.terminal-body .green{color:var(--green)}
+.terminal-body .cyan{color:var(--accent)}
+.terminal-body .dim{color:var(--text3)}
+.terminal-body .white{color:var(--text)}
 
-/* ─── Hero ────────────────────────────────────────── */
-.hero{
-  min-height:100vh;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:120px 24px 60px;
-  text-align:center;
-  position:relative;
-}
-.hero-badge{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:6px 14px;border-radius:100px;
-  background:rgba(217,119,6,0.08);border:1px solid rgba(217,119,6,0.15);
-  font-size:13px;font-weight:500;color:var(--gold-light);
-  margin-bottom:28px;
-}
-.hero h1{margin-bottom:20px}
-.hero .gold{color:var(--gold-light)}
-.hero .teal{color:var(--teal)}
-.hero .subtitle{
-  font-size:clamp(17px,2vw,21px);color:var(--muted);
-  max-width:600px;margin:0 auto 36px;
-  line-height:1.6;
-}
+/* Features */
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px}
+.feature{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:32px;transition:border-color 0.2s}
+.feature:hover{border-color:var(--accent)}
+.feature-icon{font-size:1.5rem;margin-bottom:12px}
+.feature h3{font-size:1.1rem;font-weight:600;margin-bottom:8px}
+.feature p{color:var(--text2);font-size:0.95rem}
 
-/* ─── CLI Terminal ────────────────────────────────── */
-.terminal{
-  width:100%;max-width:680px;margin:0 auto 32px;
-  background:var(--navy);border:1px solid var(--slate);
-  border-radius:var(--radius-md);
-  box-shadow:0 20px 60px rgba(0,0,0,0.4),0 0 80px rgba(217,119,6,0.03);
-  text-align:left;overflow:hidden;
-}
-.terminal-header{
-  display:flex;align-items:center;gap:8px;
-  padding:12px 16px;
-  background:var(--navy-light);border-bottom:1px solid var(--slate);
-}
-.terminal-dot{width:10px;height:10px;border-radius:50%}
-.terminal-dot:nth-child(1){background:#ef4444}
-.terminal-dot:nth-child(2){background:#eab308}
-.terminal-dot:nth-child(3){background:#22c55e}
-.terminal-title{font-size:12px;color:var(--steel);margin-left:8px;font-family:'DM Sans',sans-serif}
-.terminal-body{padding:20px 24px;font-family:'JetBrains Mono','Fira Code','SF Mono',monospace;font-size:clamp(12px,1.2vw,14px);line-height:1.7}
-.terminal-body .prompt{color:var(--teal)}
-.terminal-body .cmd{color:var(--white)}
-.terminal-body .output{color:var(--muted)}
-.terminal-body .output .highlight{color:var(--gold-light)}
-.terminal-body .cursor{
-  display:inline-block;width:7px;height:15px;
-  background:var(--teal);margin-left:2px;
-  animation:blink 1s step-end infinite;
-  vertical-align:text-bottom;
-}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+/* How it works */
+.steps{display:grid;gap:32px;max-width:700px}
+.step-item{display:grid;grid-template-columns:40px 1fr;gap:16px;align-items:start}
+.step-num{width:40px;height:40px;background:var(--bg3);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:0.9rem;color:var(--accent)}
+.step-content h4{font-weight:600;margin-bottom:4px}
+.step-content p{color:var(--text2);font-size:0.95rem}
 
-/* ─── Buttons ─────────────────────────────────────── */
-.cta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:8px}
-.btn{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:14px 28px;border-radius:var(--radius-sm);
-  font-size:16px;font-weight:600;text-decoration:none;
-  cursor:pointer;transition:all .25s;border:none;
-}
-.btn-gold{
-  background:linear-gradient(135deg,var(--gold),var(--gold-light));
-  color:var(--black);box-shadow:0 4px 20px rgba(217,119,6,0.25);
-}
-.btn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(217,119,6,0.35)}
-.btn-ghost{
-  background:transparent;color:var(--pearl);
-  border:1px solid var(--slate);
-}
-.btn-ghost:hover{border-color:var(--gold);color:var(--gold-light);transform:translateY(-2px)}
-.btn-sm{padding:10px 20px;font-size:14px}
+/* Comparison */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:800px}
+@media(max-width:640px){.compare{grid-template-columns:1fr}}
+.compare-col{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:28px}
+.compare-col h4{font-size:0.85rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--text3);margin-bottom:16px}
+.compare-col ul{list-style:none;font-size:0.95rem;color:var(--text2)}
+.compare-col ul li{padding:6px 0}
+.compare-col ul li::before{content:'✗ ';color:#ef4444}
+.compare-col.after ul li::before{content:'✓ ';color:var(--green)}
 
-/* ─── Sections ────────────────────────────────────── */
-section{padding:100px clamp(24px,5vw,64px);max-width:1200px;margin:0 auto}
-.section-label{
-  font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:2px;
-  color:var(--gold-light);margin-bottom:8px;
-}
+/* CTA */
+.cta{text-align:center;padding:100px 0}
+.cta h2{font-size:2rem;font-weight:700;margin-bottom:12px}
+.cta p{color:var(--text2);margin-bottom:32px}
+.cta-btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent2);color:#000;font-weight:600;padding:14px 32px;border-radius:var(--radius);font-size:1rem;transition:transform 0.2s,box-shadow 0.2s}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(6,182,212,0.3);text-decoration:none}
 
-/* ─── Capabilities (numbers) ──────────────────────── */
-.cap-grid{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;
-  margin:48px auto;max-width:900px;
-}
-.cap-card{
-  text-align:center;padding:32px 20px;
-  border-radius:var(--radius-md);
-  background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);
-  transition:all .3s;
-}
-.cap-card:hover{background:rgba(255,255,255,0.035);border-color:var(--slate);transform:translateY(-4px)}
-.cap-card .num{font-size:clamp(36px,5vw,52px);font-weight:700;font-family:'DM Serif Display',serif;background:linear-gradient(135deg,var(--gold-light),var(--teal));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
-.cap-card .label{font-size:14px;color:var(--muted);margin-top:8px}
-.cap-card .detail{font-size:12px;color:var(--steel);margin-top:4px}
+/* Footer */
+footer{border-top:1px solid var(--border);padding:40px 0;text-align:center;color:var(--text3);font-size:0.875rem}
+footer a{color:var(--text2)}
 
-/* ─── Feature Rows (asymmetric) ───────────────────── */
-.feature-row{
-  display:grid;grid-template-columns:1fr 1fr;gap:60px;
-  align-items:center;padding:60px 0;
-  border-bottom:1px solid rgba(255,255,255,0.03);
-}
-.feature-row:last-child{border-bottom:none}
-@media(max-width:800px){.feature-row{grid-template-columns:1fr;gap:32px;padding:40px 0}}
-.feature-row .visual{
-  position:relative;
-  background:linear-gradient(135deg,var(--navy),var(--navy-light));
-  border-radius:var(--radius-lg);
-  border:1px solid var(--slate);
-  padding:32px;min-height:200px;
-  display:flex;align-items:center;justify-content:center;
-  font-family:'JetBrains Mono','Fira Code',monospace;font-size:14px;
-  box-shadow:0 8px 32px rgba(0,0,0,0.2);
-}
-.feature-row .visual pre{margin:0;color:var(--muted);line-height:1.8;font-size:13px;overflow-x:auto}
-.feature-row .visual pre .k{color:var(--teal)}
-.feature-row .visual pre .s{color:var(--gold-light)}
-.feature-row .visual pre .c{color:var(--steel);font-style:italic}
-.feature-row .text{padding:0}
-.feature-row .text .tag{
-  display:inline-block;padding:2px 10px;border-radius:4px;
-  font-size:12px;font-weight:600;margin-bottom:12px;
-}
-.tag-automation{background:rgba(94,234,212,0.1);color:var(--teal)}
-.tag-security{background:rgba(239,68,68,0.1);color:var(--red)}
-.tag-agent{background:rgba(217,119,6,0.1);color:var(--gold-light)}
-.tag-pipeline{background:rgba(59,130,246,0.1);color:#60a5fa}
-.feature-row .text h2{font-size:clamp(24px,3vw,34px);margin-bottom:12px}
-.feature-row .text p{font-size:16px;line-height:1.7;margin-bottom:16px}
-.feature-row .text ul{list-style:none;display:flex;flex-direction:column;gap:6px}
-.feature-row .text ul li{font-size:14px;color:var(--muted);display:flex;align-items:center;gap:8px}
-.feature-row .text ul li::before{content:'→';color:var(--gold-light);font-weight:600}
-
-/* ─── Agent Mapping Table ─────────────────────────── */
-.agent-table{
-  width:100%;border-collapse:separate;border-spacing:0;
-  margin-top:40px;font-size:15px;border-radius:var(--radius-md);overflow:hidden;
-  border:1px solid var(--slate);
-}
-.agent-table thead{background:var(--navy)}
-.agent-table th{
-  padding:16px 20px;text-align:left;font-weight:600;font-size:13px;
-  text-transform:uppercase;letter-spacing:1px;color:var(--muted);
-  border-bottom:1px solid var(--slate);
-}
-.agent-table td{
-  padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.03);
-  color:var(--pearl);font-size:14px;
-}
-.agent-table tbody tr:hover{background:rgba(255,255,255,0.02)}
-.agent-table tbody tr:last-child td{border-bottom:none}
-.agent-table .check{color:var(--teal);font-weight:600}
-.agent-table .cross{color:var(--red)}
-.agent-table .role{color:var(--gold-light);font-weight:500}
-
-/* ─── Quick Start ─────────────────────────────────── */
-.steps{display:grid;gap:20px;margin-top:40px;max-width:700px}
-.step{
-  display:grid;grid-template-columns:44px 1fr;gap:16px;
-  padding:24px;border-radius:var(--radius-md);
-  background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);
-  transition:all .2s;
-}
-.step:hover{background:rgba(255,255,255,0.035);border-color:var(--slate)}
-.step-num{
-  width:44px;height:44px;border-radius:50%;
-  background:linear-gradient(135deg,var(--gold),var(--gold-light));
-  color:var(--black);font-weight:700;font-size:18px;
-  display:flex;align-items:center;justify-content:center;
-}
-.step .cmd{
-  font-family:'JetBrains Mono','Fira Code',monospace;
-  font-size:15px;color:var(--teal);margin-bottom:4px;
-}
-.step .desc{font-size:14px;color:var(--muted)}
-.step .desc code{color:var(--gold-light);font-size:13px}
-
-/* ─── Output Grid ─────────────────────────────────── */
-.output-grid{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
-  gap:10px;max-width:640px;margin:24px auto 0;
-}
-.output-item{
-  display:flex;align-items:center;gap:8px;
-  padding:12px 16px;border-radius:var(--radius-sm);
-  background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);
-  font-size:14px;font-family:'JetBrains Mono',monospace;
-  transition:all .2s;
-}
-.output-item:hover{background:rgba(255,255,255,0.035);border-color:var(--slate)}
-.output-item .check{color:var(--teal);font-size:16px;flex-shrink:0}
-
-/* ─── Platforms ───────────────────────────────────── */
-.plat-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:32px}
-.plat-chip{
-  padding:8px 18px;border-radius:100px;
-  background:rgba(255,255,255,0.03);border:1px solid var(--slate);
-  font-size:14px;color:var(--muted);transition:all .2s;
-}
-.plat-chip:hover{border-color:var(--gold);color:var(--gold-light);background:var(--gold-glow)}
-
-/* ─── CTA ─────────────────────────────────────────── */
-.cta-block{
-  text-align:center;padding:100px 24px;
-  border-top:1px solid rgba(255,255,255,0.04);
-  position:relative;
-}
-.cta-block::before{
-  content:'⚓';position:absolute;top:-18px;left:50%;transform:translateX(-50%);
-  font-size:36px;background:var(--black);padding:0 20px;
-}
-.cta-block h2{margin-bottom:12px}
-.cta-block p{color:var(--muted);font-size:18px;margin:0 auto 32px;max-width:500px}
-
-/* ─── Footer ──────────────────────────────────────── */
-footer{
-  border-top:1px solid rgba(255,255,255,0.04);
-  padding:48px clamp(24px,5vw,64px);
-  display:flex;justify-content:space-between;align-items:center;
-  flex-wrap:wrap;gap:24px;
-  max-width:1200px;margin:0 auto;
-}
-footer .copy{font-size:13px;color:var(--steel)}
-footer .links{display:flex;gap:20px}
-footer .links a{font-size:13px;color:var(--steel)}
-footer .links a:hover{color:var(--gold-light)}
-
-/* ─── Responsive ──────────────────────────────────── */
-@media(max-width:700px){
-  .nav-links a:not(.gh-btn){display:none}
-  .hero{padding:100px 20px 40px}
-  .terminal-body{padding:16px;font-size:12px}
-  .cap-grid{grid-template-columns:repeat(2,1fr);gap:12px}
-  .cap-card{padding:24px 16px}
-  .feature-row .visual{padding:20px}
-  .agent-table{font-size:13px}
-  .agent-table th,.agent-table td{padding:12px 14px}
-}
-
-/* ─── Scroll Animation ────────────────────────────── */
-.fade-in{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
-.fade-in.visible{opacity:1;transform:translateY(0)}
+/* Section headers */
+.section-title{font-size:1.75rem;font-weight:700;margin-bottom:8px}
+.section-sub{color:var(--text2);margin-bottom:40px;font-size:1.05rem}
 </style>
 </head>
 <body>
 
-<!-- ─── Nav ─────────────────────────────────────────── -->
-<nav>
-  <div class="logo"><span>⚓</span> ShipKit</div>
-  <div class="nav-links">
-    <a href="#features">Features</a>
-    <a href="#comparison">Team</a>
-    <a href="#start">Get Started</a>
-    <a href="https://github.com/sagar-grv/shipkit" class="gh-btn" target="_blank" rel="noopener">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-      GitHub
-    </a>
-  </div>
-</nav>
+<!-- Hero -->
+<section class="hero">
+<div class="container">
+  <h1>Your <span>Automated Dev Team</span></h1>
+  <p>One command sets up CI/CD, health monitoring, security scanning, and AI agent config. Works in any directory. Zero dependencies.</p>
+  <div class="hero-cmd"><span class="dollar">$</span> npx shipkit-pipe</div>
+  <div class="hero-tag">No install needed. Runs instantly via npx. Works with any stack.</div>
 
-<!-- ─── Hero ────────────────────────────────────────── -->
-<div class="hero">
-  <div class="hero-badge">⚡ v2.0.1 &middot; Open Source &middot; MIT + Ethical Use</div>
-  <h1>
-    Replace a<br>
-    <span class="gold">6-Person Team</span><br>
-    With One <span class="teal">Command</span>
-  </h1>
-  <p class="subtitle">
-    ShipKit wires your AI agent to CI/CD, security scanning, pre-commit hooks,
-    and deployment — so a solo developer ships like a well-oiled engineering team.
-  </p>
-
-  <!-- CLI Terminal -->
+  <!-- Terminal demo -->
   <div class="terminal">
-    <div class="terminal-header">
-      <div class="terminal-dot"></div><div class="terminal-dot"></div><div class="terminal-dot"></div>
-      <span class="terminal-title">~/your-project — bash</span>
+    <div class="terminal-bar">
+      <div class="terminal-dot r"></div>
+      <div class="terminal-dot y"></div>
+      <div class="terminal-dot g"></div>
     </div>
     <div class="terminal-body">
-      <span class="prompt">$</span> <span class="cmd">npx shipkit-pipe setup</span><br>
-      <span class="cmd">⚓ ShipKit — MVP to Production Pipeline</span><br>
-      <span class="output">  &nbsp;&nbsp;→ Detected stack: <span class="highlight">Next.js</span> | <span class="highlight">npm</span> | <span class="highlight">Node 20</span></span><br>
-      <span class="output">  &nbsp;&nbsp;→ AI agent: <span class="highlight">Claude Code</span> (auto-detected)</span><br>
-      <span class="output">  &nbsp;&nbsp;→ Deploy: <span class="highlight">Vercel</span> | Database: <span class="highlight">Supabase</span></span><br>
-      <span class="prompt">$</span> <span class="cmd">tree .github shipkit/</span><br>
-      <span class="output">  .github/</span><br>
-      <span class="output">  &nbsp;&nbsp;├── workflows/ci.yml        <span class="highlight">[lint → test → build]</span></span><br>
-      <span class="output">  &nbsp;&nbsp;├── workflows/codeql.yml    <span class="highlight">[security scan]</span></span><br>
-      <span class="output">  &nbsp;&nbsp;└── dependabot.yml          <span class="highlight">[auto-deps]</span></span><br>
-      <span class="output">  shipkit/</span><br>
-      <span class="output">  &nbsp;&nbsp;├── planner.md             <span class="highlight">[PM + Eng Lead]</span></span><br>
-      <span class="output">  &nbsp;&nbsp;├── co-developer.md       <span class="highlight">[Builder]</span></span><br>
-      <span class="output">  &nbsp;&nbsp;├── security-reviewer.md  <span class="highlight">[Security Engineer]</span></span><br>
-      <span class="output">  &nbsp;&nbsp;└── monitor.md            <span class="highlight">[SRE]</span></span><br>
-      <span class="output" style="color:var(--teal)">  ✓ Generated 15 files in 12 seconds</span><br>
-      <span class="prompt">$</span> <span class="cmd">git add -A && git commit -m "init: shipkit pipeline"</span><span class="cursor"></span>
-    </div>
-  </div>
+<span class="dim">$</span> <span class="white">npx shipkit-pipe</span>
 
-  <div class="cta-row">
-    <a href="#start" class="btn btn-gold">⚓ Get Started</a>
-    <a href="https://github.com/sagar-grv/shipkit/stargazers" class="btn btn-ghost" target="_blank" rel="noopener">⭐ Star on GitHub</a>
+  <span class="cyan">⚓ ShipKit</span> — my-project
+
+  <span class="green">✓</span> Next.js | pnpm | Node 20
+  <span class="green">✓</span> Scripts: lint, test, build
+  <span class="green">✓</span> Deploy: Vercel (my-project.vercel.app)
+
+  <span class="green">✓</span> Generated 7 files
+
+  <span class="cyan">Files:</span>
+    shipkit.json                 <span class="dim">← Project config</span>
+    AGENTS.md                    <span class="dim">← AI agent instructions</span>
+    .github/workflows/ci.yml     <span class="dim">← CI: lint > test > build</span>
+    .github/workflows/health.yml <span class="dim">← Health check (every 6h)</span>
+    .github/dependabot.yml       <span class="dim">← Auto-update deps</span>
+    .github/workflows/codeql.yml <span class="dim">← Security scanning</span>
+    </div>
   </div>
 </div>
+</section>
 
-<!-- ─── Capabilities ────────────────────────────────── -->
+<!-- What it does -->
 <section>
-  <p class="section-label">Capabilities</p>
-  <h2>What ShipKit Delivers</h2>
-  <p style="margin-bottom:16px">Every file is production-ready, pre-configured, and documented for your AI agent.</p>
-  <div class="cap-grid">
-    <div class="cap-card fade-in">
-      <div class="num">6</div>
-      <div class="label">Engineering Roles</div>
-      <div class="detail">Replaced by AI agents + automation</div>
+<div class="container">
+  <h2 class="section-title">What it actually does</h2>
+  <p class="section-sub">Not another boilerplate. An automated team that runs after you push.</p>
+  <div class="features">
+    <div class="feature">
+      <div class="feature-icon">⚡</div>
+      <h3>Smart CI/CD</h3>
+      <p>Reads your package.json scripts. Only generates CI steps for what exists. No lint script? No lint step. Your CI never fails because of missing commands.</p>
     </div>
-    <div class="cap-card fade-in">
-      <div class="num">15</div>
-      <div class="label">Files Generated</div>
-      <div class="detail">CI/CD, security, agent prompts, hooks</div>
+    <div class="feature">
+      <div class="feature-icon">🏥</div>
+      <h3>Health Monitoring</h3>
+      <p>Pings your site every 6 hours. If it's down, auto-creates a GitHub Issue. When it recovers, auto-closes the issue. You know before your users do.</p>
     </div>
-    <div class="cap-card fade-in">
-      <div class="num">12s</div>
-      <div class="label">Setup Time</div>
-      <div class="detail">From zero to pipeline in seconds</div>
+    <div class="feature">
+      <div class="feature-icon">🔒</div>
+      <h3>Security Scanning</h3>
+      <p>CodeQL scans for vulnerabilities on every push. Dependabot keeps your dependencies updated. No manual checking needed.</p>
     </div>
-    <div class="cap-card fade-in">
-      <div class="num">9</div>
-      <div class="label">Supported Agents</div>
-      <div class="detail">Claude Code, Cursor, Copilot + more</div>
+    <div class="feature">
+      <div class="feature-icon">🤖</div>
+      <h3>AI Agent Config</h3>
+      <p>Generates AGENTS.md so your AI coding agent (Claude, Cursor, Copilot, any) knows your stack, your rules, and your project state.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">✅</div>
+      <h3>Verify Command</h3>
+      <p><code>npx shipkit-pipe check</code> — pings your deploy URL, validates CI config, checks for vulnerabilities. One command tells you if everything works.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">📦</div>
+      <h3>Works Everywhere</h3>
+      <p>Monorepos, empty directories, Next.js, Express, Vue, Svelte, Go, Python — detects what you have and generates accordingly. Zero config.</p>
     </div>
   </div>
+</div>
 </section>
 
-<!-- ─── Features ───────────────────────────────────── -->
-<section id="features">
-  <p class="section-label">Features</p>
-  <h2>Your Entire Engineering Team,<br>Now in Your Terminal</h2>
-
-  <!-- Feature 1 -->
-  <div class="feature-row fade-in">
-    <div class="visual">
-      <pre><span class="c"># AGENTS.md — loaded at session start</span>
-<span class="k">TECH_STACK</span>=Next.js, Supabase, Vercel
-<span class="k">CI</span>=lint → test → build → deploy
-<span class="k">SECURITY</span>=CodeQL on every PR
-<span class="k">STATE</span>=LAST_SESSION.md + BUGS.md
-
-→ <span class="s">Your agent reads this automatically</span>
-→ <span class="s">No more "forgot the context"</span></pre>
-    </div>
-    <div class="text">
-      <span class="tag tag-agent">AI Agent Protocol</span>
-      <h2>Your Agent Remembers Everything</h2>
-      <p>ShipKit generates AGENTS.md — a universal protocol your AI reads every session. It knows your stack, your pipeline rules, and exactly where you left off.</p>
-      <ul>
-        <li>Works with Claude Code, Cursor, Copilot, Cline, OpenCode, Aider</li>
-        <li>Session continuity via LAST_SESSION.md + BUGS.md + ROADMAP.md</li>
-        <li>No context window wasted — agent reads only what matters</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Feature 2 -->
-  <div class="feature-row fade-in">
-    <div class="text">
-      <span class="tag tag-pipeline">CI/CD Pipeline</span>
-      <h2>Push to Ship. No Config.</h2>
-      <p>Pre-built GitHub Actions workflows run linting, type-checking, tests, and build on every push. Add preview URLs, E2E tests, and deploy automatically.</p>
-      <ul>
-        <li>Vercel, Netlify, Railway, Fly.io, Render, Cloudflare, AWS, GCP</li>
-        <li>Husky pre-commit hooks catch issues before CI</li>
-        <li>Playwright E2E testing workflow included</li>
-      </ul>
-    </div>
-    <div class="visual">
-      <pre><span class="c"># .github/workflows/ci.yml</span>
-on: [push, pull_request]
-<span class="k">jobs</span>:
-  <span class="k">ci</span>:
-    <span class="k">steps</span>:
-      - run: npm <span class="s">lint</span>
-      - run: npm <span class="s">test</span>
-      - run: npm run <span class="s">build</span>
-      - run: npx <span class="s">playwright</span> test
-      - run: npx <span class="s">tsc</span> --noEmit</pre>
-    </div>
-  </div>
-
-  <!-- Feature 3 -->
-  <div class="feature-row fade-in">
-    <div class="visual">
-      <pre><span class="c"># Security — pre-push gate</span>
-→ CodeQL: <span class="s">2 critical, 0 high</span>
-→ Dependabot: <span class="s">4 updates available</span>
-→ Secrets scan: <span class="s">clean</span>
-→ RLS bypass check: <span class="s">clean</span>
-→ OWASP Top 10: <span class="s">passing</span>
-
-<span class="k">$</span> review security
-<span class="s">✓ APPROVED — safe to push</span></pre>
-    </div>
-    <div class="text">
-      <span class="tag tag-security">Security by Default</span>
-      <h2>Built-In Security Reviewer</h2>
-      <p>A dedicated AI agent reviews every diff before you push. Secrets, SQL injection, RLS policies, OWASP Top 10 — caught before they reach production.</p>
-      <ul>
-        <li>CodeQL vulnerability scanning on every PR</li>
-        <li>Dependabot for weekly npm/actions updates</li>
-        <li>One command: "review security" before push</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Feature 4 -->
-  <div class="feature-row fade-in">
-    <div class="text">
-      <span class="tag tag-automation">Async Monitoring</span>
-      <h2>Your SRE Never Sleeps</h2>
-      <p>Every session starts with a Monitor Agent check — it reads Sentry, Vercel logs, and GitHub Actions status. If something broke overnight, you know before you type a line.</p>
-      <ul>
-        <li>Post-deploy canary checks every session</li>
-        <li>Root cause analysis on every error</li>
-        <li>Graceful degradation when APIs rate-limit</li>
-      </ul>
-    </div>
-    <div class="visual">
-      <pre><span class="c"># Monitor Agent — session start</span>
-→ <span class="s">Sentry</span>: 0 new errors (24h)
-→ <span class="s">Vercel</span>: deploy #42 • 100% uptime
-→ <span class="s">GitHub Actions</span>: 3/3 passing
-→ <span class="s">Dependabot</span>: 0 critical vulns
-
-<span class="k">✓ All clear. Ready to ship.</span></pre>
-    </div>
-  </div>
-</section>
-
-<!-- ─── Comparison Table ───────────────────────────── -->
-<section id="comparison">
-  <p class="section-label">The Model</p>
-  <h2>6 Roles → 6 AI Agents</h2>
-  <p style="margin-bottom:16px">ShipKit doesn't replace engineers. It gives solo developers the same capability structure as a full team.</p>
-  <table class="agent-table">
-    <thead>
-      <tr><th>Team Role</th><th>Without ShipKit</th><th>With ShipKit</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="role">Product Manager</td><td>Meetings, specs, backlogs</td><td class="check">✓ Planner Agent</td></tr>
-      <tr><td class="role">Developer</td><td>Manual setup, lost context</td><td class="check">✓ Builder Agent</td></tr>
-      <tr><td class="role">QA Engineer</td><td>Manual testing, bug tracking</td><td class="check">✓ Tester Agent</td></tr>
-      <tr><td class="role">Security Engineer</td><td>Expensive audits, reactive fixes</td><td class="check">✓ Security Reviewer</td></tr>
-      <tr><td class="role">DevOps Engineer</td><td>Manual CI/CD, flaky deploys</td><td class="check">✓ Auto Pipelines</td></tr>
-      <tr><td class="role">SRE / Incident Commander</td><td>On-call, alert fatigue</td><td class="check">✓ Monitor Agent</td></tr>
-    </tbody>
-  </table>
-</section>
-
-<!-- ─── Platforms ──────────────────────────────────── -->
+<!-- How it works -->
 <section>
-  <p class="section-label">Compatibility</p>
-  <h2>Works With Your Stack</h2>
-  <p style="margin-bottom:8px">Zero vendor lock-in. ShipKit generates standard config files — you keep full control.</p>
-  <div class="plat-grid">
-    <span class="plat-chip">Next.js</span><span class="plat-chip">React</span><span class="plat-chip">Vue / Nuxt</span>
-    <span class="plat-chip">Svelte</span><span class="plat-chip">Remix</span><span class="plat-chip">Astro</span>
-    <span class="plat-chip">Express</span><span class="plat-chip">FastAPI</span><span class="plat-chip">Django</span>
-    <span class="plat-chip">Supabase</span><span class="plat-chip">Firebase</span><span class="plat-chip">MongoDB</span>
-    <span class="plat-chip">PostgreSQL</span><span class="plat-chip">Vercel</span><span class="plat-chip">Netlify</span>
-    <span class="plat-chip">Railway</span><span class="plat-chip">Fly.io</span><span class="plat-chip">Render</span>
-    <span class="plat-chip">Cloudflare</span><span class="plat-chip">AWS</span><span class="plat-chip">GCP</span>
-    <span class="plat-chip">Claude Code</span><span class="plat-chip">Cursor</span><span class="plat-chip">Copilot</span>
-    <span class="plat-chip">OpenCode</span><span class="plat-chip">Cline</span><span class="plat-chip">Aider</span>
-  </div>
-</section>
-
-<!-- ─── Quick Start ────────────────────────────────── -->
-<section id="start">
-  <p class="section-label">Quick Start</p>
-  <h2>Ship in 3 Commands</h2>
-  <p style="margin-bottom:8px">Works in any project directory. No account needed. No SaaS sign-up.</p>
+<div class="container">
+  <h2 class="section-title">How it works</h2>
+  <p class="section-sub">Three seconds from install to working pipeline.</p>
   <div class="steps">
-    <div class="step fade-in">
+    <div class="step-item">
       <div class="step-num">1</div>
-      <div>
-        <div class="cmd">npx shipkit-pipe setup</div>
-        <div class="desc">Interactive wizard detects your stack (~30 seconds, ~5 questions)</div>
+      <div class="step-content">
+        <h4>Run the command</h4>
+        <p><code>npx shipkit-pipe</code> in any project directory. No install, no config file, no setup wizard.</p>
       </div>
     </div>
-    <div class="step fade-in">
+    <div class="step-item">
       <div class="step-num">2</div>
-      <div>
-        <div class="cmd">git add -A && git commit -m "init: shipkit"</div>
-        <div class="desc">Your pipeline, security scanning, agent prompts, and pre-commit hooks are ready</div>
+      <div class="step-content">
+        <h4>Auto-detect</h4>
+        <p>Reads your package.json, lock files, git remote, deploy config. Figures out your stack, package manager, Node version, and available scripts.</p>
       </div>
     </div>
-    <div class="step fade-in">
+    <div class="step-item">
       <div class="step-num">3</div>
-      <div>
-        <div class="cmd">git push origin main</div>
-        <div class="desc">CI runs lint → type-check → test → build → deploy + CodeQL security scan</div>
+      <div class="step-content">
+        <h4>Generate pipeline</h4>
+        <p>Creates GitHub Actions workflows, health checks, security scanning, and AI agent config — only what your project actually needs.</p>
       </div>
     </div>
-  </div>
-
-  <p style="margin-top:48px;font-size:13px;color:var(--steel);text-align:center">After setup, open your project in your AI agent and say <code style="color:var(--gold-light)">"plan: login page"</code> — your agent already knows everything.</p>
-
-  <div style="margin-top:32px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:var(--radius-md);padding:28px;max-width:640px;margin-left:auto;margin-right:auto">
-    <p style="font-size:14px;color:var(--muted);text-align:center;margin-bottom:16px;max-width:100%">ShipKit generates these files automatically:</p>
-    <div class="output-grid">
-      <div class="output-item"><span class="check">✓</span> shipkit.json</div>
-      <div class="output-item"><span class="check">✓</span> AGENTS.md</div>
-      <div class="output-item"><span class="check">✓</span> GitHub Actions CI</div>
-      <div class="output-item"><span class="check">✓</span> CodeQL Security</div>
-      <div class="output-item"><span class="check">✓</span> Dependabot Updates</div>
-      <div class="output-item"><span class="check">✓</span> Playwright E2E</div>
-      <div class="output-item"><span class="check">✓</span> Pre-commit Hooks</div>
-      <div class="output-item"><span class="check">✓</span> Agent Prompts</div>
-      <div class="output-item"><span class="check">✓</span> Session Continuity</div>
-      <div class="output-item"><span class="check">✓</span> Security Reviewer</div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h4>Push and forget</h4>
+        <p><code>git push</code> — CI runs on every PR, health checks run every 6 hours, Dependabot keeps deps fresh, CodeQL scans for vulnerabilities.</p>
+      </div>
     </div>
-  </div>
-</section>
-
-<!-- ─── CTA ────────────────────────────────────────── -->
-<div class="cta-block">
-  <h2>Ship Your MVP. Not Your Sanity.</h2>
-  <p>Open source. Free. Works with any stack, any AI agent, any deploy platform.</p>
-  <div class="cta-row">
-    <a href="https://github.com/sagar-grv/shipkit#readme" class="btn btn-gold" target="_blank" rel="noopener">⚓ Get Started on GitHub</a>
-    <a href="https://github.com/sagar-grv/shipkit/stargazers" class="btn btn-ghost" target="_blank" rel="noopener">⭐ Star the Repo</a>
   </div>
 </div>
+</section>
 
-<!-- ─── Footer ─────────────────────────────────────── -->
+<!-- Before/After -->
+<section>
+<div class="container">
+  <h2 class="section-title">Before vs After</h2>
+  <p class="section-sub">What changes when you add ShipKit to your workflow.</p>
+  <div class="compare">
+    <div class="compare-col">
+      <h4>Without ShipKit</h4>
+      <ul>
+        <li>Manually check if site is up</li>
+        <li>Forget to run tests before pushing</li>
+        <li>Dependencies go months without updates</li>
+        <li>No security scanning until it's too late</li>
+        <li>AI agent forgets your project every session</li>
+        <li>CI config copied from Stack Overflow</li>
+      </ul>
+    </div>
+    <div class="compare-col after">
+      <h4>With ShipKit</h4>
+      <ul>
+        <li>Health check pings site every 6 hours</li>
+        <li>CI runs lint/test/build on every PR</li>
+        <li>Dependabot creates PRs for updates</li>
+        <li>CodeQL scans on every push</li>
+        <li>AGENTS.md gives your AI full context</li>
+        <li>CI generated from your actual scripts</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+<div class="container">
+  <h2>Ready to ship?</h2>
+  <p>One command. Three seconds. Your project gets an automated team.</p>
+  <a href="https://github.com/sagar-grv/shipkit" class="cta-btn">View on GitHub →</a>
+  <div style="margin-top:24px">
+    <code style="color:var(--text2);font-size:0.95rem">npx shipkit-pipe</code>
+  </div>
+</div>
+</section>
+
 <footer>
-  <div class="copy">
-    Built by <a href="https://github.com/sagar-grv" target="_blank" rel="noopener">sagar-grv</a> &middot; 
-    Apache 2.0 + <a href="https://github.com/sagar-grv/shipkit/blob/main/LICENSE" target="_blank" rel="noopener">Ethical Use</a>
-  </div>
-  <div class="links">
-    <a href="https://github.com/sagar-grv/shipkit" target="_blank" rel="noopener">GitHub</a>
-    <a href="https://github.com/sagar-grv/shipkit/issues" target="_blank" rel="noopener">Issues</a>
-    <a href="https://github.com/sagar-grv/shipkit/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
-  </div>
+<div class="container">
+  <p>Built by <a href="https://github.com/sagar-grv">Sagar Giri</a> · <a href="https://github.com/sagar-grv/shipkit">GitHub</a> · <a href="https://www.npmjs.com/package/shipkit-pipe">npm</a></p>
+</div>
 </footer>
-
-<script>
-// Intersection Observer for fade-in animations
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
-    }
-  });
-}, { threshold: 0.1 });
-
-document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-</script>
 
 </body>
 </html>
