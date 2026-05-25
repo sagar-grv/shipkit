@@ -282,7 +282,7 @@ Auto-detects your stack
 <p>CI/CD, health monitoring, security scanning, and AI agent config — all set up by detecting your project. Works with any stack, any language, any directory.</p>
 <div class="hero-row">
 <div class="hero-cmd" id="heroCmd">
-<span><span class="dollar">$</span> <span class="cmd">npx shipkit@latest init</span></span>
+<span><span class="dollar">$</span> <span class="cmd">npx shipkit-pipe</span></span>
 <button onclick="copyCmd()" title="Copy command" aria-label="Copy command">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
 </button>
@@ -395,9 +395,9 @@ Demo
 <span class="terminal-dot y"></span>
 <span class="terminal-dot g"></span>
 </div>
-<span class="terminal-title">bash — shipkit init</span>
+<span class="terminal-title">bash — shipkit-pipe</span>
 </div>
-<div class="terminal-body" id="terminalBody"><span class="prompt">$</span> npx shipkit@latest init<span class="highlight">▊</span></div>
+<div class="terminal-body" id="terminalBody"><span class="prompt">$</span> npx shipkit-pipe<span class="highlight">▊</span></div>
 </div>
 <div class="demo-side">
 <div class="demo-code-snip reveal-animate">
@@ -437,7 +437,7 @@ How it works
 <div class="step">
 <div class="step-num">1</div>
 <h3>Run one command</h3>
-<p><code class="code">npx shipkit@latest init</code> in your project directory. That's it.</p>
+<p><code class="code">npx shipkit-pipe</code> in your project directory. That's it.</p>
 </div>
 <div class="step">
 <div class="step-num">2</div>
@@ -495,10 +495,10 @@ Install
 <button class="tab-btn" data-tab="yarn">yarn</button>
 <button class="tab-btn" data-tab="bun">bun</button>
 </div>
-<div class="tab-content active" id="tab-npm"><div class="tab-code"><span class="prompt">$</span> <span class="text">npx shipkit@latest init</span></div></div>
-<div class="tab-content" id="tab-pnpm"><div class="tab-code"><span class="prompt">$</span> <span class="text">pnpm dlx shipkit@latest init</span></div></div>
-<div class="tab-content" id="tab-yarn"><div class="tab-code"><span class="prompt">$</span> <span class="text">yarn dlx shipkit@latest init</span></div></div>
-<div class="tab-content" id="tab-bun"><div class="tab-code"><span class="prompt">$</span> <span class="text">bunx shipkit@latest init</span></div></div>
+<div class="tab-content active" id="tab-npm"><div class="tab-code"><span class="prompt">$</span> <span class="text">npx shipkit-pipe</span></div></div>
+<div class="tab-content" id="tab-pnpm"><div class="tab-code"><span class="prompt">$</span> <span class="text">pnpm dlx shipkit-pipe</span></div></div>
+<div class="tab-content" id="tab-yarn"><div class="tab-code"><span class="prompt">$</span> <span class="text">yarn dlx shipkit-pipe</span></div></div>
+<div class="tab-content" id="tab-bun"><div class="tab-code"><span class="prompt">$</span> <span class="text">bunx shipkit-pipe</span></div></div>
 </div>
 </div>
 </section>
@@ -542,7 +542,7 @@ FAQ
 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
 Copy command & start
 </button>
-<div class="cta-foot">npx shipkit@latest init • No signup • Works offline</div>
+<div class="cta-foot">npx shipkit-pipe • No signup • Works offline</div>
 </div>
 </section>
 <footer>
@@ -582,7 +582,7 @@ var counterObserver=new IntersectionObserver(function(entries){entries.forEach(f
 counterObserver.unobserve(e.target)}})},{threshold:.5})
 document.querySelectorAll('#statCicd,#statHealth,#statSecure').forEach(function(el){counterObserver.observe(el)})
 // --- Terminal typing ---
-var terminalLines=['','<span class="prompt">$</span> npx shipkit@latest init','<span class="out">Detecting project structure...</span>','<span class="out">→ Found: package.json, next.config.js, tsconfig.json</span>','<span class="out">→ Detected stack: <span class="success">Next.js 15 + TypeScript</span></span>','<span class="out">Generating configurations...</span>','<span class="out">→ <span class="success">✓</span> .github/workflows/ci.yml</span>','<span class="out">→ <span class="success">✓</span> .github/workflows/deploy.yml</span>','<span class="out">→ <span class="success">✓</span> AGENTS.md</span>','<span class="out">→ <span class="success">✓</span> .env.example</span>','<span class="out">→ <span class="success">✓</span> .github/dependabot.yml</span>','<span class="out">','<span class="success">ShipKit initialized successfully!</span>','<span class="out">Run <span class="highlight">git push</span> to trigger your first pipeline.</span>','<span class="prompt">$</span> <span class="highlight">▊</span>']
+var terminalLines=['','<span class="prompt">$</span> npx shipkit-pipe','<span class="out">Detecting project structure...</span>','<span class="out">→ Found: package.json, next.config.js, tsconfig.json</span>','<span class="out">→ Detected stack: <span class="success">Next.js 15 + TypeScript</span></span>','<span class="out">Generating configurations...</span>','<span class="out">→ <span class="success">✓</span> .github/workflows/ci.yml</span>','<span class="out">→ <span class="success">✓</span> .github/workflows/deploy.yml</span>','<span class="out">→ <span class="success">✓</span> AGENTS.md</span>','<span class="out">→ <span class="success">✓</span> .env.example</span>','<span class="out">→ <span class="success">✓</span> .github/dependabot.yml</span>','<span class="out">','<span class="success">ShipKit initialized successfully!</span>','<span class="out">Run <span class="highlight">git push</span> to trigger your first pipeline.</span>','<span class="prompt">$</span> <span class="highlight">▊</span>']
 var termIdx=0
 var termBody=document.getElementById('terminalBody')
 var termObserver=new IntersectionObserver(function(entries){if(entries[0].isIntersecting){termObserver.unobserve(termBody);startTyping()}},{threshold:.3})
@@ -598,7 +598,7 @@ document.getElementById('tab-'+btn.getAttribute('data-tab')).classList.add('acti
 // --- FAQ ---
 function toggleFaq(btn){var item=btn.parentElement;item.classList.toggle('open')}
 // --- Copy command ---
-function copyCmd(){var input=document.createElement('input');input.value='npx shipkit@latest init';document.body.appendChild(input);input.select();document.execCommand('copy');document.body.removeChild(input);showToast()}
+function copyCmd(){var input=document.createElement('input');input.value='npx shipkit-pipe';document.body.appendChild(input);input.select();document.execCommand('copy');document.body.removeChild(input);showToast()}
 function copyCmdCta(){copyCmd()}
 function showToast(){var t=document.getElementById('toast');t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2000)}
 // --- Parallax hero (subtle) ---
