@@ -101,7 +101,11 @@ function detect(cwd) {
 
   if (pkg.name) d.name = d.isMonorepo ? path.basename(cwd) : pkg.name;
   if (pkg.description) d.desc = pkg.description;
-  if (pkg.homepage) d.deployUrl = pkg.homepage;
+  // Only use homepage as deploy URL if it's NOT a git hosting URL
+  if (pkg.homepage) {
+    const isGitUrl = /github\.com|gitlab\.com|bitbucket\.org/.test(pkg.homepage);
+    if (!isGitUrl) d.deployUrl = pkg.homepage;
+  }
 
   // Framework detection
   const deps = { ...pkg.dependencies || {}, ...pkg.devDependencies || {} };
@@ -262,6 +266,7 @@ function generate(cwd, d, opts = {}) {
     files.push(['github/workflows/ci.yml', '.github/workflows/ci.yml']);
     files.push(['github/dependabot.yml', '.github/dependabot.yml']);
     files.push(['github/workflows/codeql.yml', '.github/workflows/codeql.yml']);
+    files.push(['github/workflows/auto-merge.yml', '.github/workflows/auto-merge.yml']);
     // Only add health check if we have a deploy URL
     if (d.deployUrl) {
       files.push(['github/workflows/health.yml', '.github/workflows/health.yml']);
@@ -378,15 +383,21 @@ async function check(cwd, asJson = false) {
     } catch { result.deploy.status = 'unreachable'; }
   }
 
-  // Vulnerabilities
+  // Vulnerabilities — npm audit exits with code 1 when vulns found, so catch and read stdout
   try {
-    const auditRes = execSync('npm audit --json 2>/dev/null || echo "{}"', { cwd, encoding: 'utf-8', stdio: 'pipe', timeout: 15000 });
+    let auditJson = '';
     try {
-      const audit = JSON.parse(auditRes);
+      auditJson = execSync('npm audit --json', { cwd, encoding: 'utf-8', stdio: 'pipe', timeout: 15000 });
+    } catch (auditErr) {
+      // npm audit exits non-zero when vulnerabilities exist — stdout still has the JSON
+      if (auditErr.stdout) auditJson = auditErr.stdout;
+    }
+    if (auditJson) {
+      const audit = JSON.parse(auditJson);
       const vulns = audit.metadata?.vulnerabilities || {};
       result.vulnerabilities.critical = vulns.critical || 0;
       result.vulnerabilities.high = vulns.high || 0;
-    } catch {}
+    }
   } catch {}
 
   if (asJson) {
@@ -472,7 +483,7 @@ async function main() {
     process.exit(0);
   }
 
-  // Uprade command
+  // Upgrade command
   if (args[0] === 'upgrade') {
     // Wait for version check to complete
     await new Promise(r => setTimeout(r, 1500));
@@ -508,8 +519,6 @@ async function main() {
     • Auto-checks for new versions (non-blocking)
 
   ${C.bold}Works with:${C.reset} Any framework, any CI platform, any AI agent, any deploy target.
-
-  ${C.bold}No Node.js?${C.reset} Download from: https://github.com/sagar-grv/shipkit/releases
 `);
     process.exit(0);
   }
@@ -548,8 +557,9 @@ async function main() {
     } else {
       console.log(`    .github/workflows/ci.yml    ← CI: ${found.join(' > ') || 'install'}`);
       console.log(`    .github/dependabot.yml      ← Auto-update deps`);
-      console.log(`    .github/workflows/codeql.yml← Security scanning`);
-      if (d.deployUrl) console.log(`    .github/workflows/health.yml← Health check (every 6h)`);
+      console.log(`    .github/workflows/codeql.yml ← Security scanning`);
+      console.log(`    .github/workflows/auto-merge.yml ← Auto-merge safe dependabot PRs`);
+      if (d.deployUrl) console.log(`    .github/workflows/health.yml ← Health check (every 6h)`);
     }
     console.log(`    shipkit.json                ← Project config`);
     console.log(`    AGENTS.md                   ← AI agent instructions`);
@@ -620,6 +630,7 @@ async function main() {
     showFile('.github/workflows/health.yml', 'Health check (every 6h)');
     showFile('.github/dependabot.yml', 'Auto-update deps');
     showFile('.github/workflows/codeql.yml', 'Security scanning');
+    showFile('.github/workflows/auto-merge.yml', 'Auto-merge safe dependabot PRs');
   }
 
   console.log(`\n  ${C.bold}Next:${C.reset} ${C.dim}git add -A && git commit -m "add pipeline" && git push${C.reset}`);

@@ -43,6 +43,7 @@ npx shipkit-pipe
 | `.github/workflows/health.yml` | Pings your site every 6h, creates issue if down |
 | `.github/dependabot.yml` | Weekly dependency updates |
 | `.github/workflows/codeql.yml` | Security vulnerability scan |
+| `.github/workflows/auto-merge.yml` | Auto-merges safe Dependabot PRs |
 
 **For GitLab:** generates `.gitlab-ci.yml` instead of GitHub Actions.
 **For Bitbucket:** generates `bitbucket-pipelines.yml`.
@@ -69,6 +70,9 @@ ShipKit reads your existing files — it never asks what it can detect:
 | `npx shipkit-pipe` | Auto-detect & generate (default, no prompts) |
 | `npx shipkit-pipe --dry-run` | Preview what would be generated |
 | `npx shipkit-pipe check` | Validate CI, ping site, check deps |
+| `npx shipkit-pipe check --json` | Machine-readable check output |
+| `npx shipkit-pipe upgrade` | Check for newer version |
+| `npx shipkit-pipe --force` | Overwrite existing files |
 | `npx shipkit-pipe -i` | Interactive mode (ask questions) |
 | `npx shipkit-pipe --help` | Show help |
 | `npx shipkit-pipe --version` | Show version |
@@ -80,7 +84,7 @@ ShipKit reads your existing files — it never asks what it can detect:
 curl -fsSL https://raw.githubusercontent.com/sagar-grv/shipkit/main/setup.sh | bash
 
 # Windows PowerShell:
-irm https://raw.githubusercontent.com/sagar-grv/shipkit/main/setup.ps1 | powershell
+irm https://raw.githubusercontent.com/sagar-grv/shipkit/main/setup.ps1 | iex
 
 # Or globally:
 npm install -g shipkit-pipe

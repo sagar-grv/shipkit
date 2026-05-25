@@ -11,7 +11,7 @@ updates:
       interval: "weekly"
       day: "monday"
       time: "09:00"
-      timezone: "Asia/Kolkata"
+      timezone: "UTC"
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
@@ -35,7 +35,7 @@ updates:
       interval: "weekly"
       day: "monday"
       time: "09:00"
-      timezone: "Asia/Kolkata"
+      timezone: "UTC"
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
