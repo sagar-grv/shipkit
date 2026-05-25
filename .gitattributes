@@ -10,9 +10,10 @@
 *.yml text eol=lf
 *.yaml text eol=lf
 *.json text
-*.js text
-*.html text
-*.css text
+*.js text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.json text eol=lf
 
 # Binary files
 *.png binary

@@ -1,6 +1,6 @@
 {
   "name": "shipkit-pipe",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "MVP to Production Pipeline — Connect your AI agent, CI/CD, security, and deploy. One command, any stack.",
   "keywords": [
     "shipkit",
@@ -37,5 +37,10 @@
   "engines": {
     "node": ">=18"
   },
-  "preferUnplugged": true
+  "preferUnplugged": true,
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "type": "commonjs"
 }

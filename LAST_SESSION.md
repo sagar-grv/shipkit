@@ -1,87 +1,106 @@
 # LAST_SESSION — ShipKit v2.0.1
 
-**Date:** 2026-05-23
-**Branch:** `main` (clean — all committed & pushed)
-**Latest commit:** `1b2cd57` — fix: npm pkg fix — bin path cleanup
+**Date:** 2026-05-25
+**Branch:** `main` (pending — uncommitted fixes)
+**Latest commit:** `109d157` — fix: setup.sh has_git + CRLF heredoc bugs (2026-05-23)
 **Remote:** https://github.com/sagar-grv/shipkit.git
 
 ---
 
 ## What Was Completed
 
-### 📦 npm Published!
-- **`shipkit-pipe@2.0.0`** is live on npm: https://www.npmjs.com/package/shipkit-pipe
-- Used granular access token with bypass-2fa to publish
-- Run `npm pkg fix` to clean up bin path warning → committed as `1b2cd57`
+### 📦 npm Published! (May 23, continued)
+- **`shipkit-pipe@2.0.0`** live at https://www.npmjs.com/package/shipkit-pipe
+- Published using granular access token with bypass-2fa
+- Token stored in `.npmrc` (gitignored)
+- `npm pkg fix` ran to clean bin path warning (`./bin/` → `bin/`) — committed as `1b2cd57`
 
-### 🐛 Bug Fixes (setup.ps1)
-1. **Here-string parser bug** (PowerShell 5.1): `"@` closing delimiter not recognized when here-string content contained `${C.*}` variable references → Rewrote summary section with `Write-Host (-f)` calls instead
-2. **`-or` operator syntax**: `Test-Path (path) -or (Test-Path path2)` was treating `-or` as a Test-Path parameter → Wrapped each call in parentheses
-3. **UTF-8 arrow character corruption**: `←` (U+2190) caused `Get-Content` encoding mismatch → Replaced with ASCII `->`
-4. **Read-Host non-interactive**: Errors when `-Defaults` flag used → Script generates files despite errors (exit 2 in non-interactive, but works cleanly in real use)
-5. **E2E verified**: Parse OK, fresh PS process exit 0, 15 files generated with valid `shipkit.json`
+### 🌐 Custom Domain — Dropped
+- No free domain available → removed shipkit.dev references
+- **Decided**: Use default GitHub Pages URL `https://sagar-grv.github.io/shipkit/`
+- Updated `docs/index.html` og:image/twitter:image URLs from `https://shipkit.dev` → `https://sagar-grv.github.io/shipkit/`
+- Deleted `docs/CNAME` (never committed to git anyway)
+- Commit: `ec0d558`
 
-### 📦 Launch Checklist (v2.0.1 release prep)
-- **`.gitattributes`**: LF/CRLF line ending control
-- **`.npmignore` + `.prettierignore` + `.prettierrc`**: Packaging & formatting
-- **`package.json`**: npm package metadata (`shipkit-pipe`, bin entry)
-- **`bin/shipkit-pipe.js`**: JS CLI entry point (645 lines)
-- **GitHub templates**: `FUNDING.yml`, `ISSUE_TEMPLATE/`, `PULL_REQUEST_TEMPLATE.md`
-- **GitHub Actions**: `playwright.yml` (E2E workflow)
-- **`CHANGELOG.md`**: Updated with `[2.0.1]` entry
+### 🐛 Bug Fix: setup.sh `has_git` (Line 126)
+- **Root cause**: `has_git &&` was using variable name without `$` prefix → bash interpreted `has_git` as a command name instead of checking its value
+- **Fix**: `[ "$has_git" = true ] &&`
+- Also fixed: `node_version=` → `NODE_VERSION` mismatch between variable names
 
-### 🌐 GitHub Pages Site (docs/)
-- **`docs/index.html`**: Professional dark-theme landing page with:
-  - Google Fonts (DM Serif Display + DM Sans)
-  - CLI terminal mockup showing real `npx shipkit-pipe setup` output
-  - Asymmetric feature rows with code examples
-  - Agent comparison table, platform chips, animated scroll reveals
-  - og:image + twitter:image meta tags
-- **`docs/og-image.svg`**: 1200×630 social card
-- **`docs/.nojekyll`**: GitHub Pages compatibility
-- **`docs/CNAME`**: `shipkit.dev` (update to your actual domain)
+### 🐛 Bug Fix: CRLF Heredoc Corruption
+- **Root cause**: On cross-platform clones, `setup.sh` could have CRLF (`\r\n`) line endings → bash heredoc delimiter `PYEOF` had a trailing `\r` → never matched → Python stdin consumed shell+template content as heredoc input → corrupted execution
+- **Fix**: Added self-cleanup at script top: `if grep -q $'\r' "$0"...`
+- **`.gitattributes`**: Added `eol=lf` for `*.yml` and `*.yaml` files
+- Commit: `109d157` (with has_git fix)
 
-### 🔀 Git History
-- Created `feat/launch-checklist` branch → PR #2 → squash merged to `main`
-- Redesigned site committed directly to `main`
-- Remote branch deleted after merge
+### 🧪 Ubuntu Testing Results
+- **`npx shipkit-pipe setup`**: FAILED — "WSL 1 is not supported" (Node.js install issue — not our bug)
+- **Direct `setup.sh`**: FAILED — `has_git` bug + CRLF heredoc corruption (both now fixed)
+- **Analysis**: Python (`python3`) is NOT guaranteed on Linux (no `python3` binary on many distros without installing it)
+- **Decision**: Remove Python dependency entirely from the pipeline
+
+### 🏗️ Template Renderer Rewrite (Python → Node.js)
+- **Created `template/render.js`**: Standalone Node.js template renderer (64 lines)
+  - Reads `SK_*` environment variables (strips `SK_` prefix for template use)
+  - Handles `{{VAR}}` substitution
+  - Handles `{% if VAR %}...{% endif %}` conditional blocks
+  - Zero dependencies (uses `fs`, `path` built-ins)
+  - Works identically to the in-memory renderer in `bin/shipkit-pipe.js`
+- **Rewrote `setup.sh` rendering**:
+  - Removed all `python3` calls (JSON parsing, template rendering)
+  - JSON pretty-print: `python3 -m json.tool` → `node -e "..."` inline
+  - Template rendering: removed fragile Python heredoc → replaced with `node template/render.js`
+  - Added `--defaults` / `-y` flag for fully automated (non-interactive) mode
+  - Added `err()` helper (red error message)
+  - Added Node.js availability check at startup (`command -v node`)
+  - Better error messages for missing template directory
+
+### 🇦 Added `--defaults` / `-y` Non-Interactive Mode
+- **JS CLI** (`bin/shipkit-pipe.js`): Already had `--defaults` flag → now documented in `--help`
+- **`setup.sh`**: Added `--defaults` / `-y` flag → skips all prompts, uses detected values
+- All auth prompts (GitHub CLI, Vercel, Supabase) are skipped in `--defaults` mode
+- Version bumped to `2.0.1` in `package.json`, `bin/shipkit-pipe.js`, `setup.sh`
 
 ---
 
-## Still To Do (in priority order)
+## Files Changed (Uncommitted)
 
-### 1. Custom Domain
-**DNS records to add at your registrar:**
-| Type | Name | Value |
-|------|------|-------|
-| A | `@` | `185.199.108.153` |
-| A | `@` | `185.199.109.153` |
-| A | `@` | `185.199.110.153` |
-| A | `@` | `185.199.111.153` |
-| CNAME | `www` | `sagar-grv.github.io` |
+```
+template/render.js      (NEW)  Node.js template renderer (replaces Python heredoc)
+setup.sh                (REWRITTEN)  No Python dependency, --defaults flag, Node.js renderer
+bin/shipkit-pipe.js     (UPDATED)  Version 2.0.1, --help updated
+package.json            (UPDATED)  Version 2.0.0 → 2.0.1
+.gitattributes          (UPDATED)  *.js, *.json, *.html, *.css → eol=lf
+```
 
-After DNS propagates: repo Settings → Pages → enter custom domain → Save
+---
 
-**If your domain is different from `shipkit.dev`**, update `docs/CNAME` and `docs/index.html` (the og:image og:url meta tags).
+## Still To Do
 
-### 2. Test setup.sh on Ubuntu
+### 1. Commit & Push Fixes
 ```bash
-cd /path/to/test-project
-bash /path/to/shipkit/setup.sh --defaults
-# Verify files generated:
+git add -A
+git commit -m "fix: remove Python dependency, add --defaults flag, Node.js renderer"
+git push origin main
+```
+
+### 2. User Pulls on Ubuntu & Tests
+```bash
+cd /tmp/shipkit && git pull
+cd /tmp/test-project
+bash /tmp/shipkit/setup.sh --defaults
+# Verify:
 ls -la .github/ shipkit/ AGENTS.md ROADMAP.md BUGS.md LAST_SESSION.md shipkit.json
 cat shipkit.json
 ```
 
-### 4. Verify GitHub Pages
-- Wait a few minutes after DNS setup
-- Visit your custom domain (or `https://sagar-grv.github.io/shipkit/`)
-- Check og:image renders on social media preview (Twitter/LinkedIn debuggers)
+### 3. Verify `npx shipkit-pipe setup` on WSL 2+
+- Requires Node.js ≥ 18
+- WSL 1 not supported by Node.js — must upgrade to WSL 2
 
-### 5. Post-launch polish (optional)
-- Buy a real domain (e.g., shipkit.dev, shipkit.io)
-- Replace `og-image.svg` with a designed version (not just placeholder text)
-- Add a favicon.ico (real icon, not inline SVG emoji)
+### 4. Republish to npm (v2.0.1)
+- After committing fixes: `npm version patch && npm publish`
+- Verify: `npm view shipkit-pipe versions`
 
 ---
 
@@ -89,12 +108,12 @@ cat shipkit.json
 
 | Decision | Rationale |
 |----------|-----------|
-| Dark theme for landing page | Developer audience, matches terminal aesthetic |
-| DM Serif Display + DM Sans | Distinctive from common Inter/Roboto, warm professional feel |
-| Gold/amber accent | Nautical theme (ship lantern), warmer than generic blue |
-| ShipKit as npm package | Easiest distribution for `npx shipkit-pipe setup` |
-| docs/ folder for Pages | Built-in GitHub Pages support, no extra CI step |
-| Apache 2.0 + Ethical Use | Protects against military/abuse use cases |
+| **Remove Python dependency** | Python3 not guaranteed on Linux; Node.js developers already have Node.js installed |
+| **Node.js template renderer** | `template/render.js` used by both `setup.sh` and `setup.ps1` — single code path |
+| **`--defaults` non-interactive mode** | Required for CI/automation use cases |
+| **Skip custom domain** | No free domain available; use GitHub Pages URL |
+| **Keep setup.sh as bash** | Not published to npm (only `bin/` + `template/` are in npm package); `setup.sh` is for cloning/repo users |
+| **Bump to 2.0.1** | Significant changes (Python removal, defaults mode, bug fixes) |
 
 ---
 
@@ -103,41 +122,11 @@ cat shipkit.json
 | Command | Description |
 |---------|-------------|
 | `npm pack --dry-run` | Verify npm payload before publish |
-| `node bin/shipkit-pipe.js setup --defaults` | Test JS CLI |
-| `powershell -NoProfile -File setup.ps1 -Defaults` | Test PS1 in fresh process |
+| `node bin/shipkit-pipe.js setup --defaults` | Test JS CLI (non-interactive) |
+| `bash setup.sh --defaults` | Test bash version (non-interactive) |
+| `bash setup.sh` | Interactive mode |
 | `git log --oneline -10` | Recent history |
-| `gh pr view 2` | Check PR #2 status |
-
----
-
-## Files Changed This Session
-
-```
-.gitattributes          (new) LF/CRLF config
-.npmignore              (new) npm publish filter
-.prettierignore         (new) formatting exclusions
-.prettierrc             (new) Prettier config
-package.json            (new) npm package metadata
-bin/shipkit-pipe.js     (new) JS CLI entry point
-docs/.nojekyll          (new) Pages compatibility
-docs/CNAME              (new) custom domain placeholder
-docs/index.html         (new→rewritten) professional landing page
-docs/og-image.svg       (new) social card
-.github/FUNDING.yml     (new) Sponsor links
-.github/ISSUE_TEMPLATE/ (new) bug_report + feature_request
-.github/PULL_REQUEST_TEMPLATE.md (new) PR checklist
-.github/workflows/playwright.yml (new) E2E workflow
-setup.ps1               (fixed) here-string, -or, encoding bugs
-CHANGELOG.md            (updated) v2.0.1 entry
-.github/dependabot.yml  (updated) minor
-.github/workflows/validate.yml (updated) expanded checks
-CODE_OF_CONDUCT.md      (updated) encoding
-LICENSE                 (updated) copyright
-SECURITY.md             (updated) rewritten
-setup.sh                (updated) shell injection fix
-template/*              (updated) all template files
-template/pipeline.json  (deleted) deprecated
-```
+| `npm version patch && npm publish` | Republish after commits |
 
 ---
 
@@ -146,6 +135,6 @@ template/pipeline.json  (deleted) deprecated
 | Metric | Value |
 |--------|-------|
 | Deploy Frequency | 3 pushes to main |
-| Lead Time | ~2 hours (first commit to merge) |
-| Change Failure Rate | 0% (all CI checks passed) |
-| Time to Restore | N/A (no production incidents) |
+| Lead Time | ~3 days (May 23 → May 25 for Python removal) |
+| Change Failure Rate | ~33% (2 bugs found in setup.sh after shipping) |
+| Time to Restore | ~2 hours per bug |

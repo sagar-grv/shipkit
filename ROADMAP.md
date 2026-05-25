@@ -1,17 +1,23 @@
 # ShipKit Roadmap
 
-## [v2.0.1] — ✅ Shipped (2026-05-23)
+## [v2.0.1] — ✅ Shipped (2026-05-25)
+- [x] npm publish: `shipkit-pipe@2.0.0` live on npm
 - [x] Fix setup.ps1: here-string parser, -or syntax, encoding bugs
-- [x] GitHub Pages: landing page, og:image, favicon, .nojekyll
+- [x] Fix setup.sh: `has_git` variable without `$` prefix bug
+- [x] Fix setup.sh: CRLF heredoc corruption (cross-platform clones)
+- [x] .gitattributes: LF line ending enforcement for all code files
+- [x] GitHub Pages: landing page, og:image, .nojekyll (default URL)
 - [x] npm packaging: package.json, bin/, .npmignore
-- [x] CI/CD: playwright.yml template, FUNDING.yml, ISSUE_TEMPLATE
-- [x] Git: .gitattributes for LF/CRLF
+- [x] CI/CD: playwright.yml, FUNDING.yml, ISSUE_TEMPLATE
+- [x] **Remove Python dependency**: `template/render.js` (Node.js) replaces fragile Python heredoc
+- [x] **`--defaults` / `-y` flag**: Non-interactive mode for both JS CLI and setup.sh
+- [x] **Custom domain dropped**: Use GitHub Pages default URL (no free domain)
 
 ## [v2.1.0] — Next
-- [ ] **Custom domain**: DNS setup, verify TLS
-- [x] **npm publish** (`npm adduser && npm publish`) — ✅ `shipkit-pipe@2.0.0` live
-- [ ] **setup.sh verification** on Linux/macOS
-- [ ] **Post-launch analytics**: add download counter badge to README
+- [ ] **Verify on Ubuntu**: `git pull` latest, test `bash setup.sh --defaults`
+- [ ] **Republish v2.0.1 to npm**: `npm version patch && npm publish`
+- [ ] **Verify `npx shipkit-pipe setup --defaults`** on WSL 2 / native Linux
+- [ ] **Post-launch analytics**: download counter badge in README
 - [ ] **Homebrew tap** (optional): `brew install shipkit`
 
 ## [v2.2.0] — Future

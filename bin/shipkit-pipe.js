@@ -27,7 +27,7 @@ const C = {
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 const pkg = (() => {
-  try { return require('../package.json'); } catch { return { version: '2.0.0' }; }
+  try { return require('../package.json'); } catch { return { version: '2.0.1' }; }
 })();
 
 function wrap(msg, ...colors) {
@@ -515,7 +515,7 @@ This file configures your AI agent (${selectedAgent}) for **${projName}**.
     monitoring: {
       platform: vars.MONITORING_PLATFORM,
     },
-    version: '2.0.0',
+    version: '2.0.1',
   };
 
   const shipkitPath = path.join(cwd, 'shipkit.json');

@@ -30,6 +30,7 @@ CONFIG_FILE=""
 OUTPUT_DIR="."
 FORCE=false
 DETECT_ONLY=false
+DEFAULTS=false
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -37,17 +38,28 @@ while [[ $# -gt 0 ]]; do
     --output) OUTPUT_DIR="$2"; shift 2 ;;
     --force|-f) FORCE=true; shift ;;
     --detect-only) DETECT_ONLY=true; shift ;;
-    *) echo "Usage: $0 [--config file] [--output dir] [--force] [--detect-only]"; exit 1 ;;
+    --defaults|-y) DEFAULTS=true; shift ;;
+    *) echo "Usage: $0 [--config file] [--output dir] [--force] [--detect-only] [--defaults]"; exit 1 ;;
   esac
 done
+
+# Check Node.js availability early
+if ! command -v node &>/dev/null; then
+  echo -e "${RED}Error: Node.js is required but not installed.${NC}"
+  echo -e "Install Node.js from ${CYAN}https://nodejs.org${NC} or use:"
+  echo -e "  ${CYAN}npx shipkit-pipe setup${NC} (auto-installs via npm)"
+  exit 1
+fi
 
 # Helpers
 title() { echo -e "\n${BOLD}${CYAN}===== $1 =====${NC}\n"; }
 step() { echo -e "${GREEN}[*]${NC} $1"; }
 info() { echo -e "  ${YELLOW}$1${NC}"; }
+err()  { echo -e "  ${RED}$1${NC}"; }
 
 read_value() {
   local prompt="$1" default="$2"
+  $DEFAULTS && echo "$default" && return
   local default_str=""
   [ -n "$default" ] && default_str=" [$default]"
   read -r -p "$prompt$default_str: " val
@@ -57,6 +69,7 @@ read_value() {
 read_choice() {
   local prompt="$1"; shift
   local default="$1"; shift
+  $DEFAULTS && echo "$default" && return
   local options=("$@")
   echo -e "${YELLOW}$prompt${NC}"
   for i in "${!options[@]}"; do
@@ -77,6 +90,7 @@ read_choice() {
 
 confirm_yn() {
   local prompt="$1" default="$2"
+  $DEFAULTS && echo "$default" && return
   local default_str="y/N"
   $default && default_str="Y/n"
   read -r -p "$prompt ($default_str): " val
@@ -145,28 +159,22 @@ DETECTED=$(auto_detect)
 
 if $DETECT_ONLY; then
   echo -e "${CYAN}Detected project config:${NC}"
-  echo "$DETECTED" | python3 -m json.tool 2>/dev/null || echo "$DETECTED"
+  echo "$DETECTED" | node -e "process.stdin.on('data',d=>{try{console.log(JSON.stringify(JSON.parse(d),null,2))}catch(e){console.log(d+'')}})" 2>/dev/null || echo "$DETECTED"
   exit 0
 fi
 
-# Extract values from config
+# Extract values from config (using Node.js for JSON parsing)
 get_config_val() {
   local key="$1"
-  echo "$CONFIG" | python3 -c "import sys,json; c=json.load(sys.stdin); print(c.get('$key',''))" 2>/dev/null || true
+  echo "$CONFIG" | node -e "process.stdin.on('data',d=>{try{const c=JSON.parse(d);console.log(c['$key']||'')}catch(e){console.log('')}})" 2>/dev/null || true
 }
 
 get_proj_val() {
-  echo "$CONFIG" | python3 -c "import sys,json; c=json.load(sys.stdin); p=c.get('project',{}); print(p.get('$1',''))" 2>/dev/null || true
+  echo "$CONFIG" | node -e "process.stdin.on('data',d=>{try{const c=JSON.parse(d).project||{};console.log(c['$1']||'')}catch(e){console.log('')}})" 2>/dev/null || true
 }
 
 get_detected_val() {
-  echo "$DETECTED" | python3 -c "import sys,json; c=json.load(sys.stdin); print(c.get('$1',''))" 2>/dev/null || true
-}
-
-# Extract nested config values
-# We'll use python3 for JSON parsing throughout
-parse_json() {
-  python3 -c "import sys,json; d=json.loads(sys.stdin.read()); print(d)" 2>/dev/null || echo "{}"
+  echo "$DETECTED" | node -e "process.stdin.on('data',d=>{try{const c=JSON.parse(d);console.log(c['$1']||'')}catch(e){console.log('')}})" 2>/dev/null || true
 }
 
 # ============================
@@ -241,7 +249,7 @@ GH_OWNER=""
 GH_REPO=""
 
 if command -v gh &>/dev/null; then
-  if [ "$(confirm_yn "GitHub CLI detected. Auto-configure from current repo?" true)" = true ]; then
+  if [ "$(confirm_yn "GitHub CLI detected. Auto-configure from current repo?" false)" = true ]; then
     GH_OWNER=$(gh repo view --json owner --jq .owner.login 2>/dev/null || true)
     GH_REPO=$(gh repo view --json name --jq .name 2>/dev/null || true)
     [ -n "$GH_OWNER" ] && step "Detected: $GH_OWNER / $GH_REPO"
@@ -254,7 +262,7 @@ if [ -z "$GH_OWNER" ]; then
   GH_REPO=$(read_value "GitHub repository name" "$(echo "$PROJ_NAME" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9-')")
 fi
 
-if command -v gh &>/dev/null; then
+if ! $DEFAULTS && command -v gh &>/dev/null; then
   if [ "$(confirm_yn "Authenticate ShipKit with GitHub?" true)" = true ]; then
     GH_TOKEN=$(gh auth token 2>/dev/null || true)
     [ -n "$GH_TOKEN" ] && step "GitHub authenticated."
@@ -286,11 +294,11 @@ DEPLOY_PLATFORM="Vercel"
 
 DEPLOY_TOKEN=""
 DEPLOY_PROJECT_ID=""
-if [ "$DEPLOY_PLATFORM" != "None yet" ]; then
+if ! $DEFAULTS && [ "$DEPLOY_PLATFORM" != "None yet" ]; then
   if [ "$DEPLOY_PLATFORM" = "Vercel" ] && command -v vercel &>/dev/null; then
     if [ "$(confirm_yn "Authenticate with Vercel?" true)" = true ]; then
       DEPLOY_TOKEN=$(vercel token 2>/dev/null || true)
-      DEPLOY_PROJECT_ID=$(vercel project --json 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('id',''))" 2>/dev/null || true)
+      DEPLOY_PROJECT_ID=$(vercel project --json 2>/dev/null | node -e "process.stdin.on('data',d=>{try{console.log(JSON.parse(d).id||'')}catch(e){console.log('')}})" 2>/dev/null || true)
       [ -n "$DEPLOY_PROJECT_ID" ] && step "Vercel project detected."
     fi
   fi
@@ -316,7 +324,7 @@ DB_CHOICE="Supabase Postgres"
 [ -f "firebase.json" ] && DB_CHOICE="Firebase Firestore"
 [ -z "$DB_CHOICE" ] && DB_CHOICE=$(read_choice "Which database do you use?" "Supabase Postgres" $DB_CHOICES)
 
-if [[ "$DB_CHOICE" == "Supabase"* ]] && command -v supabase &>/dev/null; then
+if ! $DEFAULTS && [[ "$DB_CHOICE" == "Supabase"* ]] && command -v supabase &>/dev/null; then
   if [ "$(confirm_yn "Authenticate with Supabase?" true)" = true ]; then
     DB_TOKEN=$(supabase auth token 2>/dev/null || true)
     [ -n "$DB_TOKEN" ] && step "Supabase authenticated."
@@ -337,6 +345,7 @@ title "GENERATING PIPELINE FILES"
 
 TEMPLATE_DIR="$(dirname "$0")/template"
 SCRIPT_DIR="$(dirname "$0")"
+RENDERER="$(dirname "$0")/template/render.js"
 
 # If running from curl pipe, template won't exist locally
 # In that case, we need to download the template
@@ -344,6 +353,7 @@ if [ ! -d "$TEMPLATE_DIR" ] && [ -n "${BASH_SOURCE[0]}" ]; then
   # Try relative to script
   SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
   TEMPLATE_DIR="$SCRIPT_PATH/template"
+  RENDERER="$SCRIPT_PATH/template/render.js"
 fi
 
 # If template still doesn't exist, the user needs to clone the repo
@@ -358,7 +368,7 @@ fi
 PROJECT_ROOT="$(cd "$OUTPUT_DIR" && pwd)"
 
 # Export all template variables as SK_* env vars (safe — no quoting issues)
-# These are read by Python render_template via os.environ
+# These are read by Node.js render_template via process.env
 export_sk_vars() {
   export SK_PROJECT_NAME="$PROJ_NAME"
   export SK_PROJECT_DESCRIPTION="$PROJ_DESC"
@@ -400,52 +410,16 @@ export_sk_vars() {
   export SK_AGENT_CONFIG_FILES="$AGENT_CONFIG_FILES"
 }
 
-# Render template function (uses Python — safe from shell injection)
-# Template is read from file by Python, env vars read via os.environ
+# Render template function (uses Node.js — safe from shell injection)
 render_template() {
   local src="$1"
   local dst="$2"
 
   mkdir -p "$(dirname "$dst")"
 
-  python3 << 'PYEOF' "$src" "$dst"
-import os, re, sys
+  node "$RENDERER" "$src" "$dst"
 
-template_path = sys.argv[1]
-output_path = sys.argv[2]
-
-# Read template from file (safe — no shell expansion)
-with open(template_path) as f:
-    content = f.read()
-
-# Read all SK_* env vars (exported by caller)
-vars_data = {}
-for key, val in os.environ.items():
-    if key.startswith("SK_"):
-        vars_data[key[3:]] = val
-
-# Replace {{VAR}} placeholders (safe — Python handles all special chars)
-for key, val in vars_data.items():
-    content = content.replace("{{" + key + "}}", str(val))
-
-# Handle {% if VAR %}...{% endif %}
-def replace_if(match):
-    var_name = match.group(1)
-    inner = match.group(2)
-    val = vars_data.get(var_name, "")
-    is_truthy = bool(val) and str(val).lower() not in ("false", "0", "")
-    return inner if is_truthy else ""
-
-content = re.sub(
-    r"\{%\s*if\s+(\w+)\s*%\}(.*?)\{%\s*endif\s*%\}",
-    replace_if, content, flags=re.DOTALL
-)
-
-with open(output_path, "w") as f:
-    f.write(content)
-PYEOF
-
-  if [ $? -eq 0 ]; then
+  if [ -f "$dst" ]; then
     step "Created ${dst#$PROJECT_ROOT/}"
     echo "$dst"
   else
@@ -454,7 +428,7 @@ PYEOF
   fi
 }
 
-# Export all SK_* env vars for safe Python rendering
+# Export all SK_* env vars for template rendering
 export_sk_vars
 
 FILES_GENERATED=0
@@ -569,7 +543,7 @@ cat > "$SHIPKIT_JSON" << JSONEOF
     "type": "$DB_CHOICE",
     "rlsEnabled": $([ "$DB_CHOICE" = "${DB_CHOICE#Supabase}" ] && echo "false" || echo "true")
   },
-  "version": "2.0.0"
+  "version": "2.0.1"
 }
 JSONEOF
 step "Created shipkit.json"
